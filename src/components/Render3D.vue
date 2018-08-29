@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import vtkGenericRenderWindow from 'vtk.js/Sources/Rendering/Misc/GenericRenderWindow';
+import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
 import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
 import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
 
@@ -25,8 +25,12 @@ export default {
       const actor = vtkActor.newInstance();
       actor.setMapper(mapper);
 
-      const renderWindowContainer = vtkGenericRenderWindow.newInstance();
-      renderWindowContainer.setContainer(this.$el);
+      const renderWindowContainer = vtkFullScreenRenderWindow.newInstance();
+      // TODO: This has no real mutator, so a warning is logged on '.set'
+      renderWindowContainer.set({
+        rootContainer: this.$el,
+      });
+
       const renderer = renderWindowContainer.getRenderer();
       const renderWindow = renderWindowContainer.getRenderWindow();
       renderer.addActor(actor);
