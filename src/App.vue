@@ -27,25 +27,55 @@
         <v-list-tile @click="true">
           <v-list-tile-content>
             <v-list-tile-title>Upload a VTK PolyData file</v-list-tile-title>
+              <MeshLoader
+                @load="meshLoaded"
+                @error="meshLoadFailed"
+              ></MeshLoader>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
+    <v-dialog v-model="dialog">
+      <v-card>
+        <v-card-title>{{ dialogHeader }}</v-card-title>
+        <v-card-text style="white-space: pre;">{{ dialogMessage }}</v-card-text>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
+
+import MeshLoader from './components/MeshLoader.vue';
 import LungVolume from './components/LungVolume.vue';
 
 export default {
   name: 'App',
   components: {
+    MeshLoader,
     LungVolume,
   },
   data() {
     return {
       drawerOpen: false,
+      dialog: false,
+      dialogHeader: '',
+      dialogMessage: '',
     };
+  },
+  methods: {
+    meshLoaded(polyData) {
+      this.setPolyData(polyData);
+    },
+    meshLoadFailed(message) {
+      this.dialog = true;
+      this.dialogHeader = 'Error';
+      this.dialogMessage = message;
+    },
+    ...mapMutations([
+      'setPolyData',
+    ]),
   },
 };
 </script>

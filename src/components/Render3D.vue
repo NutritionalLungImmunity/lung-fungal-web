@@ -4,14 +4,18 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
 import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
 import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
 
 export default {
   name: 'Render3D',
-  props: {
-    polyData: Object,
+  computed: {
+    ...mapState([
+      'polyData',
+    ]),
   },
   watch: {
     polyData() {
