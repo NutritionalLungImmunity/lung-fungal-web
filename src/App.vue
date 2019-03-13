@@ -6,9 +6,12 @@
       <v-toolbar-title>
         FLungGui
       </v-toolbar-title>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-toolbar-items>
-        <v-btn flat @click.stop="drawerOpen = !drawerOpen">
+        <v-btn
+          flat
+          @click.stop="drawerOpen = !drawerOpen"
+        >
           Load data
         </v-btn>
       </v-toolbar-items>
@@ -17,9 +20,9 @@
       <LungVolume/>
     </v-content>
     <v-navigation-drawer
+      v-model="drawerOpen"
       temporary
       right
-      v-model="drawerOpen"
       fixed
       app
     >
@@ -27,10 +30,10 @@
         <v-list-tile @click="true">
           <v-list-tile-content>
             <v-list-tile-title>Upload a VTK PolyData file</v-list-tile-title>
-              <MeshLoader
-                @load="meshLoaded"
-                @error="meshLoadFailed"
-              ></MeshLoader>
+            <MeshLoader
+              @load="meshLoaded"
+              @error="meshLoadFailed"
+            />
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -47,8 +50,8 @@
 <script>
 import { mapMutations } from 'vuex';
 
-import MeshLoader from './components/MeshLoader.vue';
-import LungVolume from './components/LungVolume.vue';
+import MeshLoader from '@/components/MeshLoader.vue';
+import LungVolume from '@/components/LungVolume.vue';
 
 export default {
   name: 'App',

@@ -1,7 +1,7 @@
 <template>
   <input
-    type="file"
     :accept="accept"
+    type="file"
     @change.stop="filesSelected($event.currentTarget.files)"
   >
 </template>
@@ -12,7 +12,10 @@ import PromiseFileReader from 'promise-file-reader';
 export default {
   name: 'LocalFile',
   props: {
-    accept: String,
+    accept: {
+      type: String,
+      default: '',
+    },
   },
   methods: {
     /**

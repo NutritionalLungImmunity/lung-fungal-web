@@ -1,12 +1,7 @@
-const path = require('path');
 const process = require('process');
 
 module.exports = {
   chainWebpack: (config) => {
-    // Alias "@" to the "./src" directory for imports
-    config.resolve.alias
-      .set('@$', path.resolve(__dirname, 'src'));
-
     // Add vtk.js shader loader
     config.module
       .rule('glsl')

@@ -2,12 +2,12 @@
   <LocalFile
     accept="*.vtp"
     @load="fileLoaded"
-  ></LocalFile>
+  />
 </template>
 
 <script>
 import vtkXMLPolyDataReader from 'vtk.js/Sources/IO/XML/XMLPolyDataReader';
-import LocalFile from './LocalFile.vue';
+import LocalFile from '@/components/LocalFile.vue';
 
 export default {
   name: 'MeshLoader',

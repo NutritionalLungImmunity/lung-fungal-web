@@ -1,11 +1,11 @@
 <template>
   <v-container fluid>
-    <Render3D></Render3D>
+    <Render3D />
   </v-container>
 </template>
 
 <script>
-import Render3D from './Render3D.vue';
+import Render3D from '@/components/Render3D.vue';
 
 export default {
   name: 'LungVolume',
