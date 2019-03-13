@@ -11,3 +11,6 @@ jobs:
       - run:
           name: Run linting
           command: yarn run lint --no-fix
+      - run:
+          name: Build the app
+          command: yarn run build
