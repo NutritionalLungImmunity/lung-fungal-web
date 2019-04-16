@@ -87,6 +87,8 @@ export default {
       this.vtk.sporeActor.setMapper(this.vtk.sporeMapper);
 
       this.vtk.renderer.addActor(this.vtk.sporeActor);
+
+      this.vtk.renderWindow.render();
     },
     macrophageData() {
       if (!this.macrophageData) {
@@ -109,6 +111,8 @@ export default {
 
       // TODO: Disable rendering this, since the data is at the same location as spores
       // this.vtk.renderer.addActor(this.vtk.macrophageActor);
+
+      this.vtk.renderWindow.render();
     },
   },
   mounted() {
