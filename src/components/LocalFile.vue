@@ -18,6 +18,11 @@ export default {
     },
   },
   methods: {
+    async inputChanged(inputElement) {
+      await this.filesSelected(inputElement.files);
+      this.clearFiles(inputElement);
+    },
+
     /**
      * @param {FileList} files
      */
@@ -34,6 +39,11 @@ export default {
       const arrayBuffer = await PromiseFileReader.readAsArrayBuffer(file);
 
       this.$emit('load', arrayBuffer);
+    },
+
+    clearFiles(inputElement) {
+      // eslint-disable-next-line no-param-reassign
+      inputElement.value = null;
     },
   },
 };
