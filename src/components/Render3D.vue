@@ -9,6 +9,7 @@ import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
 import vtkColorTransferFunction from 'vtk.js/Sources/Rendering/Core/ColorTransferFunction';
 import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
 import vtkGlyph3DMapper from 'vtk.js/Sources/Rendering/Core/Glyph3DMapper';
+import vtkLookupTable from 'vtk.js/Sources/Common/Core/LookupTable';
 import vtkPiecewiseFunction from 'vtk.js/Sources/Common/DataModel/PiecewiseFunction';
 import vtkSphereSource from 'vtk.js/Sources/Filters/Sources/SphereSource';
 import vtkVolume from 'vtk.js/Sources/Rendering/Core/Volume';
@@ -33,15 +34,46 @@ export default {
       if (!this.geometryData) {
         return;
       }
-      window.geometryData = this.geometryData;
-      window.vtk = this.vtk;
+      // TODO: handler clearing of data
+      this.vtk.geometryMapper.setInputData(this.geometryData);
+      this.render();
+    },
+    sporeData() {
+      if (!this.sporeData) {
+        return;
+      }
+      this.vtk.sporeMapper.setInputData(this.sporeData, 0);
+      this.render();
+    },
+    macrophageData() {
+      if (!this.macrophageData) {
+        return;
+      }
+      this.vtk.macrophageMapper.setInputData(this.macrophageData, 0);
+      this.render();
+    },
+  },
+  mounted() {
+    this.vtk.renderWindowContainer = vtkFullScreenRenderWindow.newInstance();
+    // TODO: This has no real mutator, so a warning is logged on '.set'
+    this.vtk.renderWindowContainer.set({
+      rootContainer: this.$el,
+    });
 
-      this.vtk.mapper = vtkVolumeMapper.newInstance();
-      this.vtk.mapper.setInputData(this.geometryData);
-      this.vtk.mapper.setSampleDistance(1.1);
+    this.vtk.renderer = this.vtk.renderWindowContainer.getRenderer();
+    this.vtk.renderWindow = this.vtk.renderWindowContainer.getRenderWindow();
 
-      this.vtk.actor = vtkVolume.newInstance();
-      this.vtk.actor.setMapper(this.vtk.mapper);
+    this.createGeometry();
+    this.createSpore();
+    this.createMacrophage();
+  },
+  methods: {
+    createGeometry() {
+      this.vtk.geometryMapper = vtkVolumeMapper.newInstance();
+      this.vtk.geometryMapper.setSampleDistance(1.1);
+
+      this.vtk.geometryActor = vtkVolume.newInstance();
+      this.vtk.geometryActor.setMapper(this.vtk.geometryMapper);
 
       // create color and opacity transfer functions
       const ctfun = vtkColorTransferFunction.newInstance();
@@ -58,72 +90,62 @@ export default {
       // EPITHELIUM = 3
       ctfun.addRGBPoint(3, 0.9, 0.9, 1.0);
       ofun.addPoint(3, 0.25);
-      this.vtk.actor.getProperty().setRGBTransferFunction(0, ctfun);
-      this.vtk.actor.getProperty().setScalarOpacity(0, ofun);
+      this.vtk.geometryActor.getProperty().setRGBTransferFunction(0, ctfun);
+      this.vtk.geometryActor.getProperty().setScalarOpacity(0, ofun);
       // TODO: setInterpolationTypeToNearest should be more precise, since scalars are discrete
-      this.vtk.actor.getProperty().setInterpolationTypeToLinear();
-      this.vtk.actor.getProperty().setUseGradientOpacity(0, false);
+      this.vtk.geometryActor.getProperty().setInterpolationTypeToLinear();
+      this.vtk.geometryActor.getProperty().setUseGradientOpacity(0, false);
 
-      this.vtk.renderer.addVolume(this.vtk.actor);
-      this.vtk.renderer.resetCamera();
-
-      this.vtk.renderWindow.render();
+      this.vtk.renderer.addVolume(this.vtk.geometryActor);
     },
-    sporeData() {
-      if (!this.sporeData) {
-        return;
-      }
-      window.sporeData = this.sporeData;
+    createSpore() {
       this.vtk.sporeGlyphSource = vtkSphereSource.newInstance();
 
       this.vtk.sporeMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
         scaleFactor: 0.6,
       });
-      this.vtk.sporeMapper.setInputData(this.sporeData, 0);
       this.vtk.sporeMapper.setInputConnection(this.vtk.sporeGlyphSource.getOutputPort(), 1);
+
+      this.vtk.sporeLookupTable = vtkLookupTable.newInstance({
+        numberOfColors: 1,
+        hueRange: [0.3],
+      });
+      this.vtk.sporeMapper.setLookupTable(this.vtk.sporeLookupTable);
 
       this.vtk.sporeActor = vtkActor.newInstance();
       this.vtk.sporeActor.setMapper(this.vtk.sporeMapper);
 
       this.vtk.renderer.addActor(this.vtk.sporeActor);
-
-      this.vtk.renderWindow.render();
     },
-    macrophageData() {
-      if (!this.macrophageData) {
-        return;
-      }
-      window.macrophageData = this.macrophageData;
+    createMacrophage() {
       this.vtk.macrophageGlyphSource = vtkSphereSource.newInstance();
 
       this.vtk.macrophageMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
         scaleFactor: 0.4,
       });
-      this.vtk.macrophageMapper.setInputData(this.macrophageData, 0);
       this.vtk.macrophageMapper
         .setInputConnection(this.vtk.macrophageGlyphSource.getOutputPort(), 1);
-      // TODO: Change rendered color via this.vtk.macrophageMapper.getLookupTable()
+
+      this.vtk.macrophageLookupTable = vtkLookupTable.newInstance({
+        numberOfColors: 1,
+        hueRange: [0.6],
+      });
+      this.vtk.macrophageMapper.setLookupTable(this.vtk.macrophageLookupTable);
 
       this.vtk.macrophageActor = vtkActor.newInstance();
       this.vtk.macrophageActor.setMapper(this.vtk.macrophageMapper);
 
-      // TODO: Disable rendering this, since the data is at the same location as spores
-      // this.vtk.renderer.addActor(this.vtk.macrophageActor);
-
-      this.vtk.renderWindow.render();
+      // TODO: Rendering can be disabled here
+      this.vtk.renderer.addActor(this.vtk.macrophageActor);
     },
-  },
-  mounted() {
-    this.vtk.renderWindowContainer = vtkFullScreenRenderWindow.newInstance();
-    // TODO: This has no real mutator, so a warning is logged on '.set'
-    this.vtk.renderWindowContainer.set({
-      rootContainer: this.$el,
-    });
-
-    this.vtk.renderer = this.vtk.renderWindowContainer.getRenderer();
-    this.vtk.renderWindow = this.vtk.renderWindowContainer.getRenderWindow();
+    render() {
+      if (this.geometryData && this.sporeData && this.macrophageData) {
+        this.vtk.renderer.resetCamera();
+        this.vtk.renderWindow.render();
+      }
+    },
   },
 };
 </script>
