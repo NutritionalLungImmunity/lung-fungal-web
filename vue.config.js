@@ -27,4 +27,9 @@ module.exports = {
       config.output.globalObject('this');
     }
   },
+  transpileDependencies: [
+    'vtk.js',
+  ],
+  // https://github.com/webpack-contrib/worker-loader/issues/177
+  parallel: false,
 };

@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import '@babel/polyfill';
+
 import Vue from 'vue';
 
 import '@/plugins/static';

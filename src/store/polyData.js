@@ -5,9 +5,11 @@ import vtkXMLPolyDataReader from 'vtk.js/Sources/IO/XML/XMLPolyDataReader';
 export default {
   namespaced: true,
 
-  state: {
-    polyData: null,
-    error: null,
+  state() {
+    return {
+      polyData: null,
+      error: null,
+    };
   },
   mutations: {
     /**

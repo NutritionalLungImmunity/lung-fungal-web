@@ -5,9 +5,11 @@ import vtkXMLImageDataReader from 'vtk.js/Sources/IO/XML/XMLImageDataReader';
 export default {
   namespaced: true,
 
-  state: {
-    imageData: null,
-    error: null,
+  state() {
+    return {
+      imageData: null,
+      error: null,
+    };
   },
   mutations: {
     /**

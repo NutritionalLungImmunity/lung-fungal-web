@@ -9,11 +9,10 @@
       <v-spacer />
       <v-toolbar-items>
         <v-btn
-          disabled
           flat
           @click.stop="drawerOpen = !drawerOpen"
         >
-          Load data
+          Select time point
         </v-btn>
       </v-toolbar-items>
     </v-toolbar>
@@ -22,12 +21,12 @@
     </v-content>
     <v-navigation-drawer
       v-model="drawerOpen"
-      temporary
       right
       fixed
       app
     >
       <v-list>
+        <!--
         <v-list-tile @click="true">
           <v-list-tile-content>
             <v-list-tile-title>Upload a VTK ImageData file</v-list-tile-title>
@@ -38,6 +37,17 @@
             />
           </v-list-tile-content>
         </v-list-tile>
+        -->
+
+        <v-list-tile
+          v-for="timepoint in sortedTimepoints"
+          :key="timepoint"
+          @click="loadTimepoint(timepoint)">
+          <v-list-tile-content>
+            <v-list-tile-title>{{ timepoint }}</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+
       </v-list>
     </v-navigation-drawer>
     <v-dialog v-model="dialog">
@@ -50,15 +60,16 @@
 </template>
 
 <script>
+import sortBy from 'lodash/sortBy';
 import { mapMutations, mapActions } from 'vuex';
 
-import LocalFile from '@/components/LocalFile.vue';
+// import LocalFile from '@/components/LocalFile.vue';
 import LungVolume from '@/components/LungVolume.vue';
 
 export default {
   name: 'VolumePage',
   components: {
-    LocalFile,
+    // LocalFile,
     LungVolume,
   },
   data() {
@@ -68,30 +79,42 @@ export default {
       dialog: false,
       dialogHeader: '',
       dialogMessage: '',
+      timepoints: {
+        '000': {
+          geometry: '5cda564eef2e260353a5190a',
+          spore: '5cda564eef2e260353a51907',
+          macrophage: '5cda564eef2e260353a51904',
+        },
+        '001': {
+          geometry: '5cda565bef2e260353a51913',
+          spore: '5cda565aef2e260353a51910',
+          macrophage: '5cda565aef2e260353a5190d',
+        },
+        150: {
+          geometry: '5cda5f0bef2e260353a5191e',
+          spore: '5cda5f0bef2e260353a5191b',
+          macrophage: '5cda5f0aef2e260353a51918',
+        },
+      },
     };
+  },
+  computed: {
+    sortedTimepoints() {
+      return sortBy(Object.keys(this.timepoints), parseInt);
+    },
   },
   created() {
-    const dataFiles = {
-      '000': {
-        geometry: '5cb56dd4ef2e260353a50f08',
-        spore: '5cb56f28ef2e260353a50f0f',
-        macrophage: '5cb56f33ef2e260353a50f12',
-      },
-      '001': {
-        geometry: '5cb56e0bef2e260353a50f0c',
-        spore: '5cb56f52ef2e260353a50f15',
-        macrophage: '5cb56f5aef2e260353a50f18',
-      },
-    };
-    const dataUrl = dataFile => `https://data.computational-biology.org/api/v1/file/${dataFile}/download`;
-
-    const fileNum = '001';
-
-    this.loadGeometryDataUrl({ fileUrl: dataUrl(dataFiles[fileNum].geometry) });
-    this.loadSporeDataUrl({ fileUrl: dataUrl(dataFiles[fileNum].spore) });
-    this.loadMacrophageDataUrl({ fileUrl: dataUrl(dataFiles[fileNum].macrophage) });
+    this.loadTimepoint('000');
   },
   methods: {
+    loadTimepoint(timepoint) {
+      const dataUrl = dataFile => `https://data.computational-biology.org/api/v1/file/${dataFile}/download`;
+      const timepointFiles = this.timepoints[timepoint];
+
+      this.loadGeometryDataUrl({ fileUrl: dataUrl(timepointFiles.geometry) });
+      this.loadSporeDataUrl({ fileUrl: dataUrl(timepointFiles.spore) });
+      this.loadMacrophageDataUrl({ fileUrl: dataUrl(timepointFiles.macrophage) });
+    },
     /**
      * @param {ArrayBuffer} arrayBuffer
      */
