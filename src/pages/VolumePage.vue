@@ -60,10 +60,10 @@
 </template>
 
 <script>
-import sortBy from 'lodash/sortBy';
+// import sortBy from 'lodash/sortBy';
 import { mapMutations, mapActions } from 'vuex';
-import axios from 'axios'
 
+import http from '@/http';
 // import LocalFile from '@/components/LocalFile.vue';
 import LungVolume from '@/components/LungVolume.vue';
 
@@ -82,18 +82,16 @@ export default {
       dialogMessage: '',
       timepointsIDs: {},
       timepoints: [],
-      http: axios.create({
-        baseURL: 'https://data.computational-biology.org/api/v1/'
-      })
     };
   },
   computed: {
     sortedTimepoints() {
-      return this.timepoints.sort()
+      const tempTimepoints = this.timepoints.slice();
+      return tempTimepoints.sort();
     },
   },
   async created() {
-    await this.getTPs()
+    await this.getTPs();
     this.loadTimepoint('000');
   },
   methods: {
@@ -101,54 +99,46 @@ export default {
       const dataUrl = dataFile => `https://data.computational-biology.org/api/v1/file/${dataFile}/download`;
       const timepointFolderID = this.timepointsIDs[timepoint];
 
-      const timepointFiles = await this.getTPData(timepointFolderID)
+      const timepointFiles = await this.getTPData(timepointFolderID);
       this.loadGeometryDataUrl({ fileUrl: dataUrl(timepointFiles.geometry) });
       this.loadSporeDataUrl({ fileUrl: dataUrl(timepointFiles.spore) });
       this.loadMacrophageDataUrl({ fileUrl: dataUrl(timepointFiles.macrophage) });
     },
-    async getTPs () {
-      try {
-        let timepointFolderIDs = this.timepointsIDs
+    async getTPs() {
+      const timepointFolderIDs = this.timepointsIDs;
 
-        const timepointFolders = (await this.http.get('folder', {
-          params: {
-            parentType: 'folder',
-            parentId: '5cb56d8cef2e260353a50f04'
-          }
-        })).data
+      const timepointFolders = (await http.get('folder', {
+        params: {
+          parentType: 'folder',
+          parentId: '5cb56d8cef2e260353a50f04',
+        },
+      })).data;
 
-        for (let i = 0; i < timepointFolders.length; i++) {
-          timepointFolderIDs[timepointFolders[i].name] = timepointFolders[i]._id
-          this.timepoints.push(timepointFolders[i].name)
-        }
-      } catch (err) {
-        console.error(err)
+      for (let i = 0; i < timepointFolders.length; i += 1) {
+        timepointFolderIDs[timepointFolders[i].name] = timepointFolders[i]._id;
+        this.timepoints.push(timepointFolders[i].name);
       }
     },
-    async getTPData (TPFolderID) {
-      try {
-        const dataItems = (await this.http.get('item', {
-          params: {
-            folderId: TPFolderID
-          }
-        })).data
-        const dataFilesPromises = dataItems.map((dataItem) => {
-          const path = 'item/' + dataItem._id + '/files'
-          return this.http.get(path)
-        })
-        const dataFilesResponses = await Promise.all(dataFilesPromises)
-        const dataFiles = dataFilesResponses.map((dataFileResponse) => dataFileResponse.data)
+    async getTPData(TPFolderID) {
+      const dataItems = (await http.get('item', {
+        params: {
+          folderId: TPFolderID,
+        },
+      })).data;
+      const dataFilesPromises = dataItems.map((dataItem) => {
+        const path = `item/${dataItem._id}/files`;
+        return http.get(path);
+      });
+      const dataFilesResponses = await Promise.all(dataFilesPromises);
+      const dataFiles = dataFilesResponses.map(dataFileResponse => dataFileResponse.data);
 
-        let dataFilesIDs = {}
-        for (let i = 0; i < dataFiles.length; i++) {
-          const dataFile = dataFiles[i][0]
-          var fullname = dataFile.name
-          dataFilesIDs[fullname.substring(0, fullname.length - 8)] = dataFile._id
-        }
-        return dataFilesIDs
-      } catch (err) {
-        console.error(err)
+      const dataFilesIDs = {};
+      for (let i = 0; i < dataFiles.length; i += 1) {
+        const dataFile = dataFiles[i][0];
+        const fullname = dataFile.name;
+        dataFilesIDs[fullname.substring(0, fullname.length - 8)] = dataFile._id;
       }
+      return dataFilesIDs;
     },
     /**
      * @param {ArrayBuffer} arrayBuffer
