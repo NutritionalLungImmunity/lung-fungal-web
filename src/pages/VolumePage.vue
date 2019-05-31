@@ -108,18 +108,18 @@ export default {
     },
     async getTPs () {
       try {
-        let timePointFolderIDs = this.timepointsIDs
+        let timepointFolderIDs = this.timepointsIDs
 
-        const timePointFolders = (await this.http.get('folder', {
+        const timepointFolders = (await this.http.get('folder', {
           params: {
             parentType: 'folder',
             parentId: '5cb56d8cef2e260353a50f04'
           }
         })).data
 
-        for (let i = 0; i < timePointFolders.length; i++) {
-          timePointFolderIDs[timePointFolders[i].name] = timePointFolders[i]._id
-          this.timepoints.push(timePointFolders[i].name)
+        for (let i = 0; i < timepointFolders.length; i++) {
+          timepointFolderIDs[timepointFolders[i].name] = timepointFolders[i]._id
+          this.timepoints.push(timepointFolders[i].name)
         }
       } catch (err) {
         console.error(err)
@@ -136,13 +136,14 @@ export default {
           const path = 'item/' + dataItem._id + '/files'
           return this.http.get(path)
         })
-        const dataFilesResponse = await Promise.all(dataFilesPromises)
-        const dataFiles = dataFilesResponse.map((dataFileResponse) => dataFileResponse.data)
+        const dataFilesResponses = await Promise.all(dataFilesPromises)
+        const dataFiles = dataFilesResponses.map((dataFileResponse) => dataFileResponse.data)
 
         let dataFilesIDs = {}
         for (let i = 0; i < dataFiles.length; i++) {
-          var fullname = dataFiles[i][0].name
-          dataFilesIDs[fullname.substring(0, fullname.length - 8)] = dataFiles[i][0]._id
+          const dataFile = dataFiles[i][0]
+          var fullname = dataFile.name
+          dataFilesIDs[fullname.substring(0, fullname.length - 8)] = dataFile._id
         }
         return dataFilesIDs
       } catch (err) {
