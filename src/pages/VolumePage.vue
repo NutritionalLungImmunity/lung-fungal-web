@@ -106,11 +106,14 @@ export default {
     },
     async getTPs() {
       const timepointFolderIDs = this.timepointsIDs;
+      const rootID = '5cf18200ef2e260353a51922'
 
+      const timepointInfo = (await http.get('folder/' + rootID + '/details')).data
       const timepointFolders = (await http.get('folder', {
         params: {
           parentType: 'folder',
-          parentId: '5cb56d8cef2e260353a50f04',
+          parentId: rootID,
+          limit: timepointInfo.nItems
         },
       })).data;
 
@@ -136,7 +139,7 @@ export default {
       for (let i = 0; i < dataFiles.length; i += 1) {
         const dataFile = dataFiles[i][0];
         const fullname = dataFile.name;
-        dataFilesIDs[fullname.substring(0, fullname.length - 8)] = dataFile._id;
+        dataFilesIDs[fullname.substring(0, fullname.indexOf('_'))] = dataFile._id;
       }
       return dataFilesIDs;
     },
