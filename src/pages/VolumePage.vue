@@ -10,6 +10,33 @@
       <v-toolbar-items>
         <v-btn
           flat
+          icon
+          color="black"
+          @click="previous()"
+        >
+          <v-icon>skip_previous</v-icon>
+        </v-btn>
+        <v-btn
+          flat
+          icon
+          color="black"
+          @click="togglestatus()"
+        >
+          <v-icon>{{ playstatus }}</v-icon>
+        </v-btn>
+        <v-btn
+          flat
+          icon
+          color="black"
+          @click="next()"
+        >
+          <v-icon>skip_next</v-icon>
+        </v-btn>
+      </v-toolbar-items>
+      <v-spacer />
+      <v-toolbar-items>
+        <v-btn
+          flat
           @click.stop="drawerOpen = !drawerOpen"
         >
           Select time point
@@ -82,6 +109,9 @@ export default {
       dialogMessage: '',
       timepointsIDs: {},
       timepoints: [],
+      playstatus: 'play_arrow',
+      currentTP: '',
+      interval: setInterval(this.play, 500),
     };
   },
   computed: {
@@ -95,7 +125,41 @@ export default {
     this.loadTimepoint('000');
   },
   methods: {
+    togglestatus() {
+      if (this.playstatus === 'play_arrow') {
+        this.playstatus = 'pause';
+      } else if (this.playstatus === 'pause') {
+        this.playstatus = 'play_arrow';
+      } else {
+        throw new Error(`unknown status: ${this.playstatus}`);
+      }
+    },
+    play() {
+      if (this.playstatus === 'pause') {
+        this.next();
+      }
+    },
+    convertNum(num) {
+      const stringNum = `00${num.toString(10)}`;
+      return stringNum.substring(stringNum.length - 3);
+    },
+    next() {
+      let tp = parseInt(this.currentTP, 10);
+      if (tp < 150) {
+        tp += 1;
+        this.loadTimepoint(this.convertNum(tp));
+      }
+    },
+    previous() {
+      let tp = parseInt(this.currentTP, 10);
+      if (tp > 0) {
+        tp -= 1;
+        this.loadTimepoint(this.convertNum(tp));
+      }
+    },
     async loadTimepoint(timepoint) {
+      this.currentTP = timepoint;
+      console.log(`loading ${timepoint}`);
       const dataUrl = dataFile => `https://data.computational-biology.org/api/v1/file/${dataFile}/download`;
       const timepointFolderID = this.timepointsIDs[timepoint];
 
@@ -106,14 +170,14 @@ export default {
     },
     async getTPs() {
       const timepointFolderIDs = this.timepointsIDs;
-      const rootID = '5cf18200ef2e260353a51922'
+      const rootID = '5cf18200ef2e260353a51922';
 
-      const timepointInfo = (await http.get('folder/' + rootID + '/details')).data
+      const timepointInfo = (await http.get(`folder/${rootID}/details`)).data;
       const timepointFolders = (await http.get('folder', {
         params: {
           parentType: 'folder',
           parentId: rootID,
-          limit: timepointInfo.nItems
+          limit: timepointInfo.nItems,
         },
       })).data;
 
