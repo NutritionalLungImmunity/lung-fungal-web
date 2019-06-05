@@ -8,6 +8,25 @@
       </v-toolbar-title>
       <v-spacer />
       <v-toolbar-items>
+        <v-flex xs12>
+          <v-slider
+            v-model="currentTP"
+            max="150"
+            id="sliderTP"
+          ></v-slider>
+        </v-flex>
+      </v-toolbar-items>
+      <v-toolbar-items>
+        <v-flex xs12 sm6 md3>
+          <v-text-field
+            v-model="currentTP"
+            id="currentTP"
+          ></v-text-field>
+        </v-flex>
+        <p id="fraction">/ 150</p>
+      </v-toolbar-items>
+      <v-spacer />
+      <v-toolbar-items>
         <v-btn
           flat
           icon
@@ -32,9 +51,6 @@
         >
           <v-icon>skip_next</v-icon>
         </v-btn>
-      </v-toolbar-items>
-      <v-spacer />
-      <v-toolbar-items>
         <v-btn
           flat
           @click.stop="drawerOpen = !drawerOpen"
@@ -46,6 +62,15 @@
     <v-content>
       <LungVolume/>
     </v-content>
+    <v-footer>
+        <v-flex xs12>
+          <v-slider
+            v-model="currentTP"
+            max="150"
+            id="sliderTP"
+          ></v-slider>
+        </v-flex>
+    </v-footer>
     <v-navigation-drawer
       v-model="drawerOpen"
       right
@@ -87,7 +112,6 @@
 </template>
 
 <script>
-// import sortBy from 'lodash/sortBy';
 import { mapMutations, mapActions } from 'vuex';
 
 import http from '@/http';
@@ -110,8 +134,7 @@ export default {
       timepointsIDs: {},
       timepoints: [],
       playstatus: 'play_arrow',
-      currentTP: '',
-      interval: setInterval(this.play, 500),
+      currentTP: 0,
     };
   },
   computed: {
@@ -120,9 +143,15 @@ export default {
       return tempTimepoints.sort();
     },
   },
+  watch: {
+    currentTP: function (val) {
+      this.loadTimepoint(this.convertNum(val))
+    }
+  },
   async created() {
     await this.getTPs();
     this.loadTimepoint('000');
+    setInterval(this.play, 500);
   },
   methods: {
     togglestatus() {
@@ -144,22 +173,19 @@ export default {
       return stringNum.substring(stringNum.length - 3);
     },
     next() {
-      let tp = parseInt(this.currentTP, 10);
-      if (tp < 150) {
-        tp += 1;
-        this.loadTimepoint(this.convertNum(tp));
+      if (this.currentTP < 150) {
+        this.currentTP += 1;
+        this.loadTimepoint(this.convertNum(this.currentTP));
       }
     },
     previous() {
-      let tp = parseInt(this.currentTP, 10);
-      if (tp > 0) {
-        tp -= 1;
-        this.loadTimepoint(this.convertNum(tp));
+      if (this.currentTP > 0) {
+        this.currentTP -= 1;
+        this.loadTimepoint(this.convertNum(this.currentTP));
       }
     },
     async loadTimepoint(timepoint) {
-      this.currentTP = timepoint;
-      console.log(`loading ${timepoint}`);
+      this.currentTP = parseInt(timepoint, 10);
       const dataUrl = dataFile => `https://data.computational-biology.org/api/v1/file/${dataFile}/download`;
       const timepointFolderID = this.timepointsIDs[timepoint];
 
@@ -192,18 +218,14 @@ export default {
           folderId: TPFolderID,
         },
       })).data;
-      const dataFilesPromises = dataItems.map((dataItem) => {
-        const path = `item/${dataItem._id}/files`;
-        return http.get(path);
-      });
+      const dataFilesPromises = dataItems.map((dataItem) => http.get(`item/${dataItem._id}/files`));
       const dataFilesResponses = await Promise.all(dataFilesPromises);
       const dataFiles = dataFilesResponses.map(dataFileResponse => dataFileResponse.data);
 
       const dataFilesIDs = {};
       for (let i = 0; i < dataFiles.length; i += 1) {
         const dataFile = dataFiles[i][0];
-        const fullname = dataFile.name;
-        dataFilesIDs[fullname.substring(0, fullname.indexOf('_'))] = dataFile._id;
+        dataFilesIDs[dataFile.name.substring(0, dataFile.name.indexOf('_'))] = dataFile._id;
       }
       return dataFilesIDs;
     },
@@ -232,3 +254,19 @@ export default {
   },
 };
 </script>
+
+<style>
+#fraction {
+  margin-top: 16px;
+  margin-left: 7px;
+  font-size: 12pt;
+}
+#currentTP {
+  max-width: 75px;
+  text-align: right;
+}
+#sliderTP {
+  margin-top: 15px;
+  margin-right: 20px;
+}
+</style>
