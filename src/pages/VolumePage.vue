@@ -7,56 +7,8 @@
         FLungGui
       </v-toolbar-title>
       <v-spacer />
+      <TimeControl/>
       <v-toolbar-items>
-        <v-flex xs12>
-          <v-slider
-            id="sliderTP"
-            v-model="tpIndex"
-            :max="max"
-          />
-        </v-flex>
-      </v-toolbar-items>
-      <v-toolbar-items>
-        <v-flex
-          xs12
-          sm6
-          md3
-        >
-          <v-text-field
-            id="currentTP"
-            v-model="tpIndex"
-            :value="timepoints[tpIndex]" />
-        </v-flex>
-        <p id="fraction">
-          / {{ max }}
-        </p>
-      </v-toolbar-items>
-      <v-spacer />
-      <v-toolbar-items>
-        <v-btn
-          flat
-          icon
-          color="black"
-          @click="previous()"
-        >
-          <v-icon>skip_previous</v-icon>
-        </v-btn>
-        <v-btn
-          flat
-          icon
-          color="black"
-          @click="toggle()"
-        >
-          <v-icon>{{ playstatus }}</v-icon>
-        </v-btn>
-        <v-btn
-          flat
-          icon
-          color="black"
-          @click="next()"
-        >
-          <v-icon>skip_next</v-icon>
-        </v-btn>
         <v-btn
           flat
           @click.stop="drawerOpen = !drawerOpen"
@@ -112,6 +64,7 @@ import { mapMutations, mapActions } from 'vuex';
 
 // import LocalFile from '@/components/LocalFile.vue';
 import LungVolume from '@/components/LungVolume.vue';
+import TimeControl from '@/components/TimeControl.vue';
 import http from '@/http';
 
 export default {
@@ -119,6 +72,7 @@ export default {
   components: {
     // LocalFile,
     LungVolume,
+    TimeControl,
   },
   data() {
     return {
@@ -129,9 +83,6 @@ export default {
       dialogMessage: '',
       timepointsInfo: {},
       timepoints: [],
-      playstatus: 'play_arrow',
-      tpIndex: 0,
-      max: 0,
     };
   },
   computed: {
@@ -140,57 +91,10 @@ export default {
       return tempTimepoints.sort();
     },
   },
-  watch: {
-    tpIndex(val) {
-      if (val >= 0 && val <= this.max) {
-        this.loadTimepoint(this.timepoints[val]);
-      }
-    },
-  },
   async created() {
     await this.getTPs();
-    this.loadTimepoint('000');
-    setInterval(this.play, 500);
-    this.max = this.timepoints.length - 1;
   },
   methods: {
-    toggle() {
-      if (this.playstatus === 'play_arrow') {
-        this.playstatus = 'pause';
-      } else if (this.playstatus === 'pause') {
-        this.playstatus = 'play_arrow';
-      } else {
-        throw new Error(`unknown status: ${this.playstatus}`);
-      }
-    },
-    play() {
-      if (this.playstatus === 'pause') {
-        this.next();
-      }
-    },
-    next() {
-      if (this.tpIndex < this.timepoints.length) {
-        this.tpIndex += 1;
-        this.loadTimepoint(this.timepoints[this.tpIndex]);
-      }
-    },
-    previous() {
-      if (this.tpIndex > 0) {
-        this.tpIndex -= 1;
-        this.loadTimepoint(this.timepoints[this.tpIndex]);
-      }
-    },
-    async loadTimepoint(timepoint) {
-      const dataUrl = dataFile => `https://data.computational-biology.org/api/v1/file/${dataFile}/download`;
-      const timepointInfo = this.timepointsInfo[timepoint];
-      const timepointFolderID = timepointInfo.id;
-      this.tpIndex = timepointInfo.index;
-
-      const timepointFiles = await this.getTPData(timepointFolderID);
-      this.loadGeometryDataUrl({ fileUrl: dataUrl(timepointFiles.geometry) });
-      this.loadSporeDataUrl({ fileUrl: dataUrl(timepointFiles.spore) });
-      this.loadMacrophageDataUrl({ fileUrl: dataUrl(timepointFiles.macrophage) });
-    },
     async getTPs() {
       const rootID = '5cf18200ef2e260353a51922';
 
