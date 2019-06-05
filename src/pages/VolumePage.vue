@@ -110,9 +110,9 @@
 <script>
 import { mapMutations, mapActions } from 'vuex';
 
-import http from '@/http';
 // import LocalFile from '@/components/LocalFile.vue';
 import LungVolume from '@/components/LungVolume.vue';
+import http from '@/http';
 
 export default {
   name: 'VolumePage',
