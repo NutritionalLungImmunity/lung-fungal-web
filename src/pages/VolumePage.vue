@@ -10,18 +10,21 @@
       <v-toolbar-items>
         <v-flex xs12>
           <v-slider
+            id="sliderTP"
             v-model="currentTP"
             max="150"
-            id="sliderTP"
-          ></v-slider>
+          />
         </v-flex>
       </v-toolbar-items>
       <v-toolbar-items>
-        <v-flex xs12 sm6 md3>
+        <v-flex
+          xs12
+          sm6
+          md3
+        >
           <v-text-field
-            v-model="currentTP"
             id="currentTP"
-          ></v-text-field>
+            v-model="currentTP" />
         </v-flex>
         <p id="fraction">/ 150</p>
       </v-toolbar-items>
@@ -62,15 +65,6 @@
     <v-content>
       <LungVolume/>
     </v-content>
-    <v-footer>
-        <v-flex xs12>
-          <v-slider
-            v-model="currentTP"
-            max="150"
-            id="sliderTP"
-          ></v-slider>
-        </v-flex>
-    </v-footer>
     <v-navigation-drawer
       v-model="drawerOpen"
       right
@@ -90,7 +84,6 @@
           </v-list-tile-content>
         </v-list-tile>
         -->
-
         <v-list-tile
           v-for="timepoint in sortedTimepoints"
           :key="timepoint"
@@ -144,9 +137,9 @@ export default {
     },
   },
   watch: {
-    currentTP: function (val) {
-      this.loadTimepoint(this.convertNum(val))
-    }
+    currentTP(val) {
+      this.loadTimepoint(this.convertNum(val));
+    },
   },
   async created() {
     await this.getTPs();
@@ -218,8 +211,8 @@ export default {
           folderId: TPFolderID,
         },
       })).data;
-      const dataFilesPromises = dataItems.map((dataItem) => http.get(`item/${dataItem._id}/files`));
-      const dataFilesResponses = await Promise.all(dataFilesPromises);
+      const dataFilesPromises = dataItems.map(dataItem => http.get(`item/${dataItem._id}/files`));
+      const dataFilesResponses = await (Promise.all(dataFilesPromises));
       const dataFiles = dataFilesResponses.map(dataFileResponse => dataFileResponse.data);
 
       const dataFilesIDs = {};
