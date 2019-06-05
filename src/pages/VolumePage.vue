@@ -11,8 +11,8 @@
         <v-flex xs12>
           <v-slider
             id="sliderTP"
-            v-model="currentTP"
-            max="150"
+            v-model="tpIndex"
+            :max="max"
           />
         </v-flex>
       </v-toolbar-items>
@@ -24,9 +24,12 @@
         >
           <v-text-field
             id="currentTP"
-            v-model="currentTP" />
+            v-model="tpIndex"
+            :value="timepoints[tpIndex]" />
         </v-flex>
-        <p id="fraction">/ 150</p>
+        <p id="fraction">
+          / {{ max }}
+        </p>
       </v-toolbar-items>
       <v-spacer />
       <v-toolbar-items>
@@ -42,7 +45,7 @@
           flat
           icon
           color="black"
-          @click="togglestatus()"
+          @click="toggle()"
         >
           <v-icon>{{ playstatus }}</v-icon>
         </v-btn>
@@ -124,10 +127,11 @@ export default {
       dialog: false,
       dialogHeader: '',
       dialogMessage: '',
-      timepointsIDs: {},
+      timepointsInfo: {},
       timepoints: [],
       playstatus: 'play_arrow',
-      currentTP: 0,
+      tpIndex: 0,
+      max: 0,
     };
   },
   computed: {
@@ -137,17 +141,20 @@ export default {
     },
   },
   watch: {
-    currentTP(val) {
-      this.loadTimepoint(this.convertNum(val));
+    tpIndex(val) {
+      if (val >= 0 && val <= this.max) {
+        this.loadTimepoint(this.timepoints[val]);
+      }
     },
   },
   async created() {
     await this.getTPs();
     this.loadTimepoint('000');
     setInterval(this.play, 500);
+    this.max = this.timepoints.length - 1;
   },
   methods: {
-    togglestatus() {
+    toggle() {
       if (this.playstatus === 'play_arrow') {
         this.playstatus = 'pause';
       } else if (this.playstatus === 'pause') {
@@ -161,26 +168,23 @@ export default {
         this.next();
       }
     },
-    convertNum(num) {
-      const stringNum = `00${num.toString(10)}`;
-      return stringNum.substring(stringNum.length - 3);
-    },
     next() {
-      if (this.currentTP < 150) {
-        this.currentTP += 1;
-        this.loadTimepoint(this.convertNum(this.currentTP));
+      if (this.tpIndex < this.timepoints.length) {
+        this.tpIndex += 1;
+        this.loadTimepoint(this.timepoints[this.tpIndex]);
       }
     },
     previous() {
-      if (this.currentTP > 0) {
-        this.currentTP -= 1;
-        this.loadTimepoint(this.convertNum(this.currentTP));
+      if (this.tpIndex > 0) {
+        this.tpIndex -= 1;
+        this.loadTimepoint(this.timepoints[this.tpIndex]);
       }
     },
     async loadTimepoint(timepoint) {
-      this.currentTP = parseInt(timepoint, 10);
       const dataUrl = dataFile => `https://data.computational-biology.org/api/v1/file/${dataFile}/download`;
-      const timepointFolderID = this.timepointsIDs[timepoint];
+      const timepointInfo = this.timepointsInfo[timepoint];
+      const timepointFolderID = timepointInfo.id;
+      this.tpIndex = timepointInfo.index;
 
       const timepointFiles = await this.getTPData(timepointFolderID);
       this.loadGeometryDataUrl({ fileUrl: dataUrl(timepointFiles.geometry) });
@@ -188,7 +192,6 @@ export default {
       this.loadMacrophageDataUrl({ fileUrl: dataUrl(timepointFiles.macrophage) });
     },
     async getTPs() {
-      const timepointFolderIDs = this.timepointsIDs;
       const rootID = '5cf18200ef2e260353a51922';
 
       const timepointInfo = (await http.get(`folder/${rootID}/details`)).data;
@@ -201,7 +204,11 @@ export default {
       })).data;
 
       for (let i = 0; i < timepointFolders.length; i += 1) {
-        timepointFolderIDs[timepointFolders[i].name] = timepointFolders[i]._id;
+        const timepoint = {
+          index: i,
+          id: timepointFolders[i]._id,
+        };
+        this.timepointsInfo[timepointFolders[i].name] = timepoint;
         this.timepoints.push(timepointFolders[i].name);
       }
     },
