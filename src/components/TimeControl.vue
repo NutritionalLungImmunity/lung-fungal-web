@@ -34,29 +34,30 @@
       >
         <v-icon>skip_previous</v-icon>
       </v-btn>
-        <v-btn
-          flat
-          icon
-          color="black"
-          @click="toggle()"
-        >
-          <v-icon>{{ playstatus }}</v-icon>
-        </v-btn>
-        <v-btn
-          flat
-          icon
-          color="black"
-          @click="next()"
-        >
-          <v-icon>skip_next</v-icon>
-        </v-btn>
-      </v-toolbar-items>
+      <v-btn
+        flat
+        icon
+        color="black"
+        @click="toggle()"
+      >
+        <v-icon>{{ playstatus }}</v-icon>
+      </v-btn>
+      <v-btn
+        flat
+        icon
+        color="black"
+        @click="next()"
+      >
+        <v-icon>skip_next</v-icon>
+      </v-btn>
+    </v-toolbar-items>
   </v-layout>
 </template>
 
 <script>
+import { mapMutations, mapActions } from 'vuex';
+
 import http from '@/http';
-import VolumePage from '@/pages/VolumePage.vue';
 
 export default {
   name: 'TimeControl',
@@ -65,25 +66,26 @@ export default {
       playstatus: 'play_arrow',
       max: 0,
       tpIndex: 0,
-      timepoints: ['000'],
+      timepoints: [],
+      timepointsInfo: {},
     };
   },
-  created() {
-    this.timepoints = VolumePage.timepoints;
-    debugger
-    this.loadTimepoint('000');
-    setInterval(this.play, 500);
-    this.max = this.timepoints.length - 1;
-  }, 
   watch: {
     tpIndex(val) {
       if (val >= 0 && val <= this.max) {
-        VolumePage.loadTimepoint(this.timepoints[val]);
+        this.loadTimepoint(this.timepoints[val]);
         this.tpIndex = val;
       }
     },
   },
   methods: {
+    init(timepoints, timepointsInfo) {
+      this.timepoints = timepoints;
+      this.timepointsInfo = timepointsInfo;
+      this.loadTimepoint('000');
+      setInterval(this.play, 500);
+      this.max = this.timepoints.length - 1;
+    },
     async loadTimepoint(timepoint) {
       const dataUrl = dataFile => `https://data.computational-biology.org/api/v1/file/${dataFile}/download`;
       const timepointInfo = this.timepointsInfo[timepoint];
@@ -93,6 +95,23 @@ export default {
       this.loadGeometryDataUrl({ fileUrl: dataUrl(timepointFiles.geometry) });
       this.loadSporeDataUrl({ fileUrl: dataUrl(timepointFiles.spore) });
       this.loadMacrophageDataUrl({ fileUrl: dataUrl(timepointFiles.macrophage) });
+    },
+    async getTPData(TPFolderID) {
+      const dataItems = (await http.get('item', {
+        params: {
+          folderId: TPFolderID,
+        },
+      })).data;
+      const dataFilesPromises = dataItems.map(dataItem => http.get(`item/${dataItem._id}/files`));
+      const dataFilesResponses = await (Promise.all(dataFilesPromises));
+      const dataFiles = dataFilesResponses.map(dataFileResponse => dataFileResponse.data);
+
+      const dataFilesIDs = {};
+      for (let i = 0; i < dataFiles.length; i += 1) {
+        const dataFile = dataFiles[i][0];
+        dataFilesIDs[dataFile.name.substring(0, dataFile.name.indexOf('_'))] = dataFile._id;
+      }
+      return dataFilesIDs;
     },
     toggle() {
       if (this.playstatus === 'play_arrow') {
@@ -111,17 +130,35 @@ export default {
     next() {
       if (this.tpIndex < this.timepoints.length) {
         this.tpIndex += 1;
-        VolumePage.loadTimepoint(this.timepoints[this.tpIndex]);
+        this.loadTimepoint(this.timepoints[this.tpIndex]);
       }
     },
     previous() {
       if (this.tpIndex > 0) {
         this.tpIndex -= 1;
-        VolumePage.loadTimepoint(this.timepoints[this.tpIndex]);
+        this.loadTimepoint(this.timepoints[this.tpIndex]);
       }
     },
-    
-  }
+    fileLoaded(arrayBuffer) {
+      this.loadGeometryData({ arrayBuffer });
+    },
+    fileLoadFailed(message) {
+      this.setGeometryError({ error: message });
+    },
+    ...mapActions({
+      loadGeometryData: 'geometry/loadImageData',
+      loadGeometryDataUrl: 'geometry/loadImageDataUrl',
+      loadSporeData: 'spore/loadPolyData',
+      loadSporeDataUrl: 'spore/loadPolyDataUrl',
+      loadMacrophageData: 'macrophage/loadPolyData',
+      loadMacrophageDataUrl: 'macrophage/loadPolyDataUrl',
+    }),
+    ...mapMutations({
+      setGeometryError: 'geometry/setError',
+      setSporeError: 'spore/setError',
+      setMacrophageError: 'macrophage/setError',
+    }),
+  },
 };
 </script>
 

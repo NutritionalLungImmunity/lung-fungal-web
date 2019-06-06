@@ -7,7 +7,7 @@
         FLungGui
       </v-toolbar-title>
       <v-spacer />
-      <TimeControl/>
+      <TimeControl ref="tc" />
       <v-toolbar-items>
         <v-btn
           flat
@@ -60,8 +60,6 @@
 </template>
 
 <script>
-import { mapMutations, mapActions } from 'vuex';
-
 // import LocalFile from '@/components/LocalFile.vue';
 import LungVolume from '@/components/LungVolume.vue';
 import TimeControl from '@/components/TimeControl.vue';
@@ -81,7 +79,6 @@ export default {
       dialog: false,
       dialogHeader: '',
       dialogMessage: '',
-      timepointsInfo: {},
       timepoints: [],
     };
   },
@@ -107,70 +104,17 @@ export default {
         },
       })).data;
 
+      const timepointsInfo = {};
       for (let i = 0; i < timepointFolders.length; i += 1) {
         const timepoint = {
           index: i,
           id: timepointFolders[i]._id,
         };
-        this.timepointsInfo[timepointFolders[i].name] = timepoint;
+        timepointsInfo[timepointFolders[i].name] = timepoint;
         this.timepoints.push(timepointFolders[i].name);
       }
+      this.$refs.tc.init(this.timepoints, timepointsInfo);
     },
-    async getTPData(TPFolderID) {
-      const dataItems = (await http.get('item', {
-        params: {
-          folderId: TPFolderID,
-        },
-      })).data;
-      const dataFilesPromises = dataItems.map(dataItem => http.get(`item/${dataItem._id}/files`));
-      const dataFilesResponses = await (Promise.all(dataFilesPromises));
-      const dataFiles = dataFilesResponses.map(dataFileResponse => dataFileResponse.data);
-
-      const dataFilesIDs = {};
-      for (let i = 0; i < dataFiles.length; i += 1) {
-        const dataFile = dataFiles[i][0];
-        dataFilesIDs[dataFile.name.substring(0, dataFile.name.indexOf('_'))] = dataFile._id;
-      }
-      return dataFilesIDs;
-    },
-    /**
-     * @param {ArrayBuffer} arrayBuffer
-     */
-    fileLoaded(arrayBuffer) {
-      this.loadGeometryData({ arrayBuffer });
-    },
-    fileLoadFailed(message) {
-      this.setGeometryError({ error: message });
-    },
-    ...mapActions({
-      loadGeometryData: 'geometry/loadImageData',
-      loadGeometryDataUrl: 'geometry/loadImageDataUrl',
-      loadSporeData: 'spore/loadPolyData',
-      loadSporeDataUrl: 'spore/loadPolyDataUrl',
-      loadMacrophageData: 'macrophage/loadPolyData',
-      loadMacrophageDataUrl: 'macrophage/loadPolyDataUrl',
-    }),
-    ...mapMutations({
-      setGeometryError: 'geometry/setError',
-      setSporeError: 'spore/setError',
-      setMacrophageError: 'macrophage/setError',
-    }),
   },
 };
 </script>
-
-<style>
-#fraction {
-  margin-top: 16px;
-  margin-left: 7px;
-  font-size: 12pt;
-}
-#currentTP {
-  max-width: 75px;
-  text-align: right;
-}
-#sliderTP {
-  margin-top: 15px;
-  margin-right: 20px;
-}
-</style>
