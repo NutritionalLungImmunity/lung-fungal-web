@@ -18,24 +18,28 @@
           Metadata
         </v-btn>
       </v-toolbar-items>
+      <MetadataPanel/>
     </v-toolbar>
     <v-content>
       <LungVolume/>
     </v-content>
-    <v-navigation-drawer
+    <v-content>
+      <MetadataPanel/>
+    </v-content>
+    <!-- <v-navigation-drawer
       v-model="drawerOpen"
       right
       fixed
       app
     >
       <MetadataPanel/>
-    </v-navigation-drawer>
-    <v-dialog v-model="dialog">
+    </v-navigation-drawer> -->
+    <!-- <v-dialog v-model="dialog">
       <v-card>
         <v-card-title>{{ dialogHeader }}</v-card-title>
         <v-card-text style="white-space: pre;">{{ dialogMessage }}</v-card-text>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
   </v-app>
 </template>
 
