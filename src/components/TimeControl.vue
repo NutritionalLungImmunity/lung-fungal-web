@@ -30,6 +30,14 @@
         flat
         icon
         color="black"
+        @click="rewind()"
+      >
+        <v-icon>fast_rewind</v-icon>
+      </v-btn>
+      <v-btn
+        flat
+        icon
+        color="black"
         @click="previous()"
       >
         <v-icon>skip_previous</v-icon>
@@ -50,6 +58,14 @@
       >
         <v-icon>skip_next</v-icon>
       </v-btn>
+      <v-btn
+        flat
+        icon
+        color="black"
+        @click="fastForward()"
+      >
+        <v-icon>fast_forward</v-icon>
+      </v-btn>
     </v-toolbar-items>
   </v-layout>
 </template>
@@ -68,6 +84,9 @@ export default {
       tpIndex: 0,
       timepoints: [],
       timepointsInfo: {},
+      speed: 500,
+      intervalID: 0,
+      direction: true,
     };
   },
   watch: {
@@ -83,7 +102,7 @@ export default {
       this.timepoints = timepoints;
       this.timepointsInfo = timepointsInfo;
       this.loadTimepoint('000');
-      setInterval(this.play, 500);
+      this.intervalID = setInterval(this.play, this.speed);
       this.max = this.timepoints.length - 1;
     },
     async loadTimepoint(timepoint) {
@@ -114,7 +133,11 @@ export default {
       return dataFilesIDs;
     },
     toggle() {
+      clearInterval(this.intervalID);
+      this.speed = 500;
+      this.direction = true;
       if (this.playstatus === 'play_arrow') {
+        this.intervalID = setInterval(this.play, this.speed);
         this.playstatus = 'pause';
       } else if (this.playstatus === 'pause') {
         this.playstatus = 'play_arrow';
@@ -128,16 +151,40 @@ export default {
       }
     },
     next() {
+      this.direction = true;
       if (this.tpIndex < this.timepoints.length) {
         this.tpIndex += 1;
         this.loadTimepoint(this.timepoints[this.tpIndex]);
       }
     },
     previous() {
+      this.direction = false;
       if (this.tpIndex > 0) {
         this.tpIndex -= 1;
         this.loadTimepoint(this.timepoints[this.tpIndex]);
       }
+    },
+    rewind() {
+      this.playstatus = 'pause';
+      clearInterval(this.intervalID);
+      if (this.direction) {
+        this.speed = 500;
+      } else {
+        this.speed /= 2;
+      }
+      this.direction = false;
+      this.intervalID = setInterval(this.previous, this.speed);
+    },
+    fastForward() {
+      this.playstatus = 'pause';
+      clearInterval(this.intervalID);
+      if (this.direction) {
+        this.speed /= 2;
+      } else {
+        this.speed = 500;
+      }
+      this.direction = true;
+      this.intervalID = setInterval(this.play, this.speed);
     },
     fileLoaded(arrayBuffer) {
       this.loadGeometryData({ arrayBuffer });
