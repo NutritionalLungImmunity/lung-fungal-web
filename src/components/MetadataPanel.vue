@@ -15,7 +15,6 @@
       <v-card>
         <v-card-title
           class="headline grey lighten-2"
-          primary-title
         >
           Metadata
           <v-spacer/>
@@ -81,44 +80,23 @@ export default {
       },
     };
   },
-  created() {
-      // const rootID = '5cb5d24cef2e260353a50f1a';
-      // const fileName = 'params.json';
+  async created() {
+    const rootID = '5cb5d24cef2e260353a50f1a';
+    const fileName = 'params.json';
 
-      // const metadataItem = (await http.get('item', {
-      //   params: {
-      //     folderId: rootID,
-      //     name: fileName,
-      //   },
-      // })).data;
+    const metadataItem = (await http.get('item', {
+      params: {
+        folderId: rootID,
+        name: fileName,
+      },
+    })).data[0];
 
-      // const metadataFileID = (await http.get(`item/${metadataItem._id}/files`)).data;
+    const metadataFileID = (await http.get(`item/${metadataItem._id}/files`)).data[0];
 
-      // await http.get(`file/${metadataFileID._id}/download`, {
-      //   params: {
-      //     name: fileName,
-      //   }
-      // })
-      const params = require('./params.json');
+    const params = (await http.get(`file/${metadataFileID._id}/download`)).data;
+    const variables = Object.keys(params);
 
-      for(const key in params) {
-        this.vars.push({
-          name: key,
-          val: params[key],
-        });
-      }
-
-      console.log(this.vars);
-      // $.getJSON(fileName, function(data) {
-      //   $.each(data, function(key,val) {
-      //     this.vars.push({
-      //       variable: key,
-      //       value: val,
-      //     });
-      //   });
-      // });
-  },
-  methods: {
+    this.vars = variables.map((key) => {return {name: key, val: params[key]}});
   },
 };
 </script>
