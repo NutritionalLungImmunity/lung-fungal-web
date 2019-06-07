@@ -152,9 +152,13 @@ export default {
     },
     next() {
       this.direction = true;
-      if (this.tpIndex < this.timepoints.length) {
+      if (this.tpIndex < this.max) {
         this.tpIndex += 1;
         this.loadTimepoint(this.timepoints[this.tpIndex]);
+      } else {
+        clearInterval(this.intervalID);
+        this.speed = 500;
+        this.playstatus = 'play_arrow';
       }
     },
     previous() {
@@ -162,6 +166,10 @@ export default {
       if (this.tpIndex > 0) {
         this.tpIndex -= 1;
         this.loadTimepoint(this.timepoints[this.tpIndex]);
+      } else {
+        clearInterval(this.intervalID);
+        this.speed = 500;
+        this.playstatus = 'play_arrow';
       }
     },
     rewind() {
