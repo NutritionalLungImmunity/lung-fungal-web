@@ -17,13 +17,13 @@
           Metadata
           <v-spacer/>
           <v-text-field
+            id="searchbar"
             v-model="search"
             append-icon="search"
             label="Search"
-            height=10
+            height="10"
             single-line
             hide-details
-            id="searchbar"
           />
         </v-card-title>
         <v-card-text>
@@ -96,7 +96,10 @@ export default {
     const params = (await http.get(`file/${metadataFileID._id}/download`)).data;
     const variables = Object.keys(params);
 
-    this.vars = variables.map((key) => {return {name: key, val: params[key]}});
+    this.vars = variables.map((key) => ({
+      name: key,
+      val: params[key],
+    }));
   },
 };
 </script>
@@ -106,7 +109,7 @@ export default {
   min-height: 10px !important;
   margin-bottom: 15px;
 }
-.v-input__icon--append .v-icon { 
+.v-input__icon--append .v-icon {
   margin-bottom: 40px;
 }
 </style>
