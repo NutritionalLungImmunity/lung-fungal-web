@@ -1,13 +1,11 @@
 <template>
   <div>
-    <v-toolbar-items>
-      <v-btn
-        flat
-        @click.stop="dialog = true"
-      >
-        Metadata
-      </v-btn>
-    </v-toolbar-items>
+    <v-btn
+      flat
+      @click.stop="dialog = true"
+    >
+      Metadata
+    </v-btn>
     <v-dialog
       v-model="dialog"
       width="800"
@@ -22,8 +20,10 @@
             v-model="search"
             append-icon="search"
             label="Search"
+            height=10
             single-line
             hide-details
+            id="searchbar"
           />
         </v-card-title>
         <v-card-text>
@@ -43,7 +43,7 @@
         <v-card-actions>
           <v-spacer/>
           <v-btn
-            flat="flat"
+            flat
             @click="dialog = false"
           >
             Close
@@ -100,3 +100,13 @@ export default {
   },
 };
 </script>
+
+<style>
+#searchbar {
+  min-height: 10px !important;
+  margin-bottom: 15px;
+}
+.v-input__icon--append .v-icon { 
+  margin-bottom: 40px;
+}
+</style>
