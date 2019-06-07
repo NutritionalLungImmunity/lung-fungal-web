@@ -1,91 +1,130 @@
-from vtk import vtkPolyDataReader, vtkStructuredPointsReader, \
-    vtkXMLImageDataWriter, vtkXMLPolyDataWriter
-from girder_client import GirderClient
+from vtk import (
+    vtkPolyDataReader,
+    vtkStructuredPointsReader,
+    vtkXMLImageDataWriter,
+    vtkXMLPolyDataWriter,
+)
+from requests.adapters import HTTPAdapter
+import girder_client
 import os
 import click
 import re
 
+gc = None
+
 @click.command()
-@click.option('--inputfolderid', required=True, prompt=True, help='Source Folder ID')
-@click.option('--outputfolderid', required=True, prompt=True, help='Destination Folder ID')
-@click.option('--apikey', required=True, prompt=True, help='API Key from Girder')
-@click.option('--hostname', default='https://data.computational-biology.org/api/v1/', prompt=True, help='URL, make sure to include /api/v1/ at the end')
-def main(inputfolderid, outputfolderid, apikey, hostname):
-  gc = GirderClient(apiUrl=hostname)
-  gc.authenticate(apiKey=apikey)
+@click.option(
+    '--input-folder-id',
+    required=True,
+    help='Source Folder ID',
+)
+@click.option(
+    '--output-folder-id',
+    required=True,
+    help='Destination Folder ID',
+)
+@click.option(
+    '--api-key',
+    required=True,
+    prompt=True,
+    help='API Key from Girder',
+)
+@click.option(
+    '--hostname',
+    default='https://data.computational-biology.org/api/v1/',
+    help='URL, make sure to include /api/v1/ at the end',
+)
+def main(input_folder_id, output_folder_id, api_key, hostname):
+    global gc
+    gc = girder_client.GirderClient(apiUrl=hostname)
+    gc.authenticate(apiKey=api_key)
 
-  def getFiles(itemData):
-    print('getting ' + itemData['name'])
-    dataFiles = gc.get('item/' + itemData['_id'] + '/files')
-    return dataFiles[0]
+    s = gc.session()
+    s.mount(hostname, HTTPAdapter(max_retries=5))
 
-  def getItems(folderData):
-    folderInfo = gc.get('folder/' + folderData['_id'] + '/details')
-    folderItems = gc.get('item',
-      parameters={
-        'folderId': folderData['_id'],
-        'limit': folderInfo['nItems']
-      })
-    return map(getFiles, folderItems)
-
-  gmsFolders = gc.get('folder',
-    parameters={
-      'parentType': 'folder',
-      'parentId': inputfolderid,
-    })
-
-  gmsFileNames = map(getItems, gmsFolders)
-
-  for row in gmsFileNames:
-    for elem in row:
-      oldName = elem['name']
-      print('dowloading ' + oldName)
-      try:
-        gc.downloadFile(elem['_id'], os.path.abspath(oldName))
-
-        reader = vtkPolyDataReader()
-        writer = vtkXMLPolyDataWriter()
-        fileType = ''
-        if re.search("^geometry_", oldName):
-          reader = vtkStructuredPointsReader()
-          reader.ReadAllScalarsOn()
-          writer = vtkXMLImageDataWriter()
-          fileType = 'geometry_'
-        elif re.search("^spore_", oldName):
-          fileType = 'spore_'
-        elif re.search("^macrophage_", oldName):
-          fileType = 'macrophage_'
-        else:
-          raise Exception('Invalid File: {}'.format(oldName))
-
-        reader.SetFileName(oldName)
-        reader.Update()
-        data = reader.GetOutput()
-
-        end = oldName[len(fileType):]
-        num = '00' + end[:len(end) - 4]
-        fixed = num[len(num) - 3:]
-        name = fileType + fixed + '.vti'
-        print('writing ' + name)
-
-        writer.SetFileName(name)
-        writer.SetCompressorTypeToZLib()
-        writer.SetInputData(data)
-        writer.Update()
-
-        timepointFolder = gc.post('folder/',
-          parameters={
+    gmsFolders = gc.get(
+        'folder',
+        parameters={
             'parentType': 'folder',
-            'parentId': outputfolderid,
-            'name': fixed,
-            'reuseExisting': True
-          })
+            'parentId': input_folder_id,
+        },
+    )
 
-        gc.uploadFileToFolder(timepointFolder['_id'], name)
+    gmsFiles = map(getItems, gmsFolders)
 
-      except girder_client.HttpError:
-        print("ERROR DOWNLOADING")
-        pass
+    for gms in gmsFiles:
+        for file in gms:
+            oldName = file['name']
+            print(f'downloading {oldName}')
+            try:
+                gc.downloadFile(
+                    file['_id'], os.path.abspath(oldName)
+                )
+
+                reader = vtkPolyDataReader()
+                writer = vtkXMLPolyDataWriter()
+                if re.search('^geometry', oldName):
+                    reader = vtkStructuredPointsReader()
+                    reader.ReadAllScalarsOn()
+                    writer = vtkXMLImageDataWriter()
+                    fileType = 'geometry'
+                elif re.search('^spore', oldName):
+                    fileType = 'spore'
+                elif re.search('^macrophage', oldName):
+                    fileType = 'macrophage'
+                else:
+                    raise Exception(
+                        'Invalid File: {}'.format(oldName)
+                    )
+
+                reader.SetFileName(oldName)
+                reader.Update()
+                data = reader.GetOutput()
+
+                end = oldName[len(fileType):]
+                num = '{:03d}'.format(int(end[1:-4]))
+                name = f'{fileType}_{num}.vti'
+                print(f'writing {name}')
+
+                writer.SetFileName(name)
+                writer.SetCompressorTypeToZLib()
+                writer.SetInputData(data)
+                writer.Update()
+
+                timepointFolder = gc.post(
+                    'folder/',
+                    parameters={
+                        'parentType': 'folder',
+                        'parentId': output_folder_id,
+                        'name': num,
+                        'reuseExisting': True,
+                    },
+                )
+
+                gc.uploadFileToFolder(
+                    timepointFolder['_id'], name
+                )
+
+            except girder_client.HttpError:
+                print('ERROR DOWNLOADING')
+
+
+def getItems(folderData):
+    items = gc.get(
+        'item',
+        parameters={
+            'folderId': folderData['_id'],
+            'limit': 0,
+        },
+    )
+    return map(getFiles, items)
+
+def getFiles(item):
+    print(f'getting {item["name"]}')
+    files = gc.get(
+        f'item/{item["_id"]}/files'
+    )
+    return files[0]
 
 if __name__ == '__main__':
-  main()
+    main()
