@@ -11,47 +11,12 @@
           ref="tc"
           :timepoints="timepoints"
           :timepoints-info="timepointsInfo"/>
-        <v-btn
-          flat
-          @click.stop="drawerOpen = !drawerOpen"
-        >
-          Select time point
-        </v-btn>
+        <MetadataPanel/>
       </v-toolbar-items>
     </v-toolbar>
     <v-content>
       <LungVolume/>
     </v-content>
-    <v-navigation-drawer
-      v-model="drawerOpen"
-      right
-      fixed
-      app
-    >
-      <v-list>
-        <!--
-        <v-list-tile @click="true">
-          <v-list-tile-content>
-            <v-list-tile-title>Upload a VTK ImageData file</v-list-tile-title>
-            <LocalFile
-              accept="*.vti"
-              @load="fileLoaded"
-              @error="fileLoadFailed"
-            />
-          </v-list-tile-content>
-        </v-list-tile>
-        -->
-        <v-list-tile
-          v-for="timepoint in sortedTimepoints"
-          :key="timepoint"
-          @click="loadTimepoint(timepoint)">
-          <v-list-tile-content>
-            <v-list-tile-title>{{ timepoint }}</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-
-      </v-list>
-    </v-navigation-drawer>
     <v-dialog v-model="dialog">
       <v-card>
         <v-card-title>{{ dialogHeader }}</v-card-title>
@@ -62,17 +27,17 @@
 </template>
 
 <script>
-// import LocalFile from '@/components/LocalFile.vue';
 import LungVolume from '@/components/LungVolume.vue';
 import TimeControl from '@/components/TimeControl.vue';
+import MetadataPanel from '@/components/MetadataPanel.vue';
 import http from '@/http';
 
 export default {
   name: 'VolumePage',
   components: {
-    // LocalFile,
     LungVolume,
     TimeControl,
+    MetadataPanel,
   },
   data() {
     return {
