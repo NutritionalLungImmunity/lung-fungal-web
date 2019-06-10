@@ -1,57 +1,57 @@
 <template>
-  <div>
-    <v-btn
-      flat
-      @click.stop="dialog = true"
-    >
-      Metadata
-    </v-btn>
-    <v-dialog
-      v-model="dialog"
-      width="800"
-    >
-      <v-card>
-        <v-card-title
-          class="headline grey lighten-2"
+  <v-dialog
+    v-model="dialog"
+    width="800"
+  >
+    <template v-slot:activator="{ on }">
+      <v-btn
+        flat
+        v-on="on"
+      >
+        Metadata
+      </v-btn>
+    </template>
+    <v-card>
+      <v-card-title
+        class="headline grey lighten-2"
+      >
+        Metadata
+        <v-spacer/>
+        <v-text-field
+          id="searchbar"
+          v-model="search"
+          append-icon="search"
+          label="Search"
+          height="10"
+          single-line
+          hide-details
+        />
+      </v-card-title>
+      <v-card-text>
+        <v-data-table
+          :headers="headers"
+          :items="vars"
+          :search="search"
+          hide-actions
+          class="elevation-1"
         >
-          Metadata
-          <v-spacer/>
-          <v-text-field
-            id="searchbar"
-            v-model="search"
-            append-icon="search"
-            label="Search"
-            height="10"
-            single-line
-            hide-details
-          />
-        </v-card-title>
-        <v-card-text>
-          <v-data-table
-            :headers="headers"
-            :items="vars"
-            :pagination.sync="pagination"
-            :search="search"
-            class="elevation-1"
-          >
-            <template v-slot:items="props">
-              <td>{{ props.item.name }}</td>
-              <td class="text-xs-right">{{ props.item.val }}</td>
-            </template>
-          </v-data-table>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer/>
-          <v-btn
-            flat
-            @click="dialog = false"
-          >
-            Close
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
+          <template v-slot:items="props">
+            <td>{{ props.item.name }}</td>
+            <td class="text-xs-right">{{ props.item.val }}</td>
+          </template>
+        </v-data-table>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer/>
+        <v-btn
+          flat
+          @click="dialog = false"
+        >
+          Close
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -70,14 +70,12 @@ export default {
           text: 'Value',
           value: 'val',
           align: 'right',
+          sortable: false,
         },
       ],
       vars: [],
       dialog: false,
       search: '',
-      pagination: {
-        rowsPerPage: -1,
-      },
     };
   },
   async created() {
@@ -96,7 +94,7 @@ export default {
     const params = (await http.get(`file/${metadataFileID._id}/download`)).data;
     const variables = Object.keys(params);
 
-    this.vars = variables.map((key) => ({
+    this.vars = variables.map(key => ({
       name: key,
       val: params[key],
     }));

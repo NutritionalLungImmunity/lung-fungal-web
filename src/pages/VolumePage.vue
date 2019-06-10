@@ -11,40 +11,22 @@
           ref="tc"
           :timepoints="timepoints"
           :timepoints-info="timepointsInfo"/>
-        <v-btn
-          flat
-          @click.stop="drawerOpen = !drawerOpen"
-        >
-          Metadata
-        </v-btn>
+        <MetadataPanel/>
       </v-toolbar-items>
-      <MetadataPanel/>
     </v-toolbar>
     <v-content>
       <LungVolume/>
     </v-content>
-    <v-content>
-      <MetadataPanel/>
-    </v-content>
-    <!-- <v-navigation-drawer
-      v-model="drawerOpen"
-      right
-      fixed
-      app
-    >
-      <MetadataPanel/>
-    </v-navigation-drawer> -->
-    <!-- <v-dialog v-model="dialog">
+    <v-dialog v-model="dialog">
       <v-card>
         <v-card-title>{{ dialogHeader }}</v-card-title>
         <v-card-text style="white-space: pre;">{{ dialogMessage }}</v-card-text>
       </v-card>
-    </v-dialog> -->
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
-// import LocalFile from '@/components/LocalFile.vue';
 import LungVolume from '@/components/LungVolume.vue';
 import TimeControl from '@/components/TimeControl.vue';
 import MetadataPanel from '@/components/MetadataPanel.vue';
@@ -53,7 +35,6 @@ import http from '@/http';
 export default {
   name: 'VolumePage',
   components: {
-    // LocalFile,
     LungVolume,
     TimeControl,
     MetadataPanel,
