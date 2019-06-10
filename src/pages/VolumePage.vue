@@ -106,14 +106,14 @@ export default {
     },
     async getTPs() {
       const timepointFolderIDs = this.timepointsIDs;
-      const rootID = '5cf18200ef2e260353a51922'
+      const rootID = '5cf18200ef2e260353a51922';
 
-      const timepointInfo = (await http.get('folder/' + rootID + '/details')).data
+      const timepointInfo = (await http.get(`folder/${rootID}/details`)).data;
       const timepointFolders = (await http.get('folder', {
         params: {
           parentType: 'folder',
           parentId: rootID,
-          limit: timepointInfo.nItems
+          limit: timepointInfo.nItems,
         },
       })).data;
 
