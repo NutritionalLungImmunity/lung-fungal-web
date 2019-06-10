@@ -1,44 +1,41 @@
 <template>
-  <v-layout row>
-    <v-toolbar-items>
-      <v-flex xs12>
-        <v-slider
-          id="sliderTP"
-          v-model="tpIndex"
-          :max="max"
-        />
-      </v-flex>
-    </v-toolbar-items>
-    <v-toolbar-items>
-      <v-flex
-        xs12
-        sm6
-        md3
-      >
-        <v-text-field
-          id="currentTP"
-          v-model="tpIndex"
-          :value="timepoints[tpIndex]" />
-      </v-flex>
-      <p id="fraction">
-        / {{ max }}
-      </p>
-    </v-toolbar-items>
+  <v-layout
+    row
+    align-center>
+    <v-flex
+      xs3
+      class="text-xs-center"
+    >
+      <v-layout row>
+        <v-flex xs8>
+          <v-slider
+            v-model="tpIndex"
+            :max="max"
+            class="slider-tp"
+          />
+        </v-flex>
+        <v-flex xs2>
+          <v-text-field
+            v-model="tpIndex"
+            :value="timepoints[tpIndex]"
+            class="current-tp" />
+        </v-flex>
+        <v-flex xs2>
+          <span class="fraction">
+            / {{ max }}
+          </span>
+        </v-flex>
+      </v-layout>
+    </v-flex>
     <v-spacer />
-    <v-toolbar-items>
+    <v-flex
+      xs2
+      class="text-xs-center">
       <v-btn
         flat
         icon
         color="black"
-        @click="rewind()"
-      >
-        <v-icon>fast_rewind</v-icon>
-      </v-btn>
-      <v-btn
-        flat
-        icon
-        color="black"
-        @click="previous()"
+        @click="previous"
       >
         <v-icon>skip_previous</v-icon>
       </v-btn>
@@ -46,27 +43,40 @@
         flat
         icon
         color="black"
-        @click="toggle()"
-      >
-        <v-icon>{{ playstatus }}</v-icon>
-      </v-btn>
-      <v-btn
-        flat
-        icon
-        color="black"
-        @click="next()"
+        @click="next"
       >
         <v-icon>skip_next</v-icon>
       </v-btn>
+    </v-flex>
+    <v-spacer />
+    <v-flex
+      xs2
+      class="text-xs-center">
       <v-btn
         flat
         icon
         color="black"
-        @click="fastForward()"
+        @click="rewind"
+      >
+        <v-icon>fast_rewind</v-icon>
+      </v-btn>
+      <v-btn
+        flat
+        icon
+        color="black"
+        @click="toggle"
+      >
+        <v-icon>{{ playing ? 'pause' : 'play_arrow' }}</v-icon>
+      </v-btn>
+      <v-btn
+        flat
+        icon
+        color="black"
+        @click="fastForward"
       >
         <v-icon>fast_forward</v-icon>
       </v-btn>
-    </v-toolbar-items>
+    </v-flex>
   </v-layout>
 </template>
 
@@ -77,33 +87,40 @@ import http from '@/http';
 
 export default {
   name: 'TimeControl',
+  props: {
+    timepoints: {
+      type: Array,
+      required: true,
+    },
+    timepointsInfo: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
-      playstatus: 'play_arrow',
-      max: 0,
       tpIndex: 0,
-      timepoints: [],
-      timepointsInfo: {},
       speed: 500,
-      intervalID: 0,
+      intervalID: null,
       direction: true,
+      playing: false,
     };
+  },
+  computed: {
+    max() {
+      return this.timepoints.length - 1;
+    },
   },
   watch: {
     tpIndex(val) {
       if (val >= 0 && val <= this.max) {
         this.loadTimepoint(this.timepoints[val]);
-        this.tpIndex = val;
       }
     },
   },
   methods: {
-    init(timepoints, timepointsInfo) {
-      this.timepoints = timepoints;
-      this.timepointsInfo = timepointsInfo;
+    init() {
       this.loadTimepoint('000');
-      this.intervalID = setInterval(this.play, this.speed);
-      this.max = this.timepoints.length - 1;
     },
     async loadTimepoint(timepoint) {
       const dataUrl = dataFile => `https://data.computational-biology.org/api/v1/file/${dataFile}/download`;
@@ -134,19 +151,15 @@ export default {
     },
     toggle() {
       clearInterval(this.intervalID);
+      this.playing = !this.playing;
       this.speed = 500;
       this.direction = true;
-      if (this.playstatus === 'play_arrow') {
+      if (this.playing) {
         this.intervalID = setInterval(this.play, this.speed);
-        this.playstatus = 'pause';
-      } else if (this.playstatus === 'pause') {
-        this.playstatus = 'play_arrow';
-      } else {
-        throw new Error(`unknown status: ${this.playstatus}`);
       }
     },
     play() {
-      if (this.playstatus === 'pause') {
+      if (this.playing) {
         this.next();
       }
     },
@@ -158,7 +171,7 @@ export default {
       } else {
         clearInterval(this.intervalID);
         this.speed = 500;
-        this.playstatus = 'play_arrow';
+        this.playing = false;
       }
     },
     previous() {
@@ -169,11 +182,11 @@ export default {
       } else {
         clearInterval(this.intervalID);
         this.speed = 500;
-        this.playstatus = 'play_arrow';
+        this.playing = false;
       }
     },
     rewind() {
-      this.playstatus = 'pause';
+      this.playing = true;
       clearInterval(this.intervalID);
       if (this.direction) {
         this.speed = 500;
@@ -184,7 +197,7 @@ export default {
       this.intervalID = setInterval(this.previous, this.speed);
     },
     fastForward() {
-      this.playstatus = 'pause';
+      this.playing = true;
       clearInterval(this.intervalID);
       if (this.direction) {
         this.speed /= 2;
@@ -217,18 +230,18 @@ export default {
 };
 </script>
 
-<style>
-#fraction {
+<!-- <style>
+.fraction {
   margin-top: 16px;
   margin-left: 7px;
   font-size: 12pt;
 }
-#currentTP {
+.current-tp {
   max-width: 75px;
   text-align: right;
 }
-#sliderTP {
+.slider-tp {
   margin-top: 15px;
   margin-right: 20px;
 }
-</style>
+</style> -->

@@ -6,9 +6,11 @@
       <v-toolbar-title>
         FLungGui
       </v-toolbar-title>
-      <v-spacer />
-      <TimeControl ref="tc" />
-      <v-toolbar-items>
+      <v-toolbar-items class="toolbar-items">
+        <TimeControl
+          ref="tc"
+          :timepoints="timepoints"
+          :timepoints-info="timepointsInfo"/>
         <v-btn
           flat
           @click.stop="drawerOpen = !drawerOpen"
@@ -80,6 +82,7 @@ export default {
       dialogHeader: '',
       dialogMessage: '',
       timepoints: [],
+      timepointsInfo: {},
     };
   },
   computed: {
@@ -104,17 +107,22 @@ export default {
         },
       })).data;
 
-      const timepointsInfo = {};
       for (let i = 0; i < timepointFolders.length; i += 1) {
         const timepoint = {
           index: i,
           id: timepointFolders[i]._id,
         };
-        timepointsInfo[timepointFolders[i].name] = timepoint;
+        this.$set(this.timepointsInfo, timepointFolders[i].name, timepoint);
         this.timepoints.push(timepointFolders[i].name);
       }
-      this.$refs.tc.init(this.timepoints, timepointsInfo);
+      this.$refs.tc.init();
     },
   },
 };
 </script>
+
+<style scoped>
+.toolbar-items{
+  width: 100%;
+}
+</style>
