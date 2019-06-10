@@ -60,9 +60,10 @@
 </template>
 
 <script>
-import sortBy from 'lodash/sortBy';
+// import sortBy from 'lodash/sortBy';
 import { mapMutations, mapActions } from 'vuex';
 
+import http from '@/http';
 // import LocalFile from '@/components/LocalFile.vue';
 import LungVolume from '@/components/LungVolume.vue';
 
@@ -79,41 +80,68 @@ export default {
       dialog: false,
       dialogHeader: '',
       dialogMessage: '',
-      timepoints: {
-        '000': {
-          geometry: '5cda564eef2e260353a5190a',
-          spore: '5cda564eef2e260353a51907',
-          macrophage: '5cda564eef2e260353a51904',
-        },
-        '001': {
-          geometry: '5cda565bef2e260353a51913',
-          spore: '5cda565aef2e260353a51910',
-          macrophage: '5cda565aef2e260353a5190d',
-        },
-        150: {
-          geometry: '5cda5f0bef2e260353a5191e',
-          spore: '5cda5f0bef2e260353a5191b',
-          macrophage: '5cda5f0aef2e260353a51918',
-        },
-      },
+      timepointsIDs: {},
+      timepoints: [],
     };
   },
   computed: {
     sortedTimepoints() {
-      return sortBy(Object.keys(this.timepoints), parseInt);
+      const tempTimepoints = this.timepoints.slice();
+      return tempTimepoints.sort();
     },
   },
-  created() {
+  async created() {
+    await this.getTPs();
     this.loadTimepoint('000');
   },
   methods: {
-    loadTimepoint(timepoint) {
+    async loadTimepoint(timepoint) {
       const dataUrl = dataFile => `https://data.computational-biology.org/api/v1/file/${dataFile}/download`;
-      const timepointFiles = this.timepoints[timepoint];
+      const timepointFolderID = this.timepointsIDs[timepoint];
 
+      const timepointFiles = await this.getTPData(timepointFolderID);
       this.loadGeometryDataUrl({ fileUrl: dataUrl(timepointFiles.geometry) });
       this.loadSporeDataUrl({ fileUrl: dataUrl(timepointFiles.spore) });
       this.loadMacrophageDataUrl({ fileUrl: dataUrl(timepointFiles.macrophage) });
+    },
+    async getTPs() {
+      const timepointFolderIDs = this.timepointsIDs;
+      const rootID = '5cf18200ef2e260353a51922';
+
+      const timepointInfo = (await http.get(`folder/${rootID}/details`)).data;
+      const timepointFolders = (await http.get('folder', {
+        params: {
+          parentType: 'folder',
+          parentId: rootID,
+          limit: timepointInfo.nItems,
+        },
+      })).data;
+
+      for (let i = 0; i < timepointFolders.length; i += 1) {
+        timepointFolderIDs[timepointFolders[i].name] = timepointFolders[i]._id;
+        this.timepoints.push(timepointFolders[i].name);
+      }
+    },
+    async getTPData(TPFolderID) {
+      const dataItems = (await http.get('item', {
+        params: {
+          folderId: TPFolderID,
+        },
+      })).data;
+      const dataFilesPromises = dataItems.map((dataItem) => {
+        const path = `item/${dataItem._id}/files`;
+        return http.get(path);
+      });
+      const dataFilesResponses = await Promise.all(dataFilesPromises);
+      const dataFiles = dataFilesResponses.map(dataFileResponse => dataFileResponse.data);
+
+      const dataFilesIDs = {};
+      for (let i = 0; i < dataFiles.length; i += 1) {
+        const dataFile = dataFiles[i][0];
+        const fullname = dataFile.name;
+        dataFilesIDs[fullname.substring(0, fullname.indexOf('_'))] = dataFile._id;
+      }
+      return dataFilesIDs;
     },
     /**
      * @param {ArrayBuffer} arrayBuffer
