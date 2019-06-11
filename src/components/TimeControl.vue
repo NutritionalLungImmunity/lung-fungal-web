@@ -1,35 +1,31 @@
 <template>
   <v-layout
     row
-    align-center>
+    align-right
+    class="time-controls">
+    <v-layout
+      row
+      xs5
+    >
+      <v-flex xs7>
+        <v-slider
+          v-model="tpIndex"
+          :max="max"
+          class="slider-tp"
+        />
+      </v-flex>
+      <v-flex xs1>
+        <v-text-field
+          v-model="tpIndex"
+          :value="timepoints[tpIndex]"
+        />
+      </v-flex>
+      <span class="fraction">
+        / {{ max }}
+      </span>
+    </v-layout>
     <v-flex
       xs3
-      class="text-xs-center"
-    >
-      <v-layout row>
-        <v-flex xs8>
-          <v-slider
-            v-model="tpIndex"
-            :max="max"
-            class="slider-tp"
-          />
-        </v-flex>
-        <v-flex xs2>
-          <v-text-field
-            v-model="tpIndex"
-            :value="timepoints[tpIndex]"
-            class="current-tp" />
-        </v-flex>
-        <v-flex xs2>
-          <span class="fraction">
-            / {{ max }}
-          </span>
-        </v-flex>
-      </v-layout>
-    </v-flex>
-    <v-spacer />
-    <v-flex
-      xs2
       class="text-xs-center">
       <v-btn
         flat
@@ -50,8 +46,8 @@
     </v-flex>
     <v-spacer />
     <v-flex
-      xs2
-      class="text-xs-center">
+      xs4
+      class="text-xs-right">
       <v-btn
         flat
         icon
@@ -230,18 +226,19 @@ export default {
 };
 </script>
 
-<!-- <style>
+<style>
 .fraction {
-  margin-top: 16px;
+  margin-top: 15px;
   margin-left: 7px;
-  font-size: 12pt;
-}
-.current-tp {
-  max-width: 75px;
-  text-align: right;
+  font-size: 13pt;
 }
 .slider-tp {
-  margin-top: 15px;
-  margin-right: 20px;
+  padding-top: 8px;
+  padding-right: 15px;
+  padding-left: 15px;
 }
-</style> -->
+.time-controls {
+  padding-top: 8px;
+  padding-bottom: 10px;
+}
+</style>
