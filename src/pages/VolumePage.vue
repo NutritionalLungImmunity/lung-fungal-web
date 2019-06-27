@@ -6,6 +6,7 @@
       <v-toolbar-title>
         FLungGui
       </v-toolbar-title>
+      <v-spacer/>
       <v-toolbar-items class="toolbar-items">
         <TimeControl
           ref="tc"
@@ -88,6 +89,6 @@ export default {
 
 <style scoped>
 .toolbar-items{
-  width: 100%;
+  width: 90%;
 }
 </style>
