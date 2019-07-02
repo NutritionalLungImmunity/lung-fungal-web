@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
+    "@statnett/vue-plotly": "git://github.com/Mynamewasused/vue-plotly.git",
     "axios": "^0.18.0",
     "lodash": "^4.17.11",
     "promise-file-reader": "^1.0.2",
