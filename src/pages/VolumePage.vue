@@ -40,10 +40,15 @@ export default {
     TimeControl,
     MetadataPanel,
   },
+  props: {
+    rootID: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       drawerOpen: false,
-      // TODO: set this from store errors
       dialog: false,
       dialogHeader: '',
       dialogMessage: '',
@@ -62,17 +67,14 @@ export default {
   },
   methods: {
     async getTPs() {
-      const rootID = '5cf18200ef2e260353a51922';
-
-      const timepointInfo = (await http.get(`folder/${rootID}/details`)).data;
+      const timepointInfo = (await http.get(`folder/${this.rootID}/details`)).data;
       const timepointFolders = (await http.get('folder', {
         params: {
           parentType: 'folder',
-          parentId: rootID,
-          limit: timepointInfo.nItems,
+          parentId: this.rootID,
+          limit: timepointInfo.nFolders,
         },
       })).data;
-
       for (let i = 0; i < timepointFolders.length; i += 1) {
         const timepoint = {
           index: i,
