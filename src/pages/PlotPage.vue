@@ -167,7 +167,7 @@ export default {
           type: 'scatter',
           fill: 'tonexty',
           fillcolor: '#3afc78ff',
-          name: 'Quartile 2',
+          name: 'Quartile 3',
           line: {
             dash: 'dot',
             color: '#008000ff',
