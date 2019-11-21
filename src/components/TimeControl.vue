@@ -119,7 +119,7 @@ export default {
       this.loadTimepoint('000');
     },
     async loadTimepoint(timepoint) {
-      const dataUrl = dataFile => `https://data.computational-biology.org/api/v1/file/${dataFile}/download`;
+      const dataUrl = dataFile => `https://data.nutritionallungimmunity.org/api/v1/file/${dataFile}/download`;
       const timepointInfo = this.timepointsInfo[timepoint];
       const timepointFolderID = timepointInfo.id;
 
