@@ -1,27 +1,30 @@
 <template>
   <v-app>
-    <v-toolbar
+    <v-app-bar
       app
     >
       <v-toolbar-title>
         FLungGui
       </v-toolbar-title>
-      <v-spacer/>
+      <v-spacer />
       <v-toolbar-items class="toolbar-items">
         <TimeControl
           ref="tc"
           :timepoints="timepoints"
-          :timepoints-info="timepointsInfo"/>
-        <MetadataPanel/>
+          :timepoints-info="timepointsInfo"
+        />
+        <MetadataPanel />
       </v-toolbar-items>
-    </v-toolbar>
+    </v-app-bar>
     <v-content>
-      <LungVolume/>
+      <LungVolume />
     </v-content>
     <v-dialog v-model="dialog">
       <v-card>
         <v-card-title>{{ dialogHeader }}</v-card-title>
-        <v-card-text style="white-space: pre;">{{ dialogMessage }}</v-card-text>
+        <v-card-text style="white-space: pre;">
+          {{ dialogMessage }}
+        </v-card-text>
       </v-card>
     </v-dialog>
   </v-app>
