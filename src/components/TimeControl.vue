@@ -1,79 +1,80 @@
 <template>
-  <v-layout
-    row
-    align-right
-    class="time-controls">
-    <v-layout
-      row
-      xs5
+  <v-row
+
+    class="time-controls align-right"
+  >
+    <v-row
+      class="xs5"
     >
-      <v-flex xs7>
+      <v-col cols="7">
         <v-slider
           v-model="tpIndex"
           :max="max"
           class="slider-tp"
         />
-      </v-flex>
-      <v-flex xs1>
+      </v-col>
+      <v-col cols="1">
         <v-text-field
           v-model="tpIndex"
           :value="timepoints[tpIndex]"
         />
-      </v-flex>
+      </v-col>
       <span class="fraction">
         / {{ max }}
       </span>
-    </v-layout>
-    <v-flex
-      xs3
-      class="text-xs-center">
+    </v-row>
+    <v-col
+      cols="3"
+      class="text-center"
+    >
       <v-btn
-        flat
+        text
         icon
         color="black"
         @click="previous"
       >
-        <v-icon>skip_previous</v-icon>
+        <v-icon>mdi-skip-previous</v-icon>
       </v-btn>
       <v-btn
-        flat
+        text
         icon
         color="black"
         @click="next"
       >
-        <v-icon>skip_next</v-icon>
+        <v-icon>mdi-skip-next</v-icon>
       </v-btn>
-    </v-flex>
+    </v-col>
     <v-spacer />
-    <v-flex
-      xs4
-      class="text-xs-right">
+    <v-col
+      cols="4"
+      class="text-right"
+    >
       <v-btn
-        flat
+        text
         icon
         color="black"
         @click="rewind"
       >
-        <v-icon>fast_rewind</v-icon>
+        <v-icon>mdi-rewind</v-icon>
       </v-btn>
       <v-btn
-        flat
+        text
         icon
         color="black"
         @click="toggle"
       >
-        <v-icon>{{ playing ? 'pause' : 'play_arrow' }}</v-icon>
+        <v-icon>{{ playing ? 'mdi-pause' : 'mdi-play' }}</v-icon>
       </v-btn>
       <v-btn
-        flat
+        text
         icon
         color="black"
         @click="fastForward"
       >
-        <v-icon>fast_forward</v-icon>
+        <v-icon>mdi-fast-forward</v-icon>
       </v-btn>
-    </v-flex>
-  </v-layout>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -119,7 +120,7 @@ export default {
       this.loadTimepoint('000');
     },
     async loadTimepoint(timepoint) {
-      const dataUrl = dataFile => `https://data.nutritionallungimmunity.org/api/v1/file/${dataFile}/download`;
+      const dataUrl = (dataFile) => `https://data.nutritionallungimmunity.org/api/v1/file/${dataFile}/download`;
       const timepointInfo = this.timepointsInfo[timepoint];
       const timepointFolderID = timepointInfo.id;
 
@@ -134,9 +135,9 @@ export default {
           folderId: TPFolderID,
         },
       })).data;
-      const dataFilesPromises = dataItems.map(dataItem => http.get(`item/${dataItem._id}/files`));
+      const dataFilesPromises = dataItems.map((dataItem) => http.get(`item/${dataItem._id}/files`));
       const dataFilesResponses = await (Promise.all(dataFilesPromises));
-      const dataFiles = dataFilesResponses.map(dataFileResponse => dataFileResponse.data);
+      const dataFiles = dataFilesResponses.map((dataFileResponse) => dataFileResponse.data);
 
       const dataFilesIDs = {};
       for (let i = 0; i < dataFiles.length; i += 1) {

@@ -19,9 +19,9 @@ export default {
   name: 'Render3D',
   computed: {
     ...mapState({
-      geometryData: state => state.geometry.imageData,
-      sporeData: state => state.spore.polyData,
-      macrophageData: state => state.macrophage.polyData,
+      geometryData: (state) => state.geometry.imageData,
+      sporeData: (state) => state.spore.polyData,
+      macrophageData: (state) => state.macrophage.polyData,
     }),
   },
   static() {

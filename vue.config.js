@@ -1,4 +1,4 @@
-const process = require('process');
+const process = require('process'); // eslint-disable-line import/no-extraneous-dependencies
 
 module.exports = {
   chainWebpack: (config) => {

@@ -3,9 +3,9 @@
     v-model="dialog"
     width="800"
   >
-    <template v-slot:activator="{ on }">
+    <template #activator="{ on }">
       <v-btn
-        flat
+        text
         v-on="on"
       >
         Metadata
@@ -16,7 +16,7 @@
         class="headline grey lighten-2"
       >
         Metadata
-        <v-spacer/>
+        <v-spacer />
         <v-text-field
           id="searchbar"
           v-model="search"
@@ -32,19 +32,21 @@
           :headers="headers"
           :items="vars"
           :search="search"
-          hide-actions
+          hide-default-footer
           class="elevation-1"
         >
           <template v-slot:items="props">
             <td>{{ props.item.name }}</td>
-            <td class="text-xs-right">{{ props.item.val }}</td>
+            <td class="text-right">
+              {{ props.item.val }}
+            </td>
           </template>
         </v-data-table>
       </v-card-text>
       <v-card-actions>
-        <v-spacer/>
+        <v-spacer />
         <v-btn
-          flat
+          text
           @click="dialog = false"
         >
           Close
@@ -94,7 +96,7 @@ export default {
     const params = (await http.get(`file/${metadataFileID._id}/download`)).data;
     const variables = Object.keys(params);
 
-    this.vars = variables.map(key => ({
+    this.vars = variables.map((key) => ({
       name: key,
       val: params[key],
     }));
