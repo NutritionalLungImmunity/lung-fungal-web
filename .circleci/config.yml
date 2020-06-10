@@ -7,10 +7,10 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: yarn install
+          command: yarn install --frozen-lockfile
       - run:
           name: Run linting
-          command: yarn run lint --no-fix
+          command: yarn run lint --no-fix --max-warnings=0
       - run:
           name: Build the app
           command: yarn run build
