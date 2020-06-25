@@ -96,7 +96,7 @@ export default {
   },
   data() {
     return {
-      tpIndex: 0,
+      tpIndex: 1,
       speed: 500,
       intervalID: null,
       direction: true,
@@ -109,18 +109,20 @@ export default {
     },
   },
   watch: {
+    /*
     tpIndex(val) {
       if (val >= 0 && val <= this.max) {
         this.loadTimepoint(this.timepoints[val]);
       }
     },
+     */
   },
   methods: {
     init() {
-      this.loadTimepoint('000');
+      this.loadTimepoint('001');
     },
     async loadTimepoint(timepoint) {
-      const dataUrl = (dataFile) => `https://data.nutritionallungimmunity.org/api/v1/file/${dataFile}/download`;
+      const dataUrl = (dataFile) => `https://data.kitware.com/api/v1/file/${dataFile}/download`;
       const timepointInfo = this.timepointsInfo[timepoint];
       const timepointFolderID = timepointInfo.id;
 
