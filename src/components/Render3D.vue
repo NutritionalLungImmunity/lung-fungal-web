@@ -14,6 +14,10 @@ import vtkPiecewiseFunction from 'vtk.js/Sources/Common/DataModel/PiecewiseFunct
 import vtkSphereSource from 'vtk.js/Sources/Filters/Sources/SphereSource';
 import vtkVolume from 'vtk.js/Sources/Rendering/Core/Volume';
 import vtkVolumeMapper from 'vtk.js/Sources/Rendering/Core/VolumeMapper';
+import {
+  ColorMode,
+  ScalarMode,
+} from 'vtk.js/Sources/Rendering/Core/Mapper/Constants';
 
 export default {
   name: 'Render3D',
@@ -115,6 +119,8 @@ export default {
       this.vtk.sporeMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
         scaleFactor: 5,
+        colorMode: ColorMode.MAP_SCALARS,
+        scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
       });
       this.vtk.sporeMapper.setColorByArrayName('status');
       this.vtk.sporeMapper.setInputConnection(this.vtk.sporeGlyphSource.getOutputPort(), 1);
@@ -136,6 +142,9 @@ export default {
       this.vtk.macrophageMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
         scaleFactor: 8,
+        colorMode: ColorMode.MAP_SCALARS,
+        scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
+        scalarRange: [0, 1],
       });
       this.vtk.macrophageMapper
         .setInputConnection(this.vtk.macrophageGlyphSource.getOutputPort(), 1);
