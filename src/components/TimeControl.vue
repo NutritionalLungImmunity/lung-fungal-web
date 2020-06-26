@@ -109,13 +109,11 @@ export default {
     },
   },
   watch: {
-    /*
     tpIndex(val) {
       if (val >= 0 && val <= this.max) {
         this.loadTimepoint(this.timepoints[val]);
       }
     },
-     */
   },
   methods: {
     init() {
