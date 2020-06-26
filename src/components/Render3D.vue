@@ -91,7 +91,7 @@ export default {
       ctfun.addRGBPoint(0.9, 1.0, 0.0, 0.0);
       ofun.addPoint(0.5, 0.0);
       ctfun.addRGBPoint(1, 1.0, 0.0, 0.0);
-      ofun.addPoint(1, 0.1);
+      ofun.addPoint(1, 0.05);
       ctfun.addRGBPoint(1.1, 1.0, 0.0, 0.0);
       ofun.addPoint(1.5, 0.0);
       // REGULAR_TISSUE = 2
@@ -99,11 +99,11 @@ export default {
       ofun.addPoint(2, 0.00);
       // EPITHELIUM = 3
       ctfun.addRGBPoint(2.5, 1.0, 0.8, 0.8);
-      ofun.addPoint(2, 0.00);
+      ofun.addPoint(2.5, 0.00);
       ctfun.addRGBPoint(3, 0.9, 0.9, 1.0);
-      ofun.addPoint(3, 0.1);
+      ofun.addPoint(3, 0.05);
       ctfun.addRGBPoint(3.5, 1.0, 0.8, 0.8);
-      ofun.addPoint(2, 0.00);
+      ofun.addPoint(3.5, 0.00);
 
       this.vtk.geometryActor.getProperty().setRGBTransferFunction(0, ctfun);
       this.vtk.geometryActor.getProperty().setScalarOpacity(0, ofun);
