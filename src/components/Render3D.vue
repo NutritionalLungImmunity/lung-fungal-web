@@ -14,6 +14,10 @@ import vtkPiecewiseFunction from 'vtk.js/Sources/Common/DataModel/PiecewiseFunct
 import vtkSphereSource from 'vtk.js/Sources/Filters/Sources/SphereSource';
 import vtkVolume from 'vtk.js/Sources/Rendering/Core/Volume';
 import vtkVolumeMapper from 'vtk.js/Sources/Rendering/Core/VolumeMapper';
+import {
+  ColorMode,
+  ScalarMode,
+} from 'vtk.js/Sources/Rendering/Core/Mapper/Constants';
 
 export default {
   name: 'Render3D',
@@ -42,6 +46,7 @@ export default {
       if (!this.sporeData) {
         return;
       }
+      this.sporeData.getPointData().setActiveScalars('status');
       this.vtk.sporeMapper.setInputData(this.sporeData, 0);
       this.render();
     },
@@ -49,6 +54,7 @@ export default {
       if (!this.macrophageData) {
         return;
       }
+      this.macrophageData.getPointData().setActiveScalars('dead');
       this.vtk.macrophageMapper.setInputData(this.macrophageData, 0);
       this.render();
     },
@@ -82,14 +88,23 @@ export default {
       ctfun.addRGBPoint(0, 0.0, 0.0, 0.0);
       ofun.addPoint(0, 0.0);
       // BLOOD = 1
+      ctfun.addRGBPoint(0.9, 1.0, 0.0, 0.0);
+      ofun.addPoint(0.5, 0.0);
       ctfun.addRGBPoint(1, 1.0, 0.0, 0.0);
-      ofun.addPoint(1, 0.4);
+      ofun.addPoint(1, 0.05);
+      ctfun.addRGBPoint(1.1, 1.0, 0.0, 0.0);
+      ofun.addPoint(1.5, 0.0);
       // REGULAR_TISSUE = 2
       ctfun.addRGBPoint(2, 1.0, 0.8, 0.8);
-      ofun.addPoint(2, 0.01);
+      ofun.addPoint(2, 0.00);
       // EPITHELIUM = 3
+      ctfun.addRGBPoint(2.5, 1.0, 0.8, 0.8);
+      ofun.addPoint(2.5, 0.00);
       ctfun.addRGBPoint(3, 0.9, 0.9, 1.0);
-      ofun.addPoint(3, 0.25);
+      ofun.addPoint(3, 0.05);
+      ctfun.addRGBPoint(3.5, 1.0, 0.8, 0.8);
+      ofun.addPoint(3.5, 0.00);
+
       this.vtk.geometryActor.getProperty().setRGBTransferFunction(0, ctfun);
       this.vtk.geometryActor.getProperty().setScalarOpacity(0, ofun);
       // TODO: setInterpolationTypeToNearest should be more precise, since scalars are discrete
@@ -103,8 +118,11 @@ export default {
 
       this.vtk.sporeMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
-        scaleFactor: 0.6,
+        scaleFactor: 5,
+        colorMode: ColorMode.MAP_SCALARS,
+        scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
       });
+      this.vtk.sporeMapper.setColorByArrayName('status');
       this.vtk.sporeMapper.setInputConnection(this.vtk.sporeGlyphSource.getOutputPort(), 1);
 
       this.vtk.sporeLookupTable = vtkLookupTable.newInstance({
@@ -123,7 +141,10 @@ export default {
 
       this.vtk.macrophageMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
-        scaleFactor: 0.4,
+        scaleFactor: 8,
+        colorMode: ColorMode.MAP_SCALARS,
+        scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
+        scalarRange: [0, 1],
       });
       this.vtk.macrophageMapper
         .setInputConnection(this.vtk.macrophageGlyphSource.getOutputPort(), 1);

@@ -13,7 +13,7 @@
           :timepoints="timepoints"
           :timepoints-info="timepointsInfo"
         />
-        <MetadataPanel />
+        <!--MetadataPanel /-->
       </v-toolbar-items>
     </v-app-bar>
     <v-content>
@@ -33,7 +33,7 @@
 <script>
 import LungVolume from '@/components/LungVolume.vue';
 import TimeControl from '@/components/TimeControl.vue';
-import MetadataPanel from '@/components/MetadataPanel.vue';
+// import MetadataPanel from '@/components/MetadataPanel.vue';
 import http from '@/http';
 
 export default {
@@ -41,7 +41,7 @@ export default {
   components: {
     LungVolume,
     TimeControl,
-    MetadataPanel,
+    // MetadataPanel,
   },
   data() {
     return {
@@ -65,7 +65,7 @@ export default {
   },
   methods: {
     async getTPs() {
-      const rootID = '5cf18200ef2e260353a51922';
+      const rootID = '5ef4f4579014a6d84edf79b7';
 
       const timepointInfo = (await http.get(`folder/${rootID}/details`)).data;
       const timepointFolders = (await http.get('folder', {
