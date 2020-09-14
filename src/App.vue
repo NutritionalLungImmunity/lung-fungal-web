@@ -1,6 +1,9 @@
 <template>
   <v-app>
-    <v-app-bar app>
+    <v-app-bar
+      app
+      clipped-left
+    >
       <v-toolbar-title>
         FLungGui
       </v-toolbar-title>
