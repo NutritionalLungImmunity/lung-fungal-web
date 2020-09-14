@@ -42,3 +42,9 @@ export default {
   name: 'App',
 };
 </script>
+
+<style>
+.v-application--wrap {
+  background: #dcdcdc;
+}
+</style>
