@@ -114,7 +114,6 @@ export default {
   data() {
     return {
       panel: [],
-      items: 3, // Must be equal to number of items in viewPanels array
       viewPanels: [
         {
           header: 'Geometry',
