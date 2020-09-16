@@ -1,5 +1,65 @@
 <template>
   <v-content class="px-5">
+    <v-navigation-drawer
+      v-model="filters"
+      app
+      dark
+      right
+      temporary
+    >
+      <v-toolbar
+        fixed
+        flat
+      >
+        <v-toolbar-title>
+          Filters
+        </v-toolbar-title>
+      </v-toolbar>
+      <v-divider />
+      <div class="drawer-wrapper d-flex flex-column">
+        <v-list dense>
+          <v-list-item>
+            <v-list-item-content>
+              Filtering option #1
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-checkbox />
+            </v-list-item-action>
+          </v-list-item>
+          <v-divider />
+          <v-list-item>
+            <v-list-item-content>
+              Filtering option #2
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-checkbox />
+            </v-list-item-action>
+          </v-list-item>
+          <v-divider />
+          <v-list-item>
+            <v-list-item-content>
+              Filtering option #3
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-checkbox />
+            </v-list-item-action>
+          </v-list-item>
+        </v-list>
+        <v-spacer />
+        <v-footer class="pa-0">
+          <v-btn
+            block
+            color="primary"
+            depressed
+            tile
+            x-large
+          >
+            Apply Filters
+          </v-btn>
+        </v-footer>
+      </div>
+    </v-navigation-drawer>
+
     <v-toolbar
       class="elevation-2 mt-5"
       color="primary"
@@ -58,6 +118,7 @@
               <v-btn
                 icon
                 v-on="on"
+                @click="filters = true"
               >
                 <v-icon size="20">
                   mdi-filter-menu
@@ -103,6 +164,7 @@ export default {
   name: 'SimulationListPage',
   data() {
     return {
+      filters: false,
       simulations: [
         {
           name: 'Simulation #1',
@@ -150,5 +212,8 @@ export default {
 <style scoped>
 .sorting {
   border-right: 1px solid #5a97dc;
+}
+.drawer-wrapper {
+  height: calc(100% - 65px);
 }
 </style>
