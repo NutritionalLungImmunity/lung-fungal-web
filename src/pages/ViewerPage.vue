@@ -111,7 +111,6 @@
 <script>
 export default {
   name: 'ViewerPage',
-  components: {},
   data() {
     return {
       panel: [],
@@ -134,7 +133,7 @@ export default {
     // Create an array the length of our items
     // with all values as true
     all() {
-      this.panel = [...Array(this.items).keys()].map((k, i) => i);
+      this.panel = [...Array(this.viewPanel.length).keys()];
     },
     // Reset the panel
     none() {
