@@ -147,8 +147,12 @@
             </div>
           </v-card-title>
           <v-divider />
-          <v-card-text>
-            <v-list dense>
+          <v-card-text class="pa-0">
+            <v-list
+              class="pa-0"
+              color="grey lighten-5"
+              dense
+            >
               <!-- Author -->
               <v-list-item>
                 <v-list-item-icon class="mr-2">
@@ -162,7 +166,7 @@
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-
+              <v-divider />
               <!-- Date Time -->
               <v-list-item>
                 <v-list-item-icon class="mr-2">
