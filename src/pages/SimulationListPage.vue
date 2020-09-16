@@ -148,11 +148,66 @@
           </v-card-title>
           <v-divider />
           <v-card-text>
-            <v-icon size="18">
-              mdi-account-circle
-            </v-icon>
-            {{ sim.author }}
+            <v-list dense>
+              <!-- Author -->
+              <v-list-item>
+                <v-list-item-icon class="mr-2">
+                  <v-icon size="20">
+                    mdi-account-circle
+                  </v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ sim.author }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+
+              <!-- Date Time -->
+              <v-list-item>
+                <v-list-item-icon class="mr-2">
+                  <v-icon size="20">
+                    mdi-calendar
+                  </v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    <div class="d-flex">
+                      <div class="date pr-2">
+                        {{ sim.date }}
+                      </div>
+                      <span class="grey--text">@</span>
+                      <div class="time px-2">
+                        {{ sim.time }}
+                      </div>
+                    </div>
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
           </v-card-text>
+          <v-divider />
+          <v-card-actions>
+            <v-btn
+              icon
+              text
+            >
+              <v-icon
+                color="error"
+                size="20"
+              >
+                mdi-delete
+              </v-icon>
+            </v-btn>
+            <v-spacer />
+            <v-btn
+              color="primary"
+              small
+              text
+            >
+              View Simulation
+            </v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
@@ -170,36 +225,50 @@ export default {
           name: 'Simulation #1',
           id: '#123456',
           author: 'John Smith',
+          date: '09.15.20',
+          time: '10:02 am',
         },
         {
           name: 'Simulation #2',
           id: '#123456',
           author: 'John Smith',
+          date: '09.15.20',
+          time: '10:02 am',
         },
         {
           name: 'Simulation #3',
           id: '#123456',
           author: 'John Smith',
+          date: '09.15.20',
+          time: '10:02 am',
         },
         {
           name: 'Simulation #4',
           id: '#123456',
           author: 'John Smith',
+          date: '09.15.20',
+          time: '10:02 am',
         },
         {
           name: 'Simulation #5',
           id: '#123456',
           author: 'John Smith',
+          date: '09.15.20',
+          time: '10:02 am',
         },
         {
           name: 'Simulation #6',
           id: '#123456',
           author: 'John Smith',
+          date: '09.15.20',
+          time: '10:02 am',
         },
         {
           name: 'Simulation #7',
           id: '#123456',
           author: 'John Smith',
+          date: '09.15.20',
+          time: '10:02 am',
         },
       ],
       sortOptions: ['Alphabetical', 'Author', 'Date', 'ID'],
