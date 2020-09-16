@@ -192,17 +192,66 @@
           </v-card-text>
           <v-divider />
           <v-card-actions>
-            <v-btn
-              icon
-              text
-            >
-              <v-icon
-                color="error"
-                size="20"
-              >
-                mdi-delete
-              </v-icon>
-            </v-btn>
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  small
+                  text
+                  v-on="on"
+                >
+                  <v-icon
+                    color="gray darken-1"
+                    size="20"
+                  >
+                    mdi-download
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span>
+                Download Simulation
+              </span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  small
+                  text
+                  v-on="on"
+                >
+                  <v-icon
+                    color="gray darken-1"
+                    size="20"
+                  >
+                    mdi-share
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span>
+                Share Simulation
+              </span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  small
+                  text
+                  v-on="on"
+                >
+                  <v-icon
+                    color="error"
+                    size="20"
+                  >
+                    mdi-archive
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span>
+                Archive
+              </span>
+            </v-tooltip>
             <v-spacer />
             <v-btn
               color="primary"
