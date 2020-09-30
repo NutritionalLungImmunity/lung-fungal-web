@@ -70,6 +70,7 @@
       <v-toolbar-items class="align-center d-flex">
         <div class="sorting d-flex align-center mr-1 pr-1">
           <v-select
+            v-model="sortBy"
             class="mr-1"
             dense
             hide-details
@@ -162,7 +163,7 @@
                 </v-list-item-icon>
                 <v-list-item-content>
                   <v-list-item-title>
-                    {{ sim.author }}
+                    {{ sim.nli.author }}
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
@@ -268,14 +269,21 @@
 </template>
 
 <script>
+const sortPropertyMap = {
+  Alphabetical: 'name',
+  Author: 'nli.author',
+  Date: 'created',
+};
+
 export default {
   name: 'SimulationListPage',
   inject: ['girderRest'],
   data() {
     return {
       filters: false,
-      sortOptions: ['Alphabetical', 'Author', 'Date', 'ID'],
-      sortDesc: false,
+      sortBy: 'Date',
+      sortOptions: ['Alphabetical', 'Author', 'Date'],
+      sortDesc: true,
       usersCache: {},
     };
   },
@@ -283,26 +291,14 @@ export default {
     simulations: {
       default: [],
       async get() {
-        const simulations = await this.girderRest.listSimulations();
-        // eslint-disable-next-line arrow-body-style
-        return Promise.all(
-          simulations.map((sim) => this.injectAuthor(sim, this.girderRest)),
+        return this.girderRest.listSimulations(
+          sortPropertyMap[this.sortBy],
+          this.sortDesc,
         );
       },
     },
   },
   methods: {
-    async injectAuthor(simulation, girderRest) {
-      const userId = simulation.creatorId;
-      if (!this.usersCache[userId]) {
-        const { data } = await girderRest.get(`user/${userId}`);
-        this.usersCache[userId] = `${data.firstName} ${data.lastName}`;
-      }
-      return {
-        author: this.usersCache[userId],
-        ...simulation,
-      };
-    },
     formatDate(d) {
       return (new Date(d).toLocaleDateString());
     },

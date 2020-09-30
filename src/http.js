@@ -6,8 +6,13 @@ const http = new RestClient({ apiRoot: girderApi });
 Object.assign(
   http,
   {
-    async listSimulations() {
-      const { data } = await this.get('nli/simulation');
+    async listSimulations(sortBy, sortDesc) {
+      const { data } = await this.get('nli/simulation', {
+        params: {
+          sort: sortBy,
+          sortdir: sortDesc ? 1 : -1,
+        },
+      });
       return data;
     },
   },
