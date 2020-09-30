@@ -143,7 +143,7 @@
             {{ sim.name }}
             <v-spacer />
             <div class="caption">
-              ID: {{ sim.id }}
+              ID: {{ sim._id }}
             </div>
           </v-card-title>
           <v-divider />
@@ -178,11 +178,11 @@
                   <v-list-item-title>
                     <div class="d-flex">
                       <div class="date pr-2">
-                        {{ sim.date }}
+                        {{ formatDate(sim.created) }}
                       </div>
                       <span class="grey--text">@</span>
                       <div class="time px-2">
-                        {{ sim.time }}
+                        {{ formatTime(sim.created) }}
                       </div>
                     </div>
                   </v-list-item-title>
@@ -270,63 +270,45 @@
 <script>
 export default {
   name: 'SimulationListPage',
+  inject: ['girderRest'],
   data() {
     return {
       filters: false,
-      simulations: [
-        {
-          name: 'Simulation #1',
-          id: '#123456',
-          author: 'John Smith',
-          date: '09.15.20',
-          time: '10:02 am',
-        },
-        {
-          name: 'Simulation #2',
-          id: '#123456',
-          author: 'John Smith',
-          date: '09.15.20',
-          time: '10:02 am',
-        },
-        {
-          name: 'Simulation #3',
-          id: '#123456',
-          author: 'John Smith',
-          date: '09.15.20',
-          time: '10:02 am',
-        },
-        {
-          name: 'Simulation #4',
-          id: '#123456',
-          author: 'John Smith',
-          date: '09.15.20',
-          time: '10:02 am',
-        },
-        {
-          name: 'Simulation #5',
-          id: '#123456',
-          author: 'John Smith',
-          date: '09.15.20',
-          time: '10:02 am',
-        },
-        {
-          name: 'Simulation #6',
-          id: '#123456',
-          author: 'John Smith',
-          date: '09.15.20',
-          time: '10:02 am',
-        },
-        {
-          name: 'Simulation #7',
-          id: '#123456',
-          author: 'John Smith',
-          date: '09.15.20',
-          time: '10:02 am',
-        },
-      ],
       sortOptions: ['Alphabetical', 'Author', 'Date', 'ID'],
       sortDesc: false,
+      usersCache: {},
     };
+  },
+  asyncComputed: {
+    simulations: {
+      default: [],
+      async get() {
+        const simulations = await this.girderRest.listSimulations();
+        // eslint-disable-next-line arrow-body-style
+        return Promise.all(
+          simulations.map((sim) => this.injectAuthor(sim, this.girderRest)),
+        );
+      },
+    },
+  },
+  methods: {
+    async injectAuthor(simulation, girderRest) {
+      const userId = simulation.creatorId;
+      if (!this.usersCache[userId]) {
+        const { data } = await girderRest.get(`user/${userId}`);
+        this.usersCache[userId] = `${data.firstName} ${data.lastName}`;
+      }
+      return {
+        author: this.usersCache[userId],
+        ...simulation,
+      };
+    },
+    formatDate(d) {
+      return (new Date(d).toLocaleDateString());
+    },
+    formatTime(d) {
+      return (new Date(d).toLocaleTimeString());
+    },
   },
 };
 </script>

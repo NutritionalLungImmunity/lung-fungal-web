@@ -29,11 +29,9 @@
       </v-toolbar-items>
     </v-app-bar>
 
-    <v-main>
-      <v-container fluid>
-        <router-view />
-      </v-container>
-    </v-main>
+    <v-container fluid>
+      <router-view />
+    </v-container>
   </v-app>
 </template>
 
