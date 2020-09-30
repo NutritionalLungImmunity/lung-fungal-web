@@ -199,6 +199,7 @@
                   icon
                   small
                   text
+                  :href="`${girderApi}/folder/${sim._id}/download`"
                   v-on="on"
                 >
                   <v-icon
@@ -278,7 +279,7 @@ const sortPropertyMap = {
 
 export default {
   name: 'SimulationListPage',
-  inject: ['girderRest'],
+  inject: ['girderApi', 'girderRest'],
   data() {
     return {
       filters: false,

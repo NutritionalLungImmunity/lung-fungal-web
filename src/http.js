@@ -22,3 +22,4 @@ Object.assign(
 );
 
 export default http;
+export { girderApi };
