@@ -240,6 +240,7 @@
                   small
                   text
                   v-on="on"
+                  @click="archiveSimulation(sim._id)"
                 >
                   <v-icon
                     color="error"
@@ -285,6 +286,7 @@ export default {
       sortOptions: ['Alphabetical', 'Author', 'Date'],
       sortDesc: true,
       usersCache: {},
+      updateState: new Date(),
     };
   },
   asyncComputed: {
@@ -296,6 +298,7 @@ export default {
           this.sortDesc,
         );
       },
+      watch: ['updateState'],
     },
   },
   methods: {
@@ -304,6 +307,10 @@ export default {
     },
     formatTime(d) {
       return (new Date(d).toLocaleTimeString());
+    },
+    async archiveSimulation(id) {
+      await this.girderRest.archiveSimulation(id);
+      this.updateState = new Date();
     },
   },
 };

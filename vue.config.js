@@ -1,6 +1,12 @@
 const process = require('process'); // eslint-disable-line import/no-extraneous-dependencies
 
 module.exports = {
+  devServer: {
+    overlay: {
+      warnings: false,
+      errors: false,
+    },
+  },
   chainWebpack: (config) => {
     // Add vtk.js shader loader
     config.module

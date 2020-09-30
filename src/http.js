@@ -15,6 +15,9 @@ Object.assign(
       });
       return data;
     },
+    async archiveSimulation(id) {
+      await this.post(`nli/simulation/${id}/archive`);
+    },
   },
 );
 
