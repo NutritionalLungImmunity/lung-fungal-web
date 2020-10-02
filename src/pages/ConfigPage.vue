@@ -23,7 +23,7 @@
               <v-tooltip top>
                 <template v-slot:activator="{ on }">
                   <v-btn
-                    v-if="panel.length < 3"
+                    v-if="panel.length < panelCount"
                     icon
                     small
                     @click="all"
@@ -83,24 +83,43 @@
             tile
           >
             <v-expansion-panel
-              v-for="(item,i) in viewPanels"
-              :key="i"
               class="grey darken-3"
             >
               <v-expansion-panel-header>
-                {{ item.header }}
+                Name
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                Controls here
-                <div class="d-flex panel-footer pt-3">
-                  <v-spacer />
-                  <v-btn
-                    color="primary"
-                    small
-                  >
-                    Apply
-                  </v-btn>
-                </div>
+                <v-text-field
+                  v-model="name"
+                />
+              </v-expansion-panel-content>
+              <v-divider />
+            </v-expansion-panel>
+
+            <v-expansion-panel
+              class="grey darken-3"
+            >
+              <v-expansion-panel-header>
+                Time
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-slider
+                  v-model="time"
+                  min="1"
+                  max="100"
+                  step="1"
+                >
+                  <template v-slot:append>
+                    <v-text-field
+                      v-model="time"
+                      class="mt-0 pt-0"
+                      hide-details
+                      single-line
+                      type="number"
+                      style="width: 45px"
+                    />
+                  </template>
+                </v-slider>
               </v-expansion-panel-content>
               <v-divider />
             </v-expansion-panel>
@@ -114,6 +133,7 @@
             depressed
             x-large
             tile
+            @click="runSimulation"
           >
             <v-icon
               dark
@@ -132,32 +152,33 @@
 <script>
 export default {
   name: 'ConfigPage',
+  inject: ['girderRest'],
   data() {
     return {
+      name: '',
+      time: 20,
       panel: [],
-      viewPanels: [
-        {
-          header: 'Geometry',
-          controls: '',
-        },
-        {
-          header: 'Cell Population',
-        },
-        {
-          header: 'Dynamic Properties',
-        },
-      ],
+      panelCount: 2,
     };
   },
   methods: {
     // Create an array the length of our items
     // with all values as true
     all() {
-      this.panel = [...Array(this.viewPanel.length).keys()];
+      this.panel = [...Array(this.panelCount).keys()];
     },
     // Reset the panel
     none() {
       this.panel = [];
+    },
+    runSimulation() {
+      // needs validation
+      if (this.name) {
+        this.girderRest.runSimulation({
+          name: this.name,
+          targetTime: this.time,
+        });
+      }
     },
   },
 };
