@@ -260,6 +260,7 @@
               color="primary"
               small
               text
+              :to="`/viewer/${sim._id}`"
             >
               View Simulation
             </v-btn>

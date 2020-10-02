@@ -22,7 +22,7 @@ export default new Router({
       component: SimulationListPage,
     },
     {
-      path: '/viewer',
+      path: '/viewer/:id',
       name: 'viewer',
       component: ViewerPage,
     },

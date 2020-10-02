@@ -3,8 +3,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-
 import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
 import vtkColorTransferFunction from 'vtk.js/Sources/Rendering/Core/ColorTransferFunction';
 import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
@@ -19,14 +17,33 @@ import {
   ScalarMode,
 } from 'vtk.js/Sources/Rendering/Core/Mapper/Constants';
 
+import Simulation from '@/data/simulation';
+
 export default {
   name: 'Render3D',
+  props: {
+    simulation: {
+      type: Simulation,
+      required: true,
+    },
+    timeStep: {
+      type: Number,
+      required: true,
+    },
+  },
   computed: {
-    ...mapState({
-      geometryData: (state) => state.geometry.imageData,
-      sporeData: (state) => state.spore.polyData,
-      macrophageData: (state) => state.macrophage.polyData,
-    }),
+    state() {
+      return this.simulation.timeSteps[this.timeStep];
+    },
+    geometry() {
+      return this.state.geometry;
+    },
+    spore() {
+      return this.state.spore;
+    },
+    macrophage() {
+      return this.state.macrophage;
+    },
   },
   static() {
     return {
@@ -34,37 +51,21 @@ export default {
     };
   },
   watch: {
-    geometryData() {
-      if (!this.geometryData) {
-        return;
-      }
-      // TODO: handler clearing of data
-      this.vtk.geometryMapper.setInputData(this.geometryData);
-      this.render();
-    },
-    sporeData() {
-      if (!this.sporeData) {
-        return;
-      }
-      this.sporeData.getPointData().setActiveScalars('status');
-      this.vtk.sporeMapper.setInputData(this.sporeData, 0);
-      this.render();
-    },
-    macrophageData() {
-      if (!this.macrophageData) {
-        return;
-      }
-      this.macrophageData.getPointData().setActiveScalars('dead');
-      this.vtk.macrophageMapper.setInputData(this.macrophageData, 0);
-      this.render();
+    state() {
+      this.setStateData();
     },
   },
   mounted() {
-    this.vtk.renderWindowContainer = vtkFullScreenRenderWindow.newInstance();
+    window.vtk = this.vtk;
+    this.vtk.renderWindowContainer = vtkFullScreenRenderWindow.newInstance({
+      rootContainer: this.$el,
+    });
     // TODO: This has no real mutator, so a warning is logged on '.set'
+    /*
     this.vtk.renderWindowContainer.set({
       rootContainer: this.$el,
     });
+    */
 
     this.vtk.renderer = this.vtk.renderWindowContainer.getRenderer();
     this.vtk.renderWindow = this.vtk.renderWindowContainer.getRenderWindow();
@@ -72,8 +73,18 @@ export default {
     this.createGeometry();
     this.createSpore();
     this.createMacrophage();
+    this.setStateData();
   },
   methods: {
+    setStateData() {
+      // TODO: handler clearing of data
+      this.vtk.geometryMapper.setInputData(this.geometry);
+      this.spore.getPointData().setActiveScalars('status');
+      this.vtk.sporeMapper.setInputData(this.spore, 0);
+      this.macrophage.getPointData().setActiveScalars('dead');
+      this.vtk.macrophageMapper.setInputData(this.macrophage, 0);
+      this.render();
+    },
     createGeometry() {
       this.vtk.geometryMapper = vtkVolumeMapper.newInstance();
       this.vtk.geometryMapper.setSampleDistance(1.1);
@@ -162,10 +173,8 @@ export default {
       this.vtk.renderer.addActor(this.vtk.macrophageActor);
     },
     render() {
-      if (this.geometryData && this.sporeData && this.macrophageData) {
-        this.vtk.renderer.resetCamera();
-        this.vtk.renderWindow.render();
-      }
+      this.vtk.renderer.resetCamera();
+      this.vtk.renderWindow.render();
     },
   },
 };
