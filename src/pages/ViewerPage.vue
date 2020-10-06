@@ -1,13 +1,16 @@
 <template>
-  <v-content>
-    <v-container fluid>
+  <v-main>
+    <v-container
+      fluid
+      class="pa-0"
+    >
       <Render3D
         v-if="simulation"
         :simulation="simulation"
         :time-step="timeStep"
       />
     </v-container>
-  </v-content>
+  </v-main>
 </template>
 
 <script>

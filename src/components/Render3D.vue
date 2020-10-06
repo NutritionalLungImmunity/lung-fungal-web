@@ -1,5 +1,8 @@
 <template>
-  <div />
+  <div
+    v-resize="resize"
+    class="render3d"
+  />
 </template>
 
 <script>
@@ -59,6 +62,10 @@ export default {
     window.vtk = this.vtk;
     this.vtk.renderWindowContainer = vtkFullScreenRenderWindow.newInstance({
       rootContainer: this.$el,
+      containerStyle: {
+        width: '100%',
+        height: '100%',
+      },
     });
     // TODO: This has no real mutator, so a warning is logged on '.set'
     /*
@@ -176,6 +183,17 @@ export default {
       this.vtk.renderer.resetCamera();
       this.vtk.renderWindow.render();
     },
+    resize() {
+      if (this.vtk && this.vtk.renderWindowContainer) {
+        this.vtk.renderWindowContainer.resize();
+      }
+    },
   },
 };
 </script>
+
+<style scoped>
+.render3d {
+  height: calc(100vh - 88px);
+}
+</style>
