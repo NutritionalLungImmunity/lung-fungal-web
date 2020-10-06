@@ -1,7 +1,7 @@
 <template>
-  <v-content>
+  <v-main>
     Simulation comparison page
-  </v-content>
+  </v-main>
 </template>
 
 <script>

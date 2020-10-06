@@ -20,7 +20,7 @@
     "vue-async-computed": "^3.9.0",
     "vue-router": "^3.3.2",
     "vue-static": "^0.0.5",
-    "vuetify": "^2.2.33",
+    "vuetify": "^2.3.12",
     "vuex": "^3.4.0",
     "worker-loader": "^2.0.0"
   },

@@ -1,5 +1,5 @@
 <template>
-  <v-content class="px-5">
+  <v-main class="px-5">
     <v-navigation-drawer
       v-model="filters"
       app
@@ -268,7 +268,7 @@
         </v-card>
       </v-col>
     </v-row>
-  </v-content>
+  </v-main>
 </template>
 
 <script>

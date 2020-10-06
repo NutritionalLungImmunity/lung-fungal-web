@@ -1,5 +1,5 @@
 <template>
-  <v-content>
+  <v-main>
     Simulation configuration page
     <v-navigation-drawer
       app
@@ -146,7 +146,7 @@
         </v-footer>
       </div>
     </v-navigation-drawer>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
