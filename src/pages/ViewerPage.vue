@@ -10,6 +10,33 @@
         :time-step="timeStep"
       />
       <v-container
+        class="time-control ma-4"
+      >
+        <v-row>
+          <v-btn
+            tile
+            :disabled="playing"
+            @click="previousTimeStep"
+          >
+            <v-icon>mdi-skip-previous</v-icon>
+          </v-btn>
+          <v-btn
+            :depressed="playing"
+            tile
+            @click="playOrStop"
+          >
+            <v-icon>{{ playing ? "mdi-stop" : "mdi-play" }}</v-icon>
+          </v-btn>
+          <v-btn
+            tile
+            :disabled="playing"
+            @click="nextTimeStep"
+          >
+            <v-icon>mdi-skip-next</v-icon>
+          </v-btn>
+        </v-row>
+      </v-container>
+      <v-container
         class="plot ma-4"
       >
         <Plot2D
@@ -34,7 +61,9 @@ export default {
   },
   data() {
     return {
+      playing: false,
       timeStep: 0,
+      timeStepShowDuration: 1000,
     };
   },
   computed: {
@@ -89,12 +118,31 @@ export default {
     simulation: {
       default: null,
       async get() {
-        window.simulation = await Simulation.load(this.$route.params.id);
-        return window.simulation; // Simulation.load(this.$route.params.id);
+        return Simulation.load(this.$route.params.id);
       },
     },
   },
   methods: {
+    nextTimeStep() {
+      this.timeStep = (this.timeStep + 1) % this.simulation.timeSteps.length;
+    },
+    previousTimeStep() {
+      this.timeStep = (this.timeStep - 1 + this.simulation.timeSteps.length)
+        % this.simulation.timeSteps.length;
+    },
+    playOrStop() {
+      this.playing = !this.playing;
+      if (this.playing) {
+        this.playNextFrame();
+      }
+    },
+    playNextFrame() {
+      if (!this.playing) {
+        return;
+      }
+      this.nextTimeStep();
+      window.setTimeout(this.playNextFrame.bind(this), this.timeStepShowDuration);
+    },
   },
 };
 </script>
@@ -119,5 +167,11 @@ export default {
   width: 100%;
   height: 100%;
   position: relative;
+}
+
+.time-control {
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }
 </style>
