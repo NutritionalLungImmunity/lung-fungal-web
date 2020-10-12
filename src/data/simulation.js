@@ -7,6 +7,9 @@ class Simulation {
   }
 
   static async load(id) {
+    if (!id) {
+      return null;
+    }
     const folders = (await http.get('folder', {
       params: {
         parentType: 'folder',
