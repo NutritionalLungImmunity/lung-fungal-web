@@ -13,11 +13,8 @@
           background-color="transparent"
           height="64"
         >
-          <v-tab to="/config">
-            Configuration
-          </v-tab>
           <v-tab to="/simulations">
-            Simulation List
+            Simulations
           </v-tab>
           <v-tab to="/compare">
             Compare
