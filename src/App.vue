@@ -23,7 +23,10 @@
       </v-toolbar-items>
     </v-app-bar>
 
-    <v-container fluid>
+    <v-container
+      class="pa-0"
+      fluid
+    >
       <router-view />
     </v-container>
   </v-app>
