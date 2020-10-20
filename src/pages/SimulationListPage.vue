@@ -1,14 +1,12 @@
 <template>
   <v-main class="px-0">
-    <v-toolbar
-      app
+    <v-app-bar
       color="grey darken-3"
       dark
       dense
       flat
     >
       <v-tabs
-        v-model="value"
         dark
         slider-color="primary"
       >
@@ -49,7 +47,7 @@
           </v-btn>
         </v-tab>
       </v-tabs>
-    </v-toolbar>
+    </v-app-bar>
     <v-container
       class="px-5"
       fluid
@@ -183,92 +181,7 @@
               </span>
             </v-tooltip>
           </div>
-          <v-dialog
-            v-model="simDialog"
-            scrollable
-            max-width="500px"
-            transition="dialog-transition"
-          >
-            <template v-slot:activator="{ on }">
-              <v-btn
-                color="light-blue darken-3"
-                class="ml-3"
-                dark
-                depressed
-                v-on="on"
-              >
-                New Simulation
-                <v-spacer />
-                <v-icon right>
-                  mdi-plus-circle
-                </v-icon>
-              </v-btn>
-            </template>
-            <v-card>
-              <v-card-title class="headline">
-                New Simulation
-              </v-card-title>
-              <v-card-subtitle>
-                Configure your new simulation below.
-              </v-card-subtitle>
-              <v-card-text class="pa-0">
-                <v-list class="py-0">
-                  <v-list-item class="pt-2 px-6">
-                    <v-text-field
-                      v-model="name"
-                      label="Simulation Name"
-                      outlined
-                    />
-                  </v-list-item>
-                  <v-divider />
-                  <v-subheader class="grey--text grey lighten-4">
-                    Other Parameters
-                  </v-subheader>
-                  <v-list-item class="grey lighten-4 px-6">
-                    <v-slider
-                      v-model="time"
-                      class="time-slider"
-                      label="Time"
-                      min="1"
-                      max="100"
-                      step="1"
-                      thumb-label
-                    >
-                      <template v-slot:append>
-                        <v-text-field
-                          v-model="time"
-                          class="mt-0 pt-0"
-                          dense
-                          outlined
-                          single-line
-                          type="number"
-                          style="width: 64px"
-                        />
-                      </template>
-                    </v-slider>
-                  </v-list-item>
-                </v-list>
-                <v-divider />
-              </v-card-text>
-              <v-card-actions class="pa-6">
-                <v-spacer />
-                <v-btn
-                  color="grey darken-3"
-                  text
-                  @click="simDialog = false"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  color="primary"
-                  depressed
-                  @click="simDialog = false"
-                >
-                  Create
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+          <config-dialog @create="refresh" />
         </v-toolbar-items>
       </v-toolbar>
       <v-row class="pt-5">
@@ -411,6 +324,8 @@
 </template>
 
 <script>
+import ConfigDialog from '@/components/ConfigDialog.vue';
+
 const sortPropertyMap = {
   Alphabetical: 'name',
   Author: 'nli.author',
@@ -419,6 +334,9 @@ const sortPropertyMap = {
 
 export default {
   name: 'SimulationListPage',
+  components: {
+    ConfigDialog,
+  },
   inject: ['girderApi', 'girderRest'],
   data() {
     return {
@@ -452,6 +370,12 @@ export default {
     },
     async archiveSimulation(id) {
       await this.girderRest.archiveSimulation(id);
+      // TODO: need to add a way to show "queued" simulations
+      setTimeout(() => {
+        this.refresh();
+      }, 1000);
+    },
+    refresh() {
       this.updateState = new Date();
     },
   },
