@@ -41,6 +41,7 @@
       >
         <Plot2D
           class="plot-container"
+          :time="times[timeStep]"
           :chart-data="chartData"
         />
       </v-container>

@@ -6,12 +6,17 @@
 
 <script>
 import Chart from 'chart.js';
+import * as ChartAnnotation from 'chartjs-plugin-annotation';
 
 export default {
   name: 'Plot2D',
   props: {
     chartData: {
       type: Object,
+      required: true,
+    },
+    time: {
+      type: Number,
       required: true,
     },
     options: {
@@ -27,6 +32,12 @@ export default {
         this.chart.update();
       }
     },
+    time() {
+      if (this.chart) {
+        this.chart.annotation.elements.time.options.value = this.time;
+        this.chart.update();
+      }
+    },
   },
   mounted() {
     this.chart = new Chart(
@@ -34,9 +45,24 @@ export default {
       {
         type: 'line',
         data: this.chartData,
+        plugins: [ChartAnnotation],
         options: {
+          animation: {
+            duration: 0,
+          },
           responsive: true,
           maintainAspectRatio: false,
+          annotation: {
+            annotations: [{
+              id: 'time',
+              type: 'line',
+              mode: 'vertical',
+              scaleID: 'x-axis-0',
+              value: this.time,
+              borderColor: 'black',
+              borderWidth: 2,
+            }],
+          },
           ...this.options,
         },
       },
