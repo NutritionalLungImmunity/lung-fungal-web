@@ -13,11 +13,8 @@
           background-color="transparent"
           height="64"
         >
-          <v-tab to="/config">
-            Configuration
-          </v-tab>
           <v-tab to="/simulations">
-            Simulation List
+            Simulations
           </v-tab>
           <v-tab to="/compare">
             Compare
@@ -26,7 +23,10 @@
       </v-toolbar-items>
     </v-app-bar>
 
-    <v-container fluid>
+    <v-container
+      class="pa-0"
+      fluid
+    >
       <router-view />
     </v-container>
   </v-app>
