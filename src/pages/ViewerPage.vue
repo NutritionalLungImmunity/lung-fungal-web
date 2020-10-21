@@ -8,11 +8,12 @@
       <Render3D
         :simulation="simulation"
         :time-step="timeStep"
+        @point="selectedPointInfo = $event"
       />
       <v-container
-        class="time-control ma-4"
+        class="time-control pa-0"
       >
-        <v-row>
+        <v-row class="ma-4">
           <v-btn
             tile
             :disabled="playing"
@@ -34,6 +35,26 @@
           >
             <v-icon>mdi-skip-next</v-icon>
           </v-btn>
+        </v-row>
+        <v-row
+          v-if="selectedPointInfo.id !== undefined"
+          class="ma-4"
+        >
+          <v-simple-table
+            :dense="true"
+          >
+            <template v-slot:default>
+              <tbody>
+                <tr
+                  v-for="(value, name) in selectedPointInfo"
+                  :key="name"
+                >
+                  <td>{{ name }}</td>
+                  <td>{{ value }}</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
         </v-row>
       </v-container>
       <v-container
@@ -65,6 +86,7 @@ export default {
       playing: false,
       timeStep: 0,
       timeStepShowDuration: 1000,
+      selectedPointInfo: {},
     };
   },
   computed: {
@@ -113,6 +135,12 @@ export default {
         backgroundColor: color,
         fill: false,
       };
+    },
+  },
+  watch: {
+    timeStep() {
+      // TODO: Update point info rather than clear it.
+      this.selectedPointInfo = {};
     },
   },
   asyncComputed: {
@@ -174,5 +202,6 @@ export default {
   position: absolute;
   top: 0px;
   left: 0px;
+  max-width: 300px;
 }
 </style>

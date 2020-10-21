@@ -12,6 +12,7 @@ import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenR
 import vtkGlyph3DMapper from 'vtk.js/Sources/Rendering/Core/Glyph3DMapper';
 import vtkLookupTable from 'vtk.js/Sources/Common/Core/LookupTable';
 import vtkPiecewiseFunction from 'vtk.js/Sources/Common/DataModel/PiecewiseFunction';
+import vtkPointPicker from 'vtk.js/Sources/Rendering/Core/PointPicker';
 import vtkSphereSource from 'vtk.js/Sources/Filters/Sources/SphereSource';
 import vtkVolume from 'vtk.js/Sources/Rendering/Core/Volume';
 import vtkVolumeMapper from 'vtk.js/Sources/Rendering/Core/VolumeMapper';
@@ -59,6 +60,7 @@ export default {
     },
   },
   beforeDestroy() {
+    delete window.vtk;
     // force delete the webgl context when destroying the component
     const rw = this.vtk.renderWindow;
     if (rw) {
@@ -76,12 +78,6 @@ export default {
         height: '100%',
       },
     });
-    // TODO: This has no real mutator, so a warning is logged on '.set'
-    /*
-    this.vtk.renderWindowContainer.set({
-      rootContainer: this.$el,
-    });
-    */
 
     this.vtk.renderer = this.vtk.renderWindowContainer.getRenderer();
     this.vtk.renderWindow = this.vtk.renderWindowContainer.getRenderWindow();
@@ -90,10 +86,44 @@ export default {
     this.createSpore();
     this.createMacrophage();
     this.setStateData();
+
+    this.vtk.picker = vtkPointPicker.newInstance();
+    this.vtk.renderWindow.getInteractor()
+      .onLeftButtonPress((evt) => this.onLeftClick(evt));
   },
   methods: {
+    onLeftClick(evt) {
+      if (evt.pokedRenderer !== this.vtk.renderer) {
+        return;
+      }
+
+      const { position } = evt;
+      const point = [position.x, position.y, 0.0];
+      this.vtk.picker.pick(point, this.vtk.renderer);
+
+      if (!this.vtk.picker.getActors().length) {
+        return;
+      }
+
+      const [actor] = this.vtk.picker.getActors();
+      const pointId = this.vtk.picker.getPointId();
+      const mapper = actor.getMapper();
+      const pointData = mapper.getInputData().getPointData();
+
+      const info = pointData.getArrays().map((a) => {
+        const name = a.getName();
+        let value = a.getTuple(pointId);
+        if (value.length === 1) {
+          [value] = value;
+        }
+        return [
+          name,
+          value,
+        ];
+      });
+      this.$emit('point', Object.fromEntries([['id', pointId], ...info]));
+    },
     setStateData() {
-      // TODO: handler clearing of data
       this.vtk.geometryMapper.setInputData(this.geometry);
       this.spore.getPointData().setActiveScalars('status');
       this.vtk.sporeMapper.setInputData(this.spore, 0);
