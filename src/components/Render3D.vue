@@ -58,6 +58,15 @@ export default {
       this.setStateData();
     },
   },
+  beforeDestroy() {
+    // force delete the webgl context when destroying the component
+    const rw = this.vtk.renderWindow;
+    if (rw) {
+      rw.getInteractor().unbindEvents();
+      const gl = this.$el.querySelector('canvas').getContext('webgl2');
+      gl.getExtension('WEBGL_lose_context').loseContext();
+    }
+  },
   mounted() {
     window.vtk = this.vtk;
     this.vtk.renderWindowContainer = vtkFullScreenRenderWindow.newInstance({
