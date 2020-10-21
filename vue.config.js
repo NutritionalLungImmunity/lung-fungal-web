@@ -26,6 +26,9 @@ module.exports = {
         fallback: false,
       });
 
+    // fix development with npm link
+    config.resolve.symlinks(false);
+
     // Fix an issue with HMR and the worker-loader
     // https://github.com/webpack/webpack/issues/6642
     // https://github.com/vuejs/vue-cli/issues/2276
