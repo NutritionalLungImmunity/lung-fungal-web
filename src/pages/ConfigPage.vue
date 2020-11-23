@@ -32,17 +32,44 @@
                       Simulation
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      <v-list dense>
-                        <v-list-item>
-                          stuff
-                        </v-list-item>
-                        <v-list-item>
-                          stuff
-                        </v-list-item>
-                        <v-list-item>
-                          stuff
-                        </v-list-item>
-                      </v-list>
+                      <v-row class="px-5 py-3">
+                        <v-col cols="12">
+                          <v-slider
+                            color="primary"
+                            hide-details
+                            label="Slider 1"
+                            thumb-size="24"
+                            thumb-label="hover"
+                          />
+                        </v-col>
+                        <v-col cols="6">
+                          <v-checkbox
+                            label="Side by side 1"
+                            value="value"
+                          />
+                        </v-col>
+                        <v-col cols="6">
+                          <v-checkbox
+                            label="Side by side 2"
+                            value="value"
+                          />
+                        </v-col>
+                        <v-col cols="12">
+                          <v-slider
+                            color="primary"
+                            hide-details
+                            label="Slider 2"
+                            thumb-size="24"
+                            thumb-label="hover"
+                          />
+                        </v-col>
+                        <v-col cols="12">
+                          <v-checkbox
+                            label="Not side by side checkbox"
+                            value="value"
+                          />
+                        </v-col>
+                      </v-row>
                     </v-expansion-panel-content>
                     <v-divider />
                   </v-expansion-panel>
@@ -430,7 +457,7 @@ export default {
 
 <style>
 .params-panel .v-expansion-panel-content__wrap {
-  background: rgba(255, 255, 255, .12);
+  background: rgba(0, 0, 0, .25);
   padding-left: 0;
   padding-right: 0;
 }
