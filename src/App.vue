@@ -13,6 +13,9 @@
           background-color="transparent"
           height="64"
         >
+          <v-tab to="/configure">
+            Configuration
+          </v-tab>
           <v-tab to="/simulations">
             Simulations
           </v-tab>
