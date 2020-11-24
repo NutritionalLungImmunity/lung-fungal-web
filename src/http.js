@@ -18,10 +18,10 @@ Object.assign(
     async archiveSimulation(id) {
       await this.post(`nli/simulation/${id}/archive`);
     },
-    async runSimulation(params) {
+    async runSimulation(params, config) {
       return {
         nli: {},
-        ...this.post('nli/job', {}, { params }).data,
+        ...this.post('nli/job', { config }, { params }).data,
       };
     },
   },
