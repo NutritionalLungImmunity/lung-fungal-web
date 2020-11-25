@@ -25,6 +25,9 @@
               class="mt-0 pt-0"
               type="number"
               style="width: 60px"
+              dense
+              hide-details
+              outlined
             />
           </template>
         </v-slider>
@@ -84,3 +87,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.v-input__append-outer {
+  margin: -3px 0 0;
+}
+</style>
