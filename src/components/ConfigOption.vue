@@ -2,8 +2,11 @@
   <div
     v-if="type === 'slider'"
   >
-    <v-row class="px-5 py-3">
-      <v-col cols="12">
+    <v-row class="px-5 py-2">
+      <v-col
+        cols="12"
+        class="py-0"
+      >
         <v-subheader class="pl-0">
           {{ label }}
         </v-subheader>
@@ -38,7 +41,10 @@
     v-else-if="type === 'checkbox'"
   >
     <v-row class="px-5 py-3">
-      <v-col cols="12">
+      <v-col
+        cols="12"
+        class="py-0"
+      >
         <v-checkbox
           :label="label"
           :value="value"
