@@ -7,6 +7,7 @@
             v-for="panel in panels"
             :key="panel.title"
             cols="6"
+            class="params-cols"
           >
             <config-panel
               v-model="values"
