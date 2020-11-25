@@ -7,7 +7,7 @@
         cols="12"
         class="py-0"
       >
-        <v-subheader class="pl-0">
+        <v-subheader class="panel-subheader pl-0">
           {{ label }}
         </v-subheader>
         <v-slider
@@ -93,6 +93,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.panel-subheader {
+  height: 32px;
+}
+</style>
 
 <style>
 .v-input__append-outer {
