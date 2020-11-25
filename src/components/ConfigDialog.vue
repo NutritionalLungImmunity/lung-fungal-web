@@ -7,16 +7,17 @@
   >
     <template v-slot:activator="{ on }">
       <v-btn
-        color="light-blue darken-3"
+        color="primary"
         class="ml-3"
         dark
         depressed
+        large
         v-on="on"
       >
-        New Simulation
+        Run Simulation
         <v-spacer />
         <v-icon right>
-          mdi-plus-circle
+          mdi-chevron-right
         </v-icon>
       </v-btn>
     </template>
@@ -25,7 +26,7 @@
         New Simulation
       </v-card-title>
       <v-card-subtitle>
-        Configure your new simulation below.
+        Provide a name for your simulation.
       </v-card-subtitle>
       <v-card-text class="pa-0">
         <v-list class="py-0">
@@ -36,35 +37,7 @@
               outlined
             />
           </v-list-item>
-          <v-divider />
-          <v-subheader class="grey--text grey lighten-4">
-            Other Parameters
-          </v-subheader>
-          <v-list-item class="grey lighten-4 px-6">
-            <v-slider
-              v-model="time"
-              class="time-slider"
-              label="Time"
-              min="1"
-              max="100"
-              step="1"
-              thumb-label
-            >
-              <template v-slot:append>
-                <v-text-field
-                  v-model="time"
-                  class="mt-0 pt-0"
-                  dense
-                  outlined
-                  single-line
-                  type="number"
-                  style="width: 64px"
-                />
-              </template>
-            </v-slider>
-          </v-list-item>
         </v-list>
-        <v-divider />
       </v-card-text>
       <v-card-actions class="pa-6">
         <v-spacer />
@@ -89,6 +62,12 @@
 
 <script>
 export default {
+  props: {
+    config: {
+      type: Object,
+      required: true,
+    },
+  },
   inject: ['girderRest'],
   data() {
     return {
@@ -102,7 +81,7 @@ export default {
       await this.girderRest.runSimulation({
         targetTime: this.time,
         name: this.name,
-      });
+      }, this.config);
       this.$emit('create');
       this.simDialog = false;
     },

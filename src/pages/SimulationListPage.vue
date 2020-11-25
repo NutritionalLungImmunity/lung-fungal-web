@@ -181,7 +181,6 @@
               </span>
             </v-tooltip>
           </div>
-          <config-dialog @create="refresh" />
         </v-toolbar-items>
       </v-toolbar>
       <v-row class="pt-5">
@@ -324,8 +323,6 @@
 </template>
 
 <script>
-import ConfigDialog from '@/components/ConfigDialog.vue';
-
 const sortPropertyMap = {
   Alphabetical: 'name',
   Author: 'nli.author',
@@ -334,9 +331,6 @@ const sortPropertyMap = {
 
 export default {
   name: 'SimulationListPage',
-  components: {
-    ConfigDialog,
-  },
   inject: ['girderApi', 'girderRest'],
   data() {
     return {
