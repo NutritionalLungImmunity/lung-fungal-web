@@ -15,6 +15,7 @@
           :min="option.min"
           :max="option.max"
           :step="option.step"
+          :color="color"
           @input="onChange(option.id, $event)"
         />
       </div>
@@ -45,6 +46,10 @@ export default {
     },
     value: {
       type: Object,
+      required: true,
+    },
+    color: {
+      type: String,
       required: true,
     },
   },

@@ -27,6 +27,7 @@
           :options="opts"
           :module="module"
           :value="value"
+          :color="color"
           @input="$emit('input', $event)"
         />
       </v-expansion-panels>
@@ -52,6 +53,10 @@ export default {
     },
     value: {
       type: Object,
+      required: true,
+    },
+    color: {
+      type: String,
       required: true,
     },
   },

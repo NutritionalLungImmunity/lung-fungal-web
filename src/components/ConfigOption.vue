@@ -11,7 +11,7 @@
           {{ label }}
         </v-subheader>
         <v-slider
-          color="primary"
+          :color="color"
           hide-details
           thumb-size="24"
           :thumb-label="true"
@@ -89,6 +89,10 @@ export default {
     step: {
       type: Number,
       default: 1,
+    },
+    color: {
+      type: String,
+      required: true,
     },
   },
 };

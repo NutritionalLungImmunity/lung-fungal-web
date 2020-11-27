@@ -4,7 +4,7 @@
       <v-col cols="5">
         <v-row no-gutters>
           <v-col
-            v-for="panel in panels"
+            v-for="(panel, id) in panels"
             :key="panel.title"
             cols="6"
             class="params-cols"
@@ -13,6 +13,7 @@
               v-model="values"
               :title="panel.title"
               :modules="panel.modules"
+              :color="colors[id]"
             />
           </v-col>
         </v-row>
@@ -69,6 +70,13 @@ export default {
     return {
       panels: config,
       values,
+      // These colors should match the colors embedded in the CSS for ConfigPanel.
+      colors: {
+        geometry: 'deep-purple lighten-2',
+        dynamics: 'blue lighten-1',
+        populations: 'cyan lighten-2',
+        properties: 'lime lighten-1',
+      },
     };
   },
   asyncComputed: {
