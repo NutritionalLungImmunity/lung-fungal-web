@@ -4,18 +4,21 @@
       {{ name }}
     </v-expansion-panel-header>
     <v-expansion-panel-content>
-      <config-option
-        v-for="option in options"
-        :key="option.id"
-        :value="value[module][option.id] || option.default"
-        :type="option.type || 'slider'"
-        :label="option.label"
-        :tooltip="option.help || option.label"
-        :min="option.min"
-        :max="option.max"
-        :step="option.step"
-        @input="onChange(option.id, $event)"
-      />
+      <div class="pt-4">
+        <config-option
+          v-for="option in options"
+          :key="option.id"
+          :value="value[module][option.id] || option.default"
+          :type="option.type || 'slider'"
+          :label="option.label"
+          :tooltip="option.help || option.label"
+          :min="option.min"
+          :max="option.max"
+          :step="option.step"
+          :color="color"
+          @input="onChange(option.id, $event)"
+        />
+      </div>
     </v-expansion-panel-content>
     <v-divider />
   </v-expansion-panel>
@@ -43,6 +46,10 @@ export default {
     },
     value: {
       type: Object,
+      required: true,
+    },
+    color: {
+      type: String,
       required: true,
     },
   },

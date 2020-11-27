@@ -27,6 +27,7 @@
           :options="opts"
           :module="module"
           :value="value"
+          :color="color"
           @input="$emit('input', $event)"
         />
       </v-expansion-panels>
@@ -54,6 +55,10 @@ export default {
       type: Object,
       required: true,
     },
+    color: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -79,6 +84,16 @@ export default {
 .param-card .v-card__title {
   background: #353535;
 }
+.param-card .v-card__title:before {
+  background: inherit;
+  border: 1px solid #2b2b2b;
+  border-radius: 100%;
+  content: '';
+  display: inline;
+  height: 8px;
+  margin-right: 15px;
+  width: 8px;
+}
 .params-panel {
   background: transparent !important;
 }
@@ -92,11 +107,35 @@ export default {
   overflow: hidden;
   overflow-y: auto;
 }
+.params-cols:first-of-type .param-card .v-card__title:before {
+  background: #9575CD;
+}
+.params-cols:first-of-type .scrollable {
+  border-left: 3px solid #9575CD;
+}
+.params-cols:nth-of-type(2) .param-card .v-card__title:before {
+  background: #42A5F5;
+}
+.params-cols:nth-of-type(2) .scrollable {
+  border-left: 3px solid #42A5F5;
+}
+.params-cols:nth-of-type(3) .param-card .v-card__title:before {
+  background: #4DD0E1;
+}
+.params-cols:nth-of-type(3) .scrollable {
+  border-left: 3px solid #4DD0E1;
+}
+.params-cols:last-of-type .param-card .v-card__title:before {
+  background: #D4E157;
+}
+.params-cols:last-of-type .scrollable {
+  border-left: 3px solid #D4E157;
+}
 </style>
 
 <style>
 .params-panel .v-expansion-panel-content__wrap {
-  background: rgba(0, 0, 0, .25);
+  background: rgba(0, 0, 0, 0.25);
   padding-left: 0;
   padding-right: 0;
 }

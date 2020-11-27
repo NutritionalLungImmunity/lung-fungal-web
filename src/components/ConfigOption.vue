@@ -2,13 +2,16 @@
   <div
     v-if="type === 'slider'"
   >
-    <v-row class="px-5 py-3">
-      <v-col cols="12">
-        <v-subheader class="pl-0">
+    <v-row class="px-5 py-2">
+      <v-col
+        cols="12"
+        class="py-0"
+      >
+        <v-subheader class="panel-subheader pl-0">
           {{ label }}
         </v-subheader>
         <v-slider
-          color="primary"
+          :color="color"
           hide-details
           thumb-size="24"
           :thumb-label="true"
@@ -25,6 +28,9 @@
               class="mt-0 pt-0"
               type="number"
               style="width: 60px"
+              dense
+              hide-details
+              outlined
             />
           </template>
         </v-slider>
@@ -35,7 +41,10 @@
     v-else-if="type === 'checkbox'"
   >
     <v-row class="px-5 py-3">
-      <v-col cols="12">
+      <v-col
+        cols="12"
+        class="py-0"
+      >
         <v-checkbox
           :label="label"
           :value="value"
@@ -81,6 +90,22 @@ export default {
       type: Number,
       default: 1,
     },
+    color: {
+      type: String,
+      required: true,
+    },
   },
 };
 </script>
+
+<style scoped>
+.panel-subheader {
+  height: 32px;
+}
+</style>
+
+<style>
+.v-input__append-outer {
+  margin: -3px 0 0;
+}
+</style>
