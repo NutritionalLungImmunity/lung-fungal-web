@@ -35,19 +35,33 @@
         </v-tab>
       </v-tabs>
     </v-app-bar>
-    <simulation-list-tab
-      @view="viewSimulation($event)"
-    />
+    <v-tabs-items v-model="currentTab">
+      <v-tab-item
+        key="_simulationList"
+      >
+        <simulation-list-tab
+          @view="viewSimulation($event)"
+        />
+      </v-tab-item>
+      <v-tab-item
+        v-for="simulation in tabs"
+        :key="simulation._id"
+      >
+        <simulation-viewer :simulation-id="simulation._id" />
+      </v-tab-item>
+    </v-tabs-items>
   </v-main>
 </template>
 
 <script>
 import SimulationListTab from '@/components/SimulationListTab.vue';
+import SimulationViewer from '@/components/SimulationViewer.vue';
 
 export default {
   name: 'SimulationListPage',
   components: {
     SimulationListTab,
+    SimulationViewer,
   },
   data() {
     return {
@@ -63,7 +77,10 @@ export default {
         tab = simulation;
         this.tabs.push(tab);
       }
-      this.currentTab = tab.id;
+      this.setTab(tab._id);
+    },
+    setTab(simulationId) {
+      this.currentTab = this.tabs.map((tab) => tab._id).indexOf(simulationId) + 1;
     },
     closeTab(id) {
       this.tabs = this.tabs.filter((tab) => tab._id !== id);
