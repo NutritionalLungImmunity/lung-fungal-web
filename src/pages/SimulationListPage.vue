@@ -7,9 +7,10 @@
       flat
     >
       <v-tabs
-        v-model="currentTab"
+        :value="currentTab"
         dark
         slider-color="primary"
+        @change="setTabByIndex($event)"
       >
         <v-tab
           key="_simulationList"
@@ -17,7 +18,7 @@
           <span>Simulation List</span>
         </v-tab>
         <v-tab
-          v-for="tab in tabs"
+          v-for="tab in tabObjects"
           :key="tab._id"
         >
           <span class="mr-2">{{ tab.name }}</span>
@@ -35,25 +36,33 @@
         </v-tab>
       </v-tabs>
     </v-app-bar>
-    <v-tabs-items v-model="currentTab">
+    <v-tabs-items
+      :value="currentTab"
+      @change="setTabByIndex($event)"
+    >
       <v-tab-item
         key="_simulationList"
       >
         <simulation-list-tab
+          :sort-by="sortBy"
+          :sort-desc="sortDescBoolean"
           @view="viewSimulation($event)"
+          @paging="updatePagingRoute"
         />
       </v-tab-item>
       <v-tab-item
-        v-for="simulation in tabs"
-        :key="simulation._id"
+        v-for="tab in tabs"
+        :key="tab"
       >
-        <simulation-viewer :simulation-id="simulation._id" />
+        <simulation-viewer :simulation-id="tab" />
       </v-tab-item>
     </v-tabs-items>
   </v-main>
 </template>
 
 <script>
+import { boolean } from 'boolean';
+
 import SimulationListTab from '@/components/SimulationListTab.vue';
 import SimulationViewer from '@/components/SimulationViewer.vue';
 
@@ -63,27 +72,98 @@ export default {
     SimulationListTab,
     SimulationViewer,
   },
+  inject: ['girderRest'],
+  props: {
+    sortBy: {
+      type: String,
+      default: 'Date',
+    },
+    sortDesc: {
+      type: String,
+      default: 'true',
+    },
+    activeTab: {
+      type: String,
+      default: '_simulationList',
+    },
+    tabs: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+  },
   data() {
     return {
-      currentTab: '_simulationList',
-      tabs: [],
+      simulationCache: {},
     };
+  },
+  computed: {
+    currentTab() {
+      return this.tabs.indexOf(this.activeTab) + 1;
+    },
+    sortDescBoolean() {
+      return boolean(this.sortDesc);
+    },
+    tabObjects() {
+      return this.tabs.map(
+        (id) => this.simulationCache[id],
+      ).filter((tab) => tab !== undefined);
+    },
+  },
+  created() {
+    this.tabs.forEach((tab) => {
+      this.fetchSimulation(tab);
+    });
   },
   methods: {
     viewSimulation(simulation) {
       const id = simulation._id;
-      let tab = this.tabs.filter((t) => t._id === id)[0];
-      if (!tab) {
-        tab = simulation;
-        this.tabs.push(tab);
+      this.simulationCache[id] = simulation;
+      if (!this.tabs.filter((t) => t === id)[0]) {
+        this.updateTabList([...this.tabs, id]);
       }
-      this.setTab(tab._id);
+      this.setTab(id);
+    },
+    async fetchSimulation(id) {
+      if (!this.simulationCache[id]) {
+        this.$set(this.simulationCache, id, await this.girderRest.getSimulation(id));
+      }
+      return this.simulationCache[id];
     },
     setTab(simulationId) {
-      this.currentTab = this.tabs.map((tab) => tab._id).indexOf(simulationId) + 1;
+      const query = {
+        ...this.$route.query,
+        activeTab: simulationId,
+      };
+      this.$router.push({ path: 'simulations', query });
+    },
+    setTabByIndex(index) {
+      let tab;
+      if (index === 0) {
+        tab = '_simulationList';
+      } else {
+        tab = this.tabs[index - 1];
+      }
+      this.setTab(tab);
     },
     closeTab(id) {
-      this.tabs = this.tabs.filter((tab) => tab._id !== id);
+      this.updateTabList(this.tabs.filter((tab) => tab !== id));
+    },
+    updateTabList(tabs) {
+      const query = {
+        ...this.$route.query,
+        tabs,
+      };
+      this.$router.replace({ path: 'simulations', query });
+    },
+    updatePagingRoute({ sortBy, sortDesc }) {
+      const query = {
+        ...this.$route.query,
+        sortBy,
+        sortDesc: sortDesc ? 'true' : 'false',
+      };
+      this.$router.replace({ path: 'simulations', query });
     },
   },
 };

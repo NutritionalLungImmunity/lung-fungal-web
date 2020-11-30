@@ -20,6 +20,9 @@ export default new Router({
       path: '/simulations',
       name: 'simulations',
       component: SimulationListPage,
+      props(route) {
+        return route.query;
+      },
     },
     {
       path: '/viewer/:id',
