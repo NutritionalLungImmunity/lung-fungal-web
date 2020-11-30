@@ -21,7 +21,15 @@ export default new Router({
       name: 'simulations',
       component: SimulationListPage,
       props(route) {
-        return route.query;
+        let { tabs } = route.query;
+        if (!Array.isArray(tabs)) {
+          if (tabs) {
+            tabs = [tabs];
+          } else {
+            tabs = [];
+          }
+        }
+        return { ...route.query, tabs };
       },
     },
     {
