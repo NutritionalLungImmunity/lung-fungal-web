@@ -15,6 +15,10 @@ Object.assign(
       });
       return data;
     },
+    async getSimulation(id) {
+      const { data } = await this.get(`folder/${id}`);
+      return data;
+    },
     async archiveSimulation(id) {
       await this.post(`nli/simulation/${id}/archive`);
     },
