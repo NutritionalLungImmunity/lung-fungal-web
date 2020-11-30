@@ -40,7 +40,10 @@
         key="_simulationList"
       >
         <simulation-list-tab
+          :sort-by="sortBy"
+          :sort-desc="sortDescBoolean"
           @view="viewSimulation($event)"
+          @paging="updatePagingRoute"
         />
       </v-tab-item>
       <v-tab-item
@@ -54,6 +57,8 @@
 </template>
 
 <script>
+import { boolean } from 'boolean';
+
 import SimulationListTab from '@/components/SimulationListTab.vue';
 import SimulationViewer from '@/components/SimulationViewer.vue';
 
@@ -63,11 +68,26 @@ export default {
     SimulationListTab,
     SimulationViewer,
   },
+  props: {
+    sortBy: {
+      type: String,
+      default: 'Date',
+    },
+    sortDesc: {
+      type: String,
+      default: 'true',
+    },
+  },
   data() {
     return {
       currentTab: '_simulationList',
       tabs: [],
     };
+  },
+  computed: {
+    sortDescBoolean() {
+      return boolean(this.sortDesc);
+    },
   },
   methods: {
     viewSimulation(simulation) {
@@ -84,6 +104,14 @@ export default {
     },
     closeTab(id) {
       this.tabs = this.tabs.filter((tab) => tab._id !== id);
+    },
+    updatePagingRoute({ sortBy, sortDesc }) {
+      const query = {
+        ...this.$route.query,
+        sortBy,
+        sortDesc: sortDesc ? 'true' : 'false',
+      };
+      this.$router.replace({ path: 'simulations', query });
     },
   },
 };

@@ -11,6 +11,7 @@
     "@girder/components": "^2.2.6",
     "@mdi/font": "^5.3.45",
     "axios": "^0.19.2",
+    "boolean": "^3.0.2",
     "chart.js": "^2.9.3",
     "chartjs-plugin-annotation": "^0.5.7",
     "core-js": "^3.6.5",

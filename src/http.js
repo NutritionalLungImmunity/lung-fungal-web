@@ -10,7 +10,7 @@ Object.assign(
       const { data } = await this.get('nli/simulation', {
         params: {
           sort: sortBy,
-          sortdir: sortDesc ? 1 : -1,
+          sortdir: sortDesc ? -1 : 1,
         },
       });
       return data;

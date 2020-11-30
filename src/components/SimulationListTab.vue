@@ -71,13 +71,14 @@
       <v-toolbar-items class="align-center d-flex">
         <div class="sorting d-flex align-center mr-1 pr-1">
           <v-select
-            v-model="sortBy"
+            :value="sortBy"
             class="mr-1"
             dense
             hide-details
             :items="sortOptions"
             label="Sort by"
             outlined
+            @change="updatePaging({ 'sortBy': $event })"
           />
           <v-tooltip
             v-if="!sortDesc"
@@ -87,7 +88,7 @@
               <v-btn
                 icon
                 v-on="on"
-                @click="sortDesc = true"
+                @click="updatePaging({ 'sortDesc': true })"
               >
                 <v-icon size="20">
                   mdi-sort-ascending
@@ -104,7 +105,7 @@
               <v-btn
                 icon
                 v-on="on"
-                @click="sortDesc = false"
+                @click="updatePaging({ 'sortDesc': false })"
               >
                 <v-icon size="20">
                   mdi-sort-descending
@@ -164,13 +165,21 @@ export default {
     SimulationCard,
   },
   inject: ['girderApi', 'girderRest'],
+  props: {
+    sortBy: {
+      type: String,
+      required: true,
+    },
+    sortDesc: {
+      type: Boolean,
+      required: true,
+    },
+  },
   data() {
     return {
       filters: false,
       simDialog: false,
-      sortBy: 'Date',
       sortOptions: ['Alphabetical', 'Author', 'Date'],
-      sortDesc: true,
       updateState: new Date(),
     };
   },
@@ -189,6 +198,13 @@ export default {
   methods: {
     refresh() {
       this.updateState = new Date();
+    },
+    updatePaging(params) {
+      this.$emit('paging', {
+        sortBy: this.sortBy,
+        sortDesc: this.sortDesc,
+        ...params,
+      });
     },
   },
 };
