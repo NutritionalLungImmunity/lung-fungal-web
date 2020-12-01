@@ -38,6 +38,7 @@
     </v-app-bar>
     <v-tabs-items
       :value="currentTab"
+      class="transparent"
       @change="setTabByIndex($event)"
     >
       <v-tab-item
