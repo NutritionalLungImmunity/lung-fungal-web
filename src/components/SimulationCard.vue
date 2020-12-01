@@ -21,6 +21,7 @@
       prominent
       tile
       type="error"
+      :value="false"
     >
       <v-row align="center">
         <v-col class="grow">
