@@ -13,13 +13,13 @@
           background-color="transparent"
           height="64"
         >
-          <v-tab to="/configure">
+          <v-tab :to="`/configure?${query}`">
             Configuration
           </v-tab>
-          <v-tab to="/simulations">
+          <v-tab :to="`/simulations?${query}`">
             Simulations
           </v-tab>
-          <v-tab to="/compare">
+          <v-tab :to="`/compare?${query}`">
             Compare
           </v-tab>
         </v-tabs>
@@ -38,6 +38,11 @@
 <script>
 export default {
   name: 'App',
+  computed: {
+    query() {
+      return this.$route.fullPath.split('?')[1] || '';
+    },
+  },
 };
 </script>
 
