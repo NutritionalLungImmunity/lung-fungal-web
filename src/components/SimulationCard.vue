@@ -8,6 +8,11 @@
       </div>
     </v-card-title>
     <v-divider />
+    <v-progress-linear
+      :indeterminate="indeterminate"
+      :color="progressColor"
+      :value="100"
+    />
     <v-card-text class="pa-0">
       <v-list
         class="pa-0"
@@ -135,6 +140,17 @@ export default {
     simulation: {
       type: Object,
       required: true,
+    },
+  },
+  computed: {
+    indeterminate() {
+      return !this.simulation.nli.complete;
+    },
+    progressColor() {
+      if (this.simulation.nli.complete) {
+        return 'green';
+      }
+      return 'primary';
     },
   },
   methods: {
