@@ -8,6 +8,35 @@
       </div>
     </v-card-title>
     <v-divider />
+    <v-progress-linear
+      :indeterminate="indeterminate"
+      :color="progressColor"
+      :value="100"
+    />
+    <v-alert
+      class="ma-0 sim-card-alert"
+      color="error"
+      dense
+      icon="mdi-alert-rhombus"
+      prominent
+      tile
+      type="error"
+      :value="false"
+    >
+      <v-row align="center">
+        <v-col class="grow">
+          An error has occured
+        </v-col>
+        <v-col class="shrink">
+          <v-btn
+            outlined
+            small
+          >
+            Learn More
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-alert>
     <v-card-text class="pa-0">
       <v-list
         class="pa-0"
@@ -96,20 +125,29 @@
       </v-tooltip>
       <v-tooltip top>
         <template v-slot:activator="{ on }">
-          <v-btn
-            icon
-            small
-            text
-            v-on="on"
-            @click="archiveSimulation(simulation._id)"
-          >
-            <v-icon
-              color="error"
-              size="20"
+          <v-hover v-slot:default="{ hover }">
+            <v-btn
+              icon
+              small
+              text
+              v-on="on"
+              @click="archiveSimulation(simulation._id)"
             >
-              mdi-archive
-            </v-icon>
-          </v-btn>
+              <v-icon
+                v-if="hover"
+                color="error"
+                size="20"
+              >
+                mdi-archive
+              </v-icon>
+              <v-icon
+                v-else
+                size="20"
+              >
+                mdi-archive
+              </v-icon>
+            </v-btn>
+          </v-hover>
         </template>
         <span>
           Archive
@@ -137,6 +175,17 @@ export default {
       required: true,
     },
   },
+  computed: {
+    indeterminate() {
+      return !this.simulation.nli.complete;
+    },
+    progressColor() {
+      if (this.simulation.nli.complete) {
+        return 'green';
+      }
+      return 'primary';
+    },
+  },
   methods: {
     viewSimulation() {
       this.$emit('view', this.simulation);
@@ -160,3 +209,13 @@ export default {
   },
 };
 </script>
+
+<style>
+.sim-card-alert .v-alert__icon {
+  font-size: 26px !important;
+  margin-right: 5px;
+}
+.sim-card-alert .v-alert__icon:after {
+  display: none;
+}
+</style>
