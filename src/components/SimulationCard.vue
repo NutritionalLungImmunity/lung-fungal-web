@@ -8,11 +8,7 @@
       </div>
     </v-card-title>
     <v-divider />
-    <v-progress-linear
-      :indeterminate="indeterminate"
-      :color="progressColor"
-      :value="100"
-    />
+    <simulation-progress-bar :simulation="simulation" />
     <v-alert
       class="ma-0 sim-card-alert"
       color="error"
@@ -167,23 +163,17 @@
 </template>
 
 <script>
+import SimulationProgressBar from '@/components/SimulationProgressBar.vue';
+
 export default {
   inject: ['girderApi', 'girderRest'],
+  components: {
+    SimulationProgressBar,
+  },
   props: {
     simulation: {
       type: Object,
       required: true,
-    },
-  },
-  computed: {
-    indeterminate() {
-      return !this.simulation.nli.complete;
-    },
-    progressColor() {
-      if (this.simulation.nli.complete) {
-        return 'green';
-      }
-      return 'primary';
     },
   },
   methods: {

@@ -16,7 +16,7 @@ Object.assign(
       return data;
     },
     async getSimulation(id) {
-      const { data } = await this.get(`folder/${id}`);
+      const { data } = await this.get(`nli/simulation/${id}`);
       return data;
     },
     async archiveSimulation(id) {

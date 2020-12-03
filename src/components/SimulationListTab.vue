@@ -159,6 +159,7 @@ const sortPropertyMap = {
   Author: 'nli.author',
   Date: 'created',
 };
+const WAIT_INTERVAL = 5000;
 
 export default {
   components: {
@@ -177,6 +178,10 @@ export default {
   },
   data() {
     return {
+      // set to true when destroying the component
+      cancelUpdate: false,
+      // set to true when refreshing all simulations to prevent race conditions
+      skipNextUpdate: false,
       filters: false,
       simDialog: false,
       sortOptions: ['Alphabetical', 'Author', 'Date'],
@@ -187,6 +192,7 @@ export default {
     simulations: {
       default: [],
       async get() {
+        this.skipNextUpdate = true;
         return this.girderRest.listSimulations(
           sortPropertyMap[this.sortBy],
           this.sortDesc,
@@ -194,6 +200,12 @@ export default {
       },
       watch: ['updateState'],
     },
+  },
+  mounted() {
+    this.updateAllInProgress();
+  },
+  beforeDestroy() {
+    this.cancelUpdate = true;
   },
   methods: {
     refresh() {
@@ -205,6 +217,25 @@ export default {
         sortDesc: this.sortDesc,
         ...params,
       });
+    },
+    async updateInProgress(index) {
+      const simulation = this.simulations[index];
+      if (simulation.nli.status <= 2 && !this.skipNextUpdate) {
+        const data = await this.girderRest.getSimulation(simulation._id);
+        if (!this.skipNextUpdate) {
+          this.$set(this.simulations, index, data);
+        }
+      }
+    },
+    async updateAllInProgress() {
+      await Promise.all(
+        this.simulations.map((_, index) => this.updateInProgress(index)),
+      );
+      if (!this.cancelUpdate) {
+        await new Promise((resolve) => setTimeout(resolve, WAIT_INTERVAL));
+        this.skipNextUpdate = false;
+        this.updateAllInProgress();
+      }
     },
   },
 };
