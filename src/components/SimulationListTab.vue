@@ -222,6 +222,7 @@ export default {
       const simulation = this.simulations[index];
       if (simulation.nli.status <= 2 && !this.skipNextUpdate) {
         const data = await this.girderRest.getSimulation(simulation._id);
+        this.$emit('update', data);
         if (!this.skipNextUpdate) {
           this.$set(this.simulations, index, data);
         }

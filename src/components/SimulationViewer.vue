@@ -88,8 +88,8 @@ export default {
     Render3D,
   },
   props: {
-    simulationId: {
-      type: String,
+    simulationFolder: {
+      type: Object,
       required: true,
     },
   },
@@ -99,9 +99,14 @@ export default {
       timeStep: 0,
       timeStepShowDuration: 1000,
       selectedPointInfo: {},
+      cachedId: null,
+      cache: null,
     };
   },
   computed: {
+    simulationId() {
+      return this.simulationFolder._id;
+    },
     numberOfTimeSteps() {
       if (this.simulation) {
         return this.simulation.timeSteps.length;
@@ -159,7 +164,11 @@ export default {
     simulation: {
       default: null,
       async get() {
-        return Simulation.load(this.simulationId);
+        if (this.cachedId !== this.simulationId) {
+          this.cache = await Simulation.load(this.simulationId);
+          this.cachedId = this.simulationId;
+        }
+        return this.cache;
       },
     },
   },

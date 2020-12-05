@@ -24,7 +24,12 @@
           v-for="tab in tabObjects"
           :key="tab._id"
         >
-          <span class="mr-2">{{ tab.name }}</span>
+          <simulation-progress-bar
+            v-if="tab.nli.progress < 100"
+            :simulation="simulationCache[tab._id]"
+            :circular="true"
+          />
+          <span class="ms-2">{{ tab.name }}</span>
           <v-btn
             icon
             small
@@ -52,13 +57,14 @@
           :sort-desc="sortDescBoolean"
           @view="viewSimulation($event)"
           @paging="updatePagingRoute"
+          @update="updateCache"
         />
       </v-tab-item>
       <v-tab-item
         v-for="tab in tabs"
         :key="tab"
       >
-        <simulation-viewer :simulation-id="tab" />
+        <simulation-viewer :simulation-folder="simulationCache[tab]" />
       </v-tab-item>
     </v-tabs-items>
   </v-main>
@@ -69,12 +75,14 @@ import { boolean } from 'boolean';
 
 import SimulationListTab from '@/components/SimulationListTab.vue';
 import SimulationViewer from '@/components/SimulationViewer.vue';
+import SimulationProgressBar from '@/components/SimulationProgressBar.vue';
 
 export default {
   name: 'SimulationListPage',
   components: {
     SimulationListTab,
     SimulationViewer,
+    SimulationProgressBar,
   },
   inject: ['girderRest'],
   props: {
@@ -168,6 +176,9 @@ export default {
         sortDesc: sortDesc ? 'true' : 'false',
       };
       this.$router.replace({ path: 'simulations', query });
+    },
+    updateCache(simulation) {
+      this.$set(this.simulationCache, simulation._id, simulation);
     },
   },
 };
