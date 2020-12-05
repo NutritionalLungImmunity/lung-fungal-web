@@ -1,5 +1,8 @@
 <template>
-  <v-main class="px-0">
+  <v-main
+    v-if="loaded"
+    class="px-0"
+  >
     <v-app-bar
       color="grey darken-3"
       dark
@@ -96,6 +99,7 @@ export default {
   },
   data() {
     return {
+      loaded: false,
       simulationCache: {},
     };
   },
@@ -112,10 +116,9 @@ export default {
       ).filter((tab) => tab !== undefined);
     },
   },
-  created() {
-    this.tabs.forEach((tab) => {
-      this.fetchSimulation(tab);
-    });
+  async created() {
+    await Promise.all(this.tabs.map((tab) => this.fetchSimulation(tab)));
+    this.loaded = true;
   },
   methods: {
     viewSimulation(simulation) {
