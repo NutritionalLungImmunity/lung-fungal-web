@@ -1,8 +1,16 @@
 <template>
   <v-progress-linear
+    v-if="!circular"
     :indeterminate="indeterminate"
     :color="progressColor"
     :value="progress"
+  />
+  <v-progress-circular
+    v-else
+    :indeterminate="indeterminate"
+    :color="progressColor"
+    :value="progress"
+    :size="20"
   />
 </template>
 
@@ -23,6 +31,10 @@ export default {
     simulation: {
       type: Object,
       required: true,
+    },
+    circular: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
