@@ -56,20 +56,16 @@ export default {
     Geometry,
   },
   inject: ['girderRest'],
+  props: {
+    initialValues: {
+      type: String,
+      default: '{}',
+    },
+  },
   data() {
-    // extract default values from the static configuration
-    const values = {};
-    Object.entries(config).forEach(([, panelOpts]) => {
-      Object.entries(panelOpts.modules).forEach(([module, moduleOpts]) => {
-        values[module] = values[module] || {};
-        Object.entries(moduleOpts).forEach(([, option]) => {
-          values[module][option.id] = option.default;
-        });
-      });
-    });
     return {
       panels: config,
-      values,
+      values: {},
       // These colors should match the colors embedded in the CSS for ConfigPanel.
       colors: {
         geometry: 'deep-purple lighten-2',
@@ -78,6 +74,11 @@ export default {
         properties: 'lime lighten-1',
       },
     };
+  },
+  watch: {
+    initialValues() {
+      this.setDefaults();
+    },
   },
   asyncComputed: {
     geometry: {
@@ -88,9 +89,28 @@ export default {
       default: null,
     },
   },
+  created() {
+    this.setDefaults();
+  },
   methods: {
     onCreate() {
       this.$router.push('simulations');
+    },
+    setDefaults() {
+      const initialValues = JSON.parse(this.initialValues);
+      // extract default values from the static configuration
+      const values = {};
+      Object.entries(config).forEach(([, panelOpts]) => {
+        Object.entries(panelOpts.modules).forEach(([module, moduleOpts]) => {
+          const initialValueModule = initialValues[module] || {};
+          values[module] = values[module] || {};
+          Object.entries(moduleOpts).forEach(([, option]) => {
+            const initialValue = initialValueModule[option.id];
+            values[module][option.id] = initialValue === undefined ? option.default : initialValue;
+          });
+        });
+      });
+      this.values = values;
     },
   },
 };

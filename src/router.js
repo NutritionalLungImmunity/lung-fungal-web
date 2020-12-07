@@ -15,6 +15,11 @@ export default new Router({
       path: '/configure',
       name: 'configuration',
       component: ConfigPage,
+      props(route) {
+        return {
+          initialValues: route.query.initialValues || {},
+        };
+      },
     },
     {
       path: '/simulations',
