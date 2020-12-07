@@ -121,6 +121,26 @@
       </v-tooltip>
       <v-tooltip top>
         <template v-slot:activator="{ on }">
+          <v-btn
+            icon
+            small
+            text
+            v-on="on"
+            @click="rerunSimulation"
+          >
+            <v-icon
+              size="20"
+            >
+              mdi-open-in-new
+            </v-icon>
+          </v-btn>
+        </template>
+        <span>
+          Rerun
+        </span>
+      </v-tooltip>
+      <v-tooltip top>
+        <template v-slot:activator="{ on }">
           <v-hover v-slot:default="{ hover }">
             <v-btn
               icon
@@ -195,6 +215,18 @@ export default {
     },
     refresh() {
       this.$emit('refresh', this.simulation);
+    },
+    rerunSimulation() {
+      let { config } = this.simulation.nli;
+      if (config.config) {
+        // TODO: Figure out why the config gets nested like this.
+        config = config.config;
+      }
+      const query = {
+        ...this.$route.query,
+        initialValues: JSON.stringify(config),
+      };
+      this.$router.push({ path: 'configure', query });
     },
   },
 };
