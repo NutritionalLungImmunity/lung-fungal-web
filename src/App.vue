@@ -30,7 +30,9 @@
       class="pa-0"
       fluid
     >
-      <router-view />
+      <keep-alive>
+        <router-view />
+      </keep-alive>
     </v-container>
   </v-app>
 </template>
