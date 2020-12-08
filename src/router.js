@@ -17,7 +17,7 @@ export default new Router({
       component: ConfigPage,
       props(route) {
         return {
-          initialValues: route.query.initialValues || {},
+          initialValues: route.query.initialValues || '{}',
         };
       },
     },
