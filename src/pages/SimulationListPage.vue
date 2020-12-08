@@ -53,6 +53,7 @@
         key="_simulationList"
       >
         <simulation-list-tab
+          ref="simulationListTab"
           :sort-by="sortBy"
           :sort-desc="sortDescBoolean"
           @view="viewSimulation($event)"
@@ -127,6 +128,11 @@ export default {
   async created() {
     await Promise.all(this.tabs.map((tab) => this.fetchSimulation(tab)));
     this.loaded = true;
+  },
+  activated() {
+    if (this.$refs.simulationListTab) {
+      this.$refs.simulationListTab.refresh();
+    }
   },
   methods: {
     viewSimulation(simulation) {
