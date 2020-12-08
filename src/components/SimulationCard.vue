@@ -208,10 +208,7 @@ export default {
     },
     async archiveSimulation() {
       await this.girderRest.archiveSimulation(this.simulation._id);
-      // TODO: need to add a way to show "queued" simulations
-      setTimeout(() => {
-        this.refresh();
-      }, 1000);
+      this.refresh();
     },
     refresh() {
       this.$emit('refresh', this.simulation);
