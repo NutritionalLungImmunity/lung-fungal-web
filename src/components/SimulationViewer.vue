@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container
-      v-if="simulation"
+      v-if="numberOfTimeSteps > 0"
       fluid
       class="pa-0"
     >
@@ -94,13 +94,14 @@ export default {
     },
   },
   data() {
+    const simulation = new Simulation(this.simulationFolder._id);
+    simulation.update();
     return {
       playing: false,
       timeStep: 0,
       timeStepShowDuration: 1000,
       selectedPointInfo: {},
-      cachedId: null,
-      cache: null,
+      simulation,
     };
   },
   computed: {
@@ -108,30 +109,21 @@ export default {
       return this.simulationFolder._id;
     },
     numberOfTimeSteps() {
-      if (this.simulation) {
-        return this.simulation.timeSteps.length;
-      }
-      return 0;
+      return this.simulation.timeSteps.length;
     },
     times() {
-      if (this.simulation) {
-        // TODO: get time information from file
-        const { length } = this.simulation.timeSteps;
-        return Array.from({ length }, (v, k) => k + 1);
-      }
-      return [];
+      // TODO: get time information from file
+      const length = this.numberOfTimeSteps;
+      return Array.from({ length }, (v, k) => k + 1);
     },
     chartData() {
-      if (this.simulation) {
-        return {
-          labels: this.times,
-          datasets: [
-            this.spores,
-            this.macrophages,
-          ],
-        };
-      }
-      return {};
+      return {
+        labels: this.times,
+        datasets: [
+          this.spores,
+          this.macrophages,
+        ],
+      };
     },
     spores() {
       const color = 'rgb(54, 162, 235)';
@@ -158,18 +150,6 @@ export default {
     timeStep() {
       // TODO: Update point info rather than clear it.
       this.selectedPointInfo = {};
-    },
-  },
-  asyncComputed: {
-    simulation: {
-      default: null,
-      async get() {
-        if (this.cachedId !== this.simulationId) {
-          this.cache = await Simulation.load(this.simulationId);
-          this.cachedId = this.simulationId;
-        }
-        return this.cache;
-      },
     },
   },
   methods: {
