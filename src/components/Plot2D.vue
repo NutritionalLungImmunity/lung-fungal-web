@@ -26,16 +26,19 @@ export default {
       },
     },
   },
+  data() {
+    return {
+      cd: { ...this.chartData },
+    };
+  },
   watch: {
     chartData() {
-      if (this.chart) {
-        this.chart.update();
-      }
+      this.refresh();
     },
     time() {
       if (this.chart) {
         this.chart.annotation.elements.time.options.value = this.time;
-        this.chart.update();
+        this.refresh();
       }
     },
   },
@@ -44,7 +47,7 @@ export default {
       this.$refs.canvas,
       {
         type: 'line',
-        data: this.chartData,
+        data: this.cd,
         plugins: [ChartAnnotation],
         options: {
           animation: {
@@ -67,6 +70,14 @@ export default {
         },
       },
     );
+  },
+  methods: {
+    refresh() {
+      if (this.chart) {
+        Object.assign(this.cd, this.chartData);
+        this.chart.update();
+      }
+    },
   },
 };
 </script>
