@@ -105,6 +105,9 @@ export default {
     };
   },
   computed: {
+    progress() {
+      return (this.simulationFolder.nli || {}).progress || 0;
+    },
     simulationId() {
       return this.simulationFolder._id;
     },
@@ -150,6 +153,9 @@ export default {
     timeStep() {
       // TODO: Update point info rather than clear it.
       this.selectedPointInfo = {};
+    },
+    progress() {
+      this.simulation.update();
     },
   },
   methods: {
