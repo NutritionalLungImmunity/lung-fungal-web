@@ -74,6 +74,7 @@
 <script>
 import { boolean } from 'boolean';
 
+import cache from '@/cache';
 import SimulationListTab from '@/components/SimulationListTab.vue';
 import SimulationViewer from '@/components/SimulationViewer.vue';
 import SimulationProgressBar from '@/components/SimulationProgressBar.vue';
@@ -109,7 +110,7 @@ export default {
   data() {
     return {
       loaded: false,
-      simulationCache: {},
+      simulationCache: cache,
     };
   },
   computed: {
