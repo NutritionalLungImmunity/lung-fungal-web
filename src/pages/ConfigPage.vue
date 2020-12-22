@@ -45,6 +45,7 @@ import ConfigPanel from '@/components/ConfigPanel.vue';
 import Geometry from '@/components/Geometry.vue';
 import State from '@/data/state';
 import config from '@/config';
+import cache from '@/cache';
 
 const geometryFileUrl = 'https://data.kitware.com/api/v1/file/5fbbc06950a41e3d1968d2ad/download';
 
@@ -93,8 +94,24 @@ export default {
     this.setDefaults();
   },
   methods: {
-    onCreate() {
-      this.$router.push('simulations');
+    async onCreate(simulationId) {
+      // TODO: this logic should be moved to vuex
+      this.$set(cache, simulationId, await this.girderRest.getSimulation(simulationId));
+
+      const { query } = this.$route;
+      let tabs = query.tabs || [];
+      if (!Array.isArray(tabs)) {
+        tabs = [tabs];
+      }
+      tabs.push(simulationId);
+      this.$router.push({
+        path: 'simulations',
+        query: {
+          ...query,
+          tabs,
+          activeTab: simulationId,
+        },
+      });
     },
     setDefaults() {
       const initialValues = JSON.parse(this.initialValues);

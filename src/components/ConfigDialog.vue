@@ -78,11 +78,11 @@ export default {
   },
   methods: {
     async createSimulation() {
-      await this.girderRest.runSimulation({
+      const data = await this.girderRest.runSimulation({
         targetTime: this.time,
         name: this.name,
       }, this.config);
-      this.$emit('create');
+      this.$emit('create', data.kwargs.simulation_id);
       this.simDialog = false;
     },
   },
