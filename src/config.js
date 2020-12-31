@@ -31,6 +31,56 @@ export default {
           help: 'This is the grid size in the z direction',
         },
       ],
+      macrophage: [
+        {
+          id: 'time_step',
+          min: 0,
+          max: 10,
+          step: 0.01,
+          default: 1,
+          label: 'Time step',
+        },
+      ],
+      neutrophil: [
+        {
+          id: 'time_step',
+          min: 0,
+          max: 10,
+          step: 0.01,
+          default: 1,
+          label: 'Time step',
+        },
+      ],
+      fungus: [
+        {
+          id: 'time_step',
+          min: 0,
+          max: 10,
+          step: 0.01,
+          default: 1,
+          label: 'Time step',
+        },
+      ],
+      epithelium: [
+        {
+          id: 'time_step',
+          min: 0,
+          max: 10,
+          step: 0.01,
+          default: 1,
+          label: 'Time step',
+        },
+      ],
+      molecules: [
+        {
+          id: 'time_step',
+          min: 0,
+          max: 10,
+          step: 0.01,
+          default: 0.33,
+          label: 'Time step',
+        },
+      ],
     },
   },
   dynamics: {
@@ -239,6 +289,19 @@ export default {
         max: 100,
         default: 10,
         label: 'Maximum conidia in phag',
+      }, {
+        id: 'init_health',
+        min: 0,
+        max: 100,
+        default: 100,
+        label: 'init_health',
+      }, {
+        id: 'p_internalization',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.3,
+        label: 'p_internalization',
       }],
       molecules: [{
         id: 'diffusion_rate',
