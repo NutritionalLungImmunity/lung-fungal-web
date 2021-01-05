@@ -9,6 +9,7 @@
       <v-btn
         color="primary"
         class="ml-3"
+        :disabled="girderRest.user === null"
         dark
         depressed
         large

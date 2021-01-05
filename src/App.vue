@@ -13,7 +13,10 @@
           background-color="transparent"
           height="64"
         >
-          <v-tab :to="`/configure?${query}`">
+          <v-tab
+            v-if="girderRest.user !== null"
+            :to="`/configure?${query}`"
+          >
             Configuration
           </v-tab>
           <v-tab :to="`/simulations?${query}`">
@@ -24,6 +27,7 @@
           </v-tab>
         </v-tabs>
       </v-toolbar-items>
+      <login-dialog />
     </v-app-bar>
 
     <v-container
@@ -38,8 +42,14 @@
 </template>
 
 <script>
+import LoginDialog from '@/components/LoginDialog.vue';
+
 export default {
   name: 'App',
+  inject: ['girderRest'],
+  components: {
+    LoginDialog,
+  },
   computed: {
     query() {
       return this.$route.fullPath.split('?')[1] || '';
