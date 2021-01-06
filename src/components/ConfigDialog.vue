@@ -83,7 +83,7 @@ export default {
         targetTime: this.time,
         name: this.name,
       }, this.config);
-      this.$emit('create', data.kwargs.simulation_id);
+      this.$emit('create', (data.kwargs || {}).simulation_id);
       this.simDialog = false;
     },
   },

@@ -95,21 +95,28 @@ export default {
   },
   methods: {
     async onCreate(simulationId) {
-      // TODO: this logic should be moved to vuex
-      this.$set(cache, simulationId, await this.girderRest.getSimulation(simulationId));
-
       const { query } = this.$route;
       let tabs = query.tabs || [];
+      let activeTab = '_simulationList';
+
       if (!Array.isArray(tabs)) {
         tabs = [tabs];
       }
-      tabs.push(simulationId);
+
+      // TODO: this is to mitigate a bug when the simulation id is not returned, remove when fixed
+      if (simulationId) {
+        // TODO: this logic should be moved to vuex
+        this.$set(cache, simulationId, await this.girderRest.getSimulation(simulationId));
+        tabs.push(simulationId);
+        activeTab = simulationId;
+      }
+
       this.$router.push({
         path: 'simulations',
         query: {
           ...query,
           tabs,
-          activeTab: simulationId,
+          activeTab,
         },
       });
     },
