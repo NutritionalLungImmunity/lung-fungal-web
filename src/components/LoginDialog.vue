@@ -39,6 +39,7 @@
       v-if="!loggedIn"
       :forgot-password-url="forgotPasswordUrl"
       :register="true"
+      :oauth="true"
     />
     <v-card
       v-else
