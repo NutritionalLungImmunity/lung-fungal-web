@@ -223,9 +223,11 @@ export default {
       this.vtk.renderWindow.render();
     },
     resize() {
-      if (this.vtk && this.vtk.renderWindowContainer) {
-        this.vtk.renderWindowContainer.resize();
-      }
+      this.$nextTick().then(() => {
+        if (this.vtk && this.vtk.renderWindowContainer) {
+          this.vtk.renderWindowContainer.resize();
+        }
+      });
     },
   },
 };
