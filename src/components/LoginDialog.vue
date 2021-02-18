@@ -14,22 +14,24 @@
         >
           <v-btn
             class="mx-1"
-            icon
+            :icon="icon"
             dark
             color="primary"
             v-bind="attrs"
             v-on="{ ...on, ...on_t }"
           >
-            <v-icon
-              v-if="!loggedIn"
-            >
-              mdi-login
-            </v-icon>
-            <v-icon
-              v-else
-            >
-              mdi-account-circle
-            </v-icon>
+            <slot>
+              <v-icon
+                v-if="!loggedIn"
+              >
+                mdi-login
+              </v-icon>
+              <v-icon
+                v-else
+              >
+                mdi-account-circle
+              </v-icon>
+            </slot>
           </v-btn>
         </template>
         <span>Login</span>
@@ -68,6 +70,13 @@ export default {
   inject: ['girderRest'],
   components: {
     GirderAuthentication,
+  },
+  props: {
+    icon: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
