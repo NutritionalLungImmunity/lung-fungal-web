@@ -240,6 +240,7 @@ export default {
         default: 2,
         label: 'Duration of growth stage',
         help: 'Duration of growth stage in minutes',
+        units: 'minutes',
       }, {
         id: 'rest_time',
         min: 1,
@@ -248,6 +249,7 @@ export default {
         default: 2,
         label: 'Duration of resting stage',
         help: 'Duration of resting stage in minutes',
+        units: 'minutes',
       }, {
         id: 'swell_time',
         min: 1,
@@ -256,6 +258,7 @@ export default {
         default: 5,
         label: 'Duration of swollen stage',
         help: 'Duration of swollen stage in minutes',
+        units: 'minutes',
       }],
       epithelium: [{
         id: 'e_kill',
@@ -349,6 +352,7 @@ export default {
         default: 50,
         label: 'Simulation world time',
         help: 'Simulation world time (hours) as opposed to real world time',
+        units: 'hours',
       }, {
         id: 'validate',
         type: 'checkbox',

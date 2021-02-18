@@ -16,6 +16,7 @@
           :max="option.max"
           :step="option.step"
           :color="color"
+          :units="option.units || null"
           @input="onChange(option.id, $event)"
         />
       </div>
