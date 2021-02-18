@@ -31,6 +31,9 @@
               type="number"
               style="width: 72px"
               :title="tooltip"
+              :min="min"
+              :max="max"
+              :step="step"
               dense
               hide-details
               outlined
