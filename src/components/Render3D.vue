@@ -235,6 +235,6 @@ export default {
 
 <style scoped>
 .render3d {
-  height: calc(100vh - 88px);
+  height: calc(100vh - 112px);
 }
 </style>

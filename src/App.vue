@@ -62,4 +62,8 @@ export default {
 .v-application--wrap {
   background: #dcdcdc;
 }
+
+html {
+  overflow-y: hidden;
+}
 </style>
