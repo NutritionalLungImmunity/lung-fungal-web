@@ -336,8 +336,8 @@ export default {
       fungus: [{
         id: 'init_num',
         min: 1,
-        max: 200,
-        default: 50,
+        max: 100000,
+        default: 1000,
         label: 'Fungus initial count',
       }],
     },
