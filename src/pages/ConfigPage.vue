@@ -29,7 +29,14 @@
           color="grey darken-4"
         >
           <v-spacer />
+          <login-dialog
+            v-if="girderRest.user === null"
+            :icon="false"
+          >
+            Login to run
+          </login-dialog>
           <config-dialog
+            v-else
             :config="values"
             @create="onCreate"
           />
@@ -43,6 +50,7 @@
 import ConfigDialog from '@/components/ConfigDialog.vue';
 import ConfigPanel from '@/components/ConfigPanel.vue';
 import Geometry from '@/components/Geometry.vue';
+import LoginDialog from '@/components/LoginDialog.vue';
 import State from '@/data/state';
 import config from '@/config';
 import cache from '@/cache';
@@ -55,6 +63,7 @@ export default {
     ConfigDialog,
     ConfigPanel,
     Geometry,
+    LoginDialog,
   },
   inject: ['girderRest'],
   props: {
