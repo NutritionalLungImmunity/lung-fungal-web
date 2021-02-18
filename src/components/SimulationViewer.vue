@@ -69,9 +69,24 @@
     </v-container>
     <v-container
       v-else
+      class="full-screen-progress fill-height pa-0"
       fluid
     >
-      Loading...
+      <v-row
+        justify="center"
+      >
+        <v-progress-circular
+          :size="120"
+          :width="10"
+          color="yellow"
+          indeterminate
+        />
+      </v-row>
+      <v-row
+        justify="center"
+      >
+        Waiting for data to load...
+      </v-row>
     </v-container>
   </div>
 </template>
@@ -210,5 +225,10 @@ export default {
   top: 0px;
   left: 0px;
   max-width: 300px;
+}
+
+.full-screen-progress {
+  height: calc(100vh - 112px);
+  background: white;
 }
 </style>
