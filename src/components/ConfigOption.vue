@@ -7,8 +7,10 @@
         cols="12"
         class="py-0"
       >
-        <v-subheader class="panel-subheader pl-0">
-          {{ label }}
+        <v-subheader
+          class="panel-subheader pl-0"
+        >
+          {{ labelWithUnits }}
         </v-subheader>
         <v-slider
           :color="color"
@@ -27,7 +29,8 @@
               v-model="value"
               class="mt-0 pt-0"
               type="number"
-              style="width: 60px"
+              style="width: 72px"
+              :title="tooltip"
               dense
               hide-details
               outlined
@@ -93,6 +96,19 @@ export default {
     color: {
       type: String,
       required: true,
+    },
+    units: {
+      type: String,
+      required: false,
+      default: null,
+    },
+  },
+  computed: {
+    labelWithUnits() {
+      if (this.units) {
+        return `${this.label} (${this.units})`;
+      }
+      return this.label;
     },
   },
 };
