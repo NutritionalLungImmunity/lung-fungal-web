@@ -2,7 +2,8 @@ export default {
   geometry: {
     title: 'Geometry',
     modules: {
-      {
+      simulation: [
+        {
           id: 'dx',
           min: 5,
           max: 15,
