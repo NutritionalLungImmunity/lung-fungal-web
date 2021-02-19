@@ -59,7 +59,7 @@ export default {
           default: 2,
           label: 'Radius of detection',
           help: 'Macrophage radius of detection',
-	  units: 'voxels',
+          units: 'voxels',
         },
         {
           id: 'rec_rate_ph',
@@ -121,7 +121,7 @@ export default {
         default: 2,
         label: 'Radius of detection',
         help: 'Neutrophil radius of detection',
-	units: 'voxels',
+        units: 'voxels',
       }, {
         id: 'granule_count',
         min: 0,
@@ -226,7 +226,7 @@ export default {
         step: 1,
         default: 1,
         label: 'Spore detection radius',
-	units: 'voxels',
+        units: 'voxels',
       }, {
         id: 'h_det',
         min: 0,
@@ -234,7 +234,7 @@ export default {
         step: 1,
         default: 1,
         label: 'Hyphae detection radius',
-	units: 'voxels',
+        units: 'voxels',
       }, {
         id: 'max_condia_in_phag',
         min: 0,
