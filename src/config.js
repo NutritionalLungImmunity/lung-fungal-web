@@ -26,7 +26,7 @@ export default {
           min: 0,
           max: 1,
           step: 0.01,
-          default: 1,
+          default: 1.0,
           label: 'Probability of appearence',
         },
         {
