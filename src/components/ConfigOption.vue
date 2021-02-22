@@ -24,13 +24,38 @@
           :step="step"
           @input="$emit('input', $event)"
         >
+          <v-tooltip
+            slot="prepend"
+            bottom
+          >
+            <template
+              v-slot:activator="{on, attrs}"
+            >
+              <v-btn
+                slot="activator"
+                icon
+                text
+                :max-height="24"
+                :max-width="24"
+                v-bind="attrs"
+                v-on="on"
+                @click="reset"
+              >
+                <v-icon
+                  class="v-input__icon"
+                >
+                  mdi-close
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Reset default</span>
+          </v-tooltip>
           <template v-slot:append>
             <v-text-field
               v-model="value"
               class="mt-0 pt-0"
               type="number"
               style="width: 72px"
-              :title="tooltip"
               :min="min"
               :max="max"
               :step="step"
@@ -112,6 +137,11 @@ export default {
         return `${this.label} (${this.units})`;
       }
       return this.label;
+    },
+  },
+  methods: {
+    reset() {
+      this.$emit('input', this.default);
     },
   },
 };
