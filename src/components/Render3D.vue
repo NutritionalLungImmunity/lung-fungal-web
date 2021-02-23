@@ -23,6 +23,8 @@ import {
 
 import Simulation from '@/data/simulation';
 
+const SPHERE_RESOLUTION = 32;
+
 export default {
   name: 'Render3D',
   props: {
@@ -172,7 +174,10 @@ export default {
       this.vtk.renderer.addVolume(this.vtk.geometryActor);
     },
     createSpore() {
-      this.vtk.sporeGlyphSource = vtkSphereSource.newInstance();
+      this.vtk.sporeGlyphSource = vtkSphereSource.newInstance({
+        thetaResolution: SPHERE_RESOLUTION,
+        phiResolution: SPHERE_RESOLUTION,
+      });
 
       this.vtk.sporeMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
@@ -195,7 +200,10 @@ export default {
       this.vtk.renderer.addActor(this.vtk.sporeActor);
     },
     createMacrophage() {
-      this.vtk.macrophageGlyphSource = vtkSphereSource.newInstance();
+      this.vtk.macrophageGlyphSource = vtkSphereSource.newInstance({
+        thetaResolution: SPHERE_RESOLUTION,
+        phiResolution: SPHERE_RESOLUTION,
+      });
 
       this.vtk.macrophageMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
