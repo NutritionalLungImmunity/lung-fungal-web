@@ -11,6 +11,7 @@ import vtkColorTransferFunction from 'vtk.js/Sources/Rendering/Core/ColorTransfe
 import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
 import vtkGlyph3DMapper from 'vtk.js/Sources/Rendering/Core/Glyph3DMapper';
 import vtkLookupTable from 'vtk.js/Sources/Common/Core/LookupTable';
+import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
 import vtkPiecewiseFunction from 'vtk.js/Sources/Common/DataModel/PiecewiseFunction';
 import vtkPointPicker from 'vtk.js/Sources/Rendering/Core/PointPicker';
 import vtkSphereSource from 'vtk.js/Sources/Filters/Sources/SphereSource';
@@ -62,6 +63,7 @@ export default {
     },
   },
   beforeDestroy() {
+    this.removeSelected();
     delete window.vtk;
     // force delete the webgl context when destroying the component
     const rw = this.vtk.renderWindow;
@@ -81,6 +83,7 @@ export default {
       },
     });
 
+    this.vtk.selected = {};
     this.vtk.renderer = this.vtk.renderWindowContainer.getRenderer();
     this.vtk.renderWindow = this.vtk.renderWindowContainer.getRenderWindow();
 
@@ -95,6 +98,33 @@ export default {
     this.vtk.renderer.resetCamera();
   },
   methods: {
+    selectedPoint(center) {
+      const source = vtkSphereSource.newInstance({
+        thetaResolution: SPHERE_RESOLUTION,
+        phiResolution: SPHERE_RESOLUTION,
+      });
+      source.setCenter(center);
+      source.setRadius(4);
+      const actor = vtkActor.newInstance();
+      const mapper = vtkMapper.newInstance();
+
+      mapper.setInputData(source.getOutputData());
+      actor.setMapper(mapper);
+      actor.getProperty().setColor(0, 0, 1.0);
+
+      return {
+        source,
+        actor,
+        mapper,
+      };
+    },
+    removeSelected() {
+      if (!this.vtk.selected.actor) {
+        return;
+      }
+      this.vtk.renderer.removeActor(this.vtk.selected.actor);
+      this.vtk.selected = {};
+    },
     onLeftClick(evt) {
       if (evt.pokedRenderer !== this.vtk.renderer) {
         return;
@@ -108,10 +138,16 @@ export default {
         return;
       }
 
+      this.removeSelected();
       const [actor] = this.vtk.picker.getActors();
       const pointId = this.vtk.picker.getPointId();
       const mapper = actor.getMapper();
       const pointData = mapper.getInputData().getPointData();
+
+      this.vtk.selected = this.selectedPoint(
+        mapper.getInputData().getPoints().getTuple(pointId),
+      );
+      this.vtk.renderer.addActor(this.vtk.selected.actor);
 
       const info = pointData.getArrays().map((a) => {
         const name = a.getName();
