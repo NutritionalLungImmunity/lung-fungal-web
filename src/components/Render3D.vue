@@ -90,6 +90,7 @@ export default {
     this.vtk.picker = vtkPointPicker.newInstance();
     this.vtk.renderWindow.getInteractor()
       .onLeftButtonPress((evt) => this.onLeftClick(evt));
+    this.vtk.renderer.resetCamera();
   },
   methods: {
     onLeftClick(evt) {
@@ -219,7 +220,6 @@ export default {
       this.vtk.renderer.addActor(this.vtk.macrophageActor);
     },
     render() {
-      this.vtk.renderer.resetCamera();
       this.vtk.renderWindow.render();
     },
     resize() {
