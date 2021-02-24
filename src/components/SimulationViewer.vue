@@ -40,21 +40,9 @@
           v-if="selectedPointInfo.id !== undefined"
           class="ma-4"
         >
-          <v-simple-table
-            :dense="true"
-          >
-            <template v-slot:default>
-              <tbody>
-                <tr
-                  v-for="(value, name) in selectedPointInfo"
-                  :key="name"
-                >
-                  <td>{{ name }}</td>
-                  <td>{{ value }}</td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
+          <selected-point-panel
+            :info="selectedPointInfo"
+          />
         </v-row>
       </v-container>
       <v-container
@@ -95,12 +83,14 @@
 import Simulation from '@/data/simulation';
 import Render3D from '@/components/Render3D.vue';
 import Plot2D from '@/components/Plot2D.vue';
+import SelectedPointPanel from '@/components/SelectedPointPanel.vue';
 
 export default {
   name: 'ViewerPage',
   components: {
     Plot2D,
     Render3D,
+    SelectedPointPanel,
   },
   props: {
     simulationFolder: {
