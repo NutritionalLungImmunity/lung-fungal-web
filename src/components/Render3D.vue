@@ -92,7 +92,9 @@ export default {
     this.createMacrophage();
     this.setStateData();
 
-    this.vtk.picker = vtkPointPicker.newInstance();
+    this.vtk.picker = vtkPointPicker.newInstance({
+      tolerance: 0.01,
+    });
     this.vtk.renderWindow.getInteractor()
       .onLeftButtonPress((evt) => this.onLeftClick(evt));
     this.vtk.renderer.resetCamera();
@@ -160,7 +162,13 @@ export default {
           value,
         ];
       });
-      this.$emit('point', Object.fromEntries([['id', pointId], ...info]));
+      let type = null;
+      if (pointData === this.spore.getPointData()) {
+        type = 'spore';
+      } else if (pointData === this.macrophage.getPointData()) {
+        type = 'macrophage';
+      }
+      this.$emit('point', Object.fromEntries([['id', pointId], ['type', type], ...info]));
     },
     setStateData() {
       this.vtk.geometryMapper.setInputData(this.geometry);
