@@ -4,19 +4,26 @@ import vtkXMLPolyDataReader from 'vtk.js/Sources/IO/XML/XMLPolyDataReader';
 import http from '@/http';
 
 class State {
-  constructor(geometry, spore, macrophage) {
+  constructor(time, geometry, spore, macrophage) {
+    this.time = time;
     this.geometry = State.loadImageData(geometry);
     this.spore = State.loadPolyData(spore);
     this.macrophage = State.loadPolyData(macrophage);
   }
 
   static async load(id) {
-    const [geometry, spore, macrophage] = await Promise.all([
+    const [time, geometry, spore, macrophage] = await Promise.all([
+      State.getTime(id),
       State.loadFile(id, 'geometry_001.vti'),
       State.loadFile(id, 'spore_001.vtp'),
       State.loadFile(id, 'macrophage_001.vtp'),
     ]);
-    return new State(geometry, spore, macrophage);
+    return new State(time, geometry, spore, macrophage);
+  }
+
+  static async getTime(folderId) {
+    const folder = await http.get(`folder/${folderId}`);
+    return folder.data.meta.time || null;
   }
 
   static async loadFile(folderId, name) {
