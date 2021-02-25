@@ -86,7 +86,6 @@ import Plot2D from '@/components/Plot2D.vue';
 import SelectedPointPanel from '@/components/SelectedPointPanel.vue';
 
 export default {
-  name: 'ViewerPage',
   components: {
     Plot2D,
     Render3D,
