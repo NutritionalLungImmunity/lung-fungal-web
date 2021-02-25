@@ -17,6 +17,12 @@
 </template>
 
 <script>
+function toFixedIfNumeric(value) {
+  if (Number.isFinite(value)) {
+    return value.toFixed(2);
+  }
+  return value;
+}
 const fungusValueMap = {
   status: {
     99: 'drifting',
@@ -34,8 +40,18 @@ const fungusValueMap = {
   mobile: (value) => !!value,
   internalized: (value) => !!value,
   dead: (value) => !!value,
-  iron: (value) => value.toFixed(2),
-  health: (value) => value.toFixed(2),
+  iron: toFixedIfNumeric,
+  health: toFixedIfNumeric,
+};
+const macrophageValueMap = {
+  dead: (value) => !!value,
+  phagosome(value) {
+    return value.filter((v) => (v !== null) && (v >= 0));
+  },
+};
+const valueMappers = {
+  spore: fungusValueMap,
+  macrophage: macrophageValueMap,
 };
 
 const excludedKeys = new Set(['id']);
@@ -50,13 +66,20 @@ export default {
   computed: {
     rows() {
       const keys = Object.keys(this.info).filter((key) => !excludedKeys.has(key)).sort();
-      const mapper = this.info.type === 'spore' ? this.mapFungusValue.bind(this) : (key, value) => value;
+      const mapper = this.getValueMapper(this.info.type);
       return keys.map((key) => [mapper(key, this.info[key]), key]);
     },
   },
   methods: {
     mapFungusValue(key, value) {
       return this.replaceValue(value, fungusValueMap[key] || {});
+    },
+    getValueMapper(type) {
+      const mapper = valueMappers[type];
+      if (mapper) {
+        return (key, value) => this.replaceValue(value, mapper[key] || {});
+      }
+      return (key, value) => value;
     },
     replaceValue(value, mapper) {
       if (mapper instanceof Function) {
