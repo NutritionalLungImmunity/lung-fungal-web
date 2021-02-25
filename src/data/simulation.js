@@ -14,7 +14,7 @@ class Simulation {
         parentType: 'folder',
         parentId: this.id,
       },
-    })).data.filter((f) => /\d{3}/.test(f.name));
+    })).data.filter((f) => /\d/.test(f.name));
 
     this.totalTimeSteps = folders.length;
     const timeStepIds = [];
