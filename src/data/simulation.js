@@ -13,6 +13,7 @@ class Simulation {
       params: {
         parentType: 'folder',
         parentId: this.id,
+        limit: 0,
       },
     })).data.filter((f) => /\d/.test(f.name));
 
