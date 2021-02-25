@@ -5,7 +5,6 @@ import http from '@/http';
 
 class State {
   constructor(time, geometry, spore, macrophage, neutrophil) {
-  constructor(time, geometry, spore, macrophage) {
     this.time = time;
     this.geometry = State.loadImageData(geometry);
     this.spore = State.loadPolyData(spore);
