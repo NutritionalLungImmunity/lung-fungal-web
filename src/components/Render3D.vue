@@ -51,6 +51,9 @@ export default {
     macrophage() {
       return this.state.macrophage;
     },
+    neutrophil() {
+      return this.state.neutrophil;
+    },
   },
   static() {
     return {
@@ -90,6 +93,7 @@ export default {
     this.createGeometry();
     this.createSpore();
     this.createMacrophage();
+    this.createNeutrophil();
     this.setStateData();
 
     this.vtk.picker = vtkPointPicker.newInstance({
@@ -164,9 +168,11 @@ export default {
       });
       let type = null;
       if (pointData === this.spore.getPointData()) {
-        type = 'spore';
+        type = 'A. Fumigatus';
       } else if (pointData === this.macrophage.getPointData()) {
         type = 'macrophage';
+      } else if (pointData === this.neutrophil.getPointData()) {
+        type = 'neutrophil';
       }
       this.$emit('point', Object.fromEntries([['id', pointId], ['type', type], ...info]));
     },
@@ -176,6 +182,8 @@ export default {
       this.vtk.sporeMapper.setInputData(this.spore, 0);
       this.macrophage.getPointData().setActiveScalars('dead');
       this.vtk.macrophageMapper.setInputData(this.macrophage, 0);
+      this.neutrophil.getPointData().setActiveScalars('dead');
+      this.vtk.neutrophilMapper.setInputData(this.neutrophil, 0);
       this.render();
     },
     createGeometry() {
@@ -270,6 +278,34 @@ export default {
 
       // TODO: Rendering can be disabled here
       this.vtk.renderer.addActor(this.vtk.macrophageActor);
+    },
+    createNeutrophil() {
+      this.vtk.neutrophilGlyphSource = vtkSphereSource.newInstance({
+        thetaResolution: SPHERE_RESOLUTION,
+        phiResolution: SPHERE_RESOLUTION,
+      });
+
+      this.vtk.neutrophilMapper = vtkGlyph3DMapper.newInstance({
+        scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
+        scaleFactor: 5,
+        colorMode: ColorMode.MAP_SCALARS,
+        scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
+      });
+      this.vtk.neutrophilMapper.setColorByArrayName('granule_count');
+      this.vtk.neutrophilMapper
+        .setInputConnection(this.vtk.neutrophilGlyphSource.getOutputPort(), 1);
+
+      this.vtk.neutrophilLookupTable = vtkLookupTable.newInstance({
+        numberOfColors: 1,
+        hueRange: [0.7], // TODO: (ACK) what color is this anyway?
+      });
+      this.vtk.neutrophilMapper.setLookupTable(this.vtk.neutrophilLookupTable);
+
+      this.vtk.neutrophilActor = vtkActor.newInstance();
+      this.vtk.neutrophilActor.setMapper(this.vtk.neutrophilMapper);
+
+      // TODO: Rendering can be disabled here
+      this.vtk.renderer.addActor(this.vtk.neutrophilActor);
     },
     render() {
       this.vtk.renderWindow.render();

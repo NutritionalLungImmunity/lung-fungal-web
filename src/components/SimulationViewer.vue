@@ -130,13 +130,14 @@ export default {
         datasets: [
           this.spores,
           this.macrophages,
+          this.neutrophils,
         ],
       };
     },
     spores() {
-      const color = 'rgb(54, 162, 235)';
+      const color = 'rgb(92, 235, 53)';
       return {
-        label: 'spores',
+        label: 'A.Fumigatus',
         data: this.simulation.timeSteps.map((t) => t.spore.getNumberOfPoints()),
         borderColor: color,
         backgroundColor: color,
@@ -146,8 +147,18 @@ export default {
     macrophages() {
       const color = 'rgb(255, 99, 132)';
       return {
-        label: 'macrophages',
+        label: 'Macrophage',
         data: this.simulation.timeSteps.map((t) => t.macrophage.getNumberOfPoints()),
+        borderColor: color,
+        backgroundColor: color,
+        fill: false,
+      };
+    },
+    neutrophils() {
+      const color = 'rgb(58, 0, 252)';
+      return {
+        label: 'Neutrophil',
+        data: this.simulation.timeSteps.map((t) => t.neutrophil.getNumberOfPoints()),
         borderColor: color,
         backgroundColor: color,
         fill: false,
