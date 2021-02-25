@@ -66,6 +66,14 @@ export default {
               borderWidth: 2,
             }],
           },
+          scales: {
+            xAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: 'Time (hours)',
+              },
+            }],
+          },
           ...this.options,
         },
       },

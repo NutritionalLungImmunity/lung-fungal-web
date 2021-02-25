@@ -86,7 +86,6 @@ import Plot2D from '@/components/Plot2D.vue';
 import SelectedPointPanel from '@/components/SelectedPointPanel.vue';
 
 export default {
-  name: 'ViewerPage',
   components: {
     Plot2D,
     Render3D,
@@ -120,9 +119,16 @@ export default {
       return this.simulation.timeSteps.length;
     },
     times() {
-      // TODO: get time information from file
-      const length = this.numberOfTimeSteps;
-      return Array.from({ length }, (v, k) => k + 1);
+      // TODO: older simulation don't have time information, remove this if we
+      //       find a way to migrate
+      let i = 0;
+      return this.simulation.timeSteps.map((t) => {
+        i += 1;
+        if (Number.isFinite(t.time)) {
+          return t.time;
+        }
+        return i;
+      });
     },
     chartData() {
       return {

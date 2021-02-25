@@ -3,7 +3,6 @@ import Router from 'vue-router';
 import ConfigPage from '@/pages/ConfigPage.vue';
 import ComparePage from '@/pages/ComparePage.vue';
 import SimulationListPage from '@/pages/SimulationListPage.vue';
-import ViewerPage from '@/pages/ViewerPage.vue';
 
 export default new Router({
   routes: [
@@ -36,11 +35,6 @@ export default new Router({
         }
         return { ...route.query, tabs };
       },
-    },
-    {
-      path: '/viewer/:id',
-      name: 'viewer',
-      component: ViewerPage,
     },
     {
       path: '/compare',
