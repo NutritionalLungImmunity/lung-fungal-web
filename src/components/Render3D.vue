@@ -13,7 +13,6 @@ import vtkGlyph3DMapper from 'vtk.js/Sources/Rendering/Core/Glyph3DMapper';
 import vtkLookupTable from 'vtk.js/Sources/Common/Core/LookupTable';
 import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
 import vtkPiecewiseFunction from 'vtk.js/Sources/Common/DataModel/PiecewiseFunction';
-import vtkPointPicker from 'vtk.js/Sources/Rendering/Core/PointPicker';
 import vtkSphereSource from 'vtk.js/Sources/Filters/Sources/SphereSource';
 import vtkVolume from 'vtk.js/Sources/Rendering/Core/Volume';
 import vtkVolumeMapper from 'vtk.js/Sources/Rendering/Core/VolumeMapper';
@@ -23,6 +22,7 @@ import {
 } from 'vtk.js/Sources/Rendering/Core/Mapper/Constants';
 
 import Simulation from '@/data/simulation';
+import Picker from '@/picker.js';
 
 const SPHERE_RESOLUTION = 32;
 
@@ -96,9 +96,7 @@ export default {
     this.createNeutrophil();
     this.setStateData();
 
-    this.vtk.picker = vtkPointPicker.newInstance({
-      tolerance: 0.01,
-    });
+    this.picker = new Picker(this.vtk.renderer, this.vtk.renderWindow);
     this.vtk.renderWindow.getInteractor()
       .onLeftButtonPress((evt) => this.onLeftClick(evt));
     this.vtk.renderer.resetCamera();
@@ -136,6 +134,8 @@ export default {
         return;
       }
 
+      const out = this.picker.pick(evt);
+      return;
       const { position } = evt;
       const point = [position.x, position.y, 0.0];
       this.vtk.picker.pick(point, this.vtk.renderer);
