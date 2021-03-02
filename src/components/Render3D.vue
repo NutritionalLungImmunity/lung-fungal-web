@@ -110,13 +110,13 @@ export default {
         phiResolution: SPHERE_RESOLUTION,
       });
       source.setCenter(center);
-      source.setRadius(4);
+      source.setRadius(6);
       const actor = vtkActor.newInstance();
       const mapper = vtkMapper.newInstance();
 
       mapper.setInputData(source.getOutputData());
       actor.setMapper(mapper);
-      actor.getProperty().setColor(0, 0, 1.0);
+      actor.getProperty().setColor(0, 0, 0);
 
       return {
         source,
@@ -139,14 +139,17 @@ export default {
       const { position } = evt;
       const point = [position.x, position.y, 0.0];
       this.vtk.picker.pick(point, this.vtk.renderer);
+      this.removeSelected();
 
       if (!this.vtk.picker.getActors().length) {
         return;
       }
 
-      this.removeSelected();
       const [actor] = this.vtk.picker.getActors();
       const pointId = this.vtk.picker.getPointId();
+      if (pointId < 0) {
+        return;
+      }
       const mapper = actor.getMapper();
       const pointData = mapper.getInputData().getPointData();
 
@@ -274,6 +277,7 @@ export default {
       this.vtk.macrophageMapper.setLookupTable(this.vtk.macrophageLookupTable);
 
       this.vtk.macrophageActor = vtkActor.newInstance();
+      this.vtk.macrophageActor.getProperty().setColor(253 / 255, 98 / 255, 132 / 255);
       this.vtk.macrophageActor.setMapper(this.vtk.macrophageMapper);
 
       // TODO: Rendering can be disabled here
