@@ -171,7 +171,7 @@ export default {
       });
       let type = null;
       if (pointData === this.spore.getPointData()) {
-        type = 'A. Fumigatus';
+        type = 'A. fumigatus';
       } else if (pointData === this.macrophage.getPointData()) {
         type = 'macrophage';
       } else if (pointData === this.neutrophil.getPointData()) {

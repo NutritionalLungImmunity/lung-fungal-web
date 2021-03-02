@@ -143,7 +143,7 @@ export default {
     spores() {
       const color = 'rgb(92, 235, 53)';
       return {
-        label: 'A.Fumigatus',
+        label: 'A. fumigatus',
         data: this.simulation.timeSteps.map((t) => t.spore.getNumberOfPoints()),
         borderColor: color,
         backgroundColor: color,
