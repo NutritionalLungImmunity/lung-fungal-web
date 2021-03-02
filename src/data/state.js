@@ -76,7 +76,7 @@ class State {
     const polyDataReader = vtkXMLPolyDataReader.newInstance();
     const success = polyDataReader.parseAsArrayBuffer(buffer);
     if (!success) {
-      throw new Error('Could not load poyy data');
+      throw new Error('Could not load poly data');
     }
     return polyDataReader.getOutputData(0);
   }
