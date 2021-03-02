@@ -49,9 +49,13 @@ const macrophageValueMap = {
     return value.filter((v) => (v !== null) && (v >= 0));
   },
 };
+const neutrophilValueMap = {
+  dead: (value) => !!value,
+};
 const valueMappers = {
-  spore: fungusValueMap,
+  'A. fumigatus': fungusValueMap,
   macrophage: macrophageValueMap,
+  neutrophil: neutrophilValueMap,
 };
 
 const excludedKeys = new Set(['id']);
