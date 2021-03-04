@@ -1,8 +1,24 @@
 <template>
   <div
-    v-resize="resize"
     class="render3d"
-  />
+  >
+    <div
+      v-if="hasWebGL"
+      ref="vtkContainer"
+      v-resize="resize"
+      class="render3d"
+    />
+    <v-container
+      class="fill-height"
+      fluid
+    >
+      <v-row
+        justify="center"
+      >
+        No WebGL support detected.
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -23,6 +39,7 @@ import {
 } from 'vtk.js/Sources/Rendering/Core/Mapper/Constants';
 
 import Simulation from '@/data/simulation';
+import hasWebGL from '@/webgl';
 
 const SPHERE_RESOLUTION = 32;
 
@@ -54,6 +71,9 @@ export default {
     neutrophil() {
       return this.state.neutrophil;
     },
+    hasWebGL() {
+      return hasWebGL;
+    },
   },
   static() {
     return {
@@ -79,7 +99,7 @@ export default {
   mounted() {
     window.vtk = this.vtk;
     this.vtk.renderWindowContainer = vtkFullScreenRenderWindow.newInstance({
-      rootContainer: this.$el,
+      rootContainer: this.$refs.vtkContainer,
       containerStyle: {
         width: '100%',
         height: '100%',
