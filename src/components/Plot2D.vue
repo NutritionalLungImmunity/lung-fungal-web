@@ -82,7 +82,10 @@ export default {
   methods: {
     refresh() {
       if (this.chart) {
-        Object.assign(this.cd, this.chartData);
+        this.chartData.datasets.forEach((dataset, index) => {
+          this.cd.datasets[index].data = dataset.data;
+        });
+        this.cd.labels = this.chartData.labels;
         this.chart.update();
       }
     },
