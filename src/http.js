@@ -26,6 +26,10 @@ Object.assign(
       const { data } = await this.post('nli/job', config, { params });
       return data;
     },
+    async listUsers() {
+      const { data } = await this.get('user', { params: { limit: 0 } });
+      return data;
+    },
   },
 );
 

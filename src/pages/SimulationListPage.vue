@@ -56,6 +56,7 @@
           ref="simulationListTab"
           :sort-by="sortBy"
           :sort-desc="sortDescBoolean"
+          :users="users"
           @view="viewSimulation($event)"
           @paging="updatePagingRoute"
           @update="updateCache"
@@ -111,6 +112,7 @@ export default {
     return {
       loaded: false,
       simulationCache: cache,
+      users: [],
     };
   },
   computed: {
@@ -127,7 +129,9 @@ export default {
     },
   },
   async created() {
-    await Promise.all(this.tabs.map((tab) => this.fetchSimulation(tab)));
+    const promises = this.tabs.map((tab) => this.fetchSimulation(tab));
+    promises.push(this.fetchUsers());
+    await Promise.all(promises);
     this.loaded = true;
   },
   activated() {
@@ -186,6 +190,13 @@ export default {
     },
     updateCache(simulation) {
       this.$set(this.simulationCache, simulation._id, simulation);
+    },
+    async fetchUsers() {
+      try {
+        this.users = await this.girderRest.listUsers();
+      } catch (err) {
+        this.users = [];
+      }
     },
   },
 };

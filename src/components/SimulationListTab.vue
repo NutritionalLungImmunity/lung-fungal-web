@@ -3,65 +3,9 @@
     class="px-5"
     fluid
   >
-    <v-navigation-drawer
-      v-model="filters"
-      app
-      dark
-      right
-      temporary
-    >
-      <v-toolbar
-        fixed
-        flat
-      >
-        <v-toolbar-title>
-          Filters
-        </v-toolbar-title>
-      </v-toolbar>
-      <v-divider />
-      <div class="drawer-wrapper d-flex flex-column">
-        <v-list dense>
-          <v-list-item>
-            <v-list-item-content>
-              Filtering option #1
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-checkbox />
-            </v-list-item-action>
-          </v-list-item>
-          <v-divider />
-          <v-list-item>
-            <v-list-item-content>
-              Filtering option #2
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-checkbox />
-            </v-list-item-action>
-          </v-list-item>
-          <v-divider />
-          <v-list-item>
-            <v-list-item-content>
-              Filtering option #3
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-checkbox />
-            </v-list-item-action>
-          </v-list-item>
-        </v-list>
-        <v-spacer />
-        <v-footer class="pa-0">
-          <v-btn
-            block
-            color="primary"
-            depressed
-            tile
-            x-large
-          >
-            Apply Filters
-          </v-btn>
-        </v-footer>
-      </div>
-    </v-navigation-drawer>
+    <filter-panel
+      v-model="filtersPanel"
+    />
 
     <v-toolbar
       class="list-toolbar elevation-2 mt-2"
@@ -121,7 +65,7 @@
               <v-btn
                 icon
                 v-on="on"
-                @click="filters = true"
+                @click="filtersPanel.enabled = true"
               >
                 <v-icon size="20">
                   mdi-filter-menu
@@ -152,6 +96,7 @@
 </template>
 
 <script>
+import FilterPanel from '@/components/FilterPanel.vue';
 import SimulationCard from '@/components/SimulationCard.vue';
 
 const sortPropertyMap = {
@@ -163,6 +108,7 @@ const WAIT_INTERVAL = 5000;
 
 export default {
   components: {
+    FilterPanel,
     SimulationCard,
   },
   inject: ['girderApi', 'girderRest'],
@@ -175,6 +121,10 @@ export default {
       type: Boolean,
       required: true,
     },
+    users: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
@@ -182,7 +132,10 @@ export default {
       cancelUpdate: false,
       // set to true when refreshing all simulations to prevent race conditions
       skipNextUpdate: false,
-      filters: false,
+      filtersPanel: {
+        enabled: false,
+        filters: [],
+      },
       simDialog: false,
       sortOptions: ['Alphabetical', 'Author', 'Date'],
       updateState: new Date(),
