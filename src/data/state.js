@@ -1,5 +1,6 @@
 import vtkXMLImageDataReader from 'vtk.js/Sources/IO/XML/XMLImageDataReader';
 import vtkXMLPolyDataReader from 'vtk.js/Sources/IO/XML/XMLPolyDataReader';
+import vtkDataArray from 'vtk.js/Sources/Common/Core/DataArray';
 
 import http from '@/http';
 
@@ -76,8 +77,12 @@ class State {
     const polyDataReader = vtkXMLPolyDataReader.newInstance();
     const success = polyDataReader.parseAsArrayBuffer(buffer);
     if (!success) {
-      throw new Error('Could not load poyy data');
+      throw new Error('Could not load poly data');
     }
+    const ds = polyDataReader.getOutputData(0);
+    const values = new Uint8Array(ds.getNumberOfPoints());
+    values.fill(1);
+    ds.getPointData().addArray(vtkDataArray.newInstance({ name: 'scale', values }));
     return polyDataReader.getOutputData(0);
   }
 }
