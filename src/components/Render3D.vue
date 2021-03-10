@@ -24,15 +24,20 @@
 <script>
 import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
 import vtkColorTransferFunction from 'vtk.js/Sources/Rendering/Core/ColorTransferFunction';
-import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
 import vtkGlyph3DMapper from 'vtk.js/Sources/Rendering/Core/Glyph3DMapper';
+import vtkInteractorStyleTrackballCamera from 'vtk.js/Sources/Interaction/Style/InteractorStyleTrackballCamera';
 import vtkLookupTable from 'vtk.js/Sources/Common/Core/LookupTable';
 import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
+import vtkOpenGLHardwareSelector from 'vtk.js/Sources/Rendering/OpenGL/HardwareSelector';
+import vtkOpenGLRenderWindow from 'vtk.js/Sources/Rendering/OpenGL/RenderWindow';
 import vtkPiecewiseFunction from 'vtk.js/Sources/Common/DataModel/PiecewiseFunction';
-import vtkPointPicker from 'vtk.js/Sources/Rendering/Core/PointPicker';
+import vtkRenderWindow from 'vtk.js/Sources/Rendering/Core/RenderWindow';
+import vtkRenderWindowInteractor from 'vtk.js/Sources/Rendering/Core/RenderWindowInteractor';
+import vtkRenderer from 'vtk.js/Sources/Rendering/Core/Renderer';
 import vtkSphereSource from 'vtk.js/Sources/Filters/Sources/SphereSource';
 import vtkVolume from 'vtk.js/Sources/Rendering/Core/Volume';
 import vtkVolumeMapper from 'vtk.js/Sources/Rendering/Core/VolumeMapper';
+import { FieldAssociations } from 'vtk.js/Sources/Common/DataModel/DataSet/Constants';
 import {
   ColorMode,
   ScalarMode,
@@ -55,6 +60,11 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      activeDataSet: null,
+    };
+  },
   computed: {
     state() {
       return this.simulation.timeSteps[this.timeStep];
@@ -74,11 +84,18 @@ export default {
     hasWebGL() {
       return hasWebGL;
     },
-  },
-  static() {
-    return {
-      vtk: {},
-    };
+    activeType() {
+      if (this.activeDataSet === this.spore) {
+        return 'A. fumigatus';
+      }
+      if (this.activeDataSet === this.macrophage) {
+        return 'macrophage';
+      }
+      if (this.activeDataSet === this.neutrophil) {
+        return 'neutrophil';
+      }
+      return '';
+    },
   },
   watch: {
     state() {
@@ -87,28 +104,55 @@ export default {
   },
   beforeDestroy() {
     this.removeSelected();
+    this.vtk.interactor.unbindEvents();
+    this.vtk.openglRenderWindow.delete();
     delete window.vtk;
-    // force delete the webgl context when destroying the component
-    const rw = this.vtk.renderWindow;
-    if (rw) {
-      rw.getInteractor().unbindEvents();
-      const gl = this.$el.querySelector('canvas').getContext('webgl2');
-      gl.getExtension('WEBGL_lose_context').loseContext();
-    }
+  },
+  created() {
+    const renderWindow = vtkRenderWindow.newInstance();
+    const renderer = vtkRenderer.newInstance({ background: [0.2, 0.3, 0.4] });
+    renderWindow.addRenderer(renderer);
+    const interactor = vtkRenderWindowInteractor.newInstance();
+
+    const openglRenderWindow = vtkOpenGLRenderWindow.newInstance();
+    renderWindow.addView(openglRenderWindow);
+
+    interactor.setView(openglRenderWindow);
+    interactor.initialize();
+    interactor.setInteractorStyle(vtkInteractorStyleTrackballCamera.newInstance());
+
+    const selector = vtkOpenGLHardwareSelector.newInstance();
+    selector.setFieldAssociation(FieldAssociations.FIELD_ASSOCIATION_POINTS);
+    selector.attach(openglRenderWindow, renderer);
+
+    this.vtk = {
+      renderWindow,
+      renderer,
+      interactor,
+      openglRenderWindow,
+      selector,
+      //
+      selected: {},
+    };
+
+    // Expose to windows
+    window.vtk = this.vtk;
+
+    // map methods to vue component
+    this.render = this.vtk.renderWindow.render;
+    this.resetCamera = renderer.resetCamera;
+    this.updateSize = () => {
+      const container = this.$refs.vtkContainer;
+      if (container) {
+        const { width, height } = container.getBoundingClientRect();
+        openglRenderWindow.setSize(width, height);
+      }
+    };
   },
   mounted() {
-    window.vtk = this.vtk;
-    this.vtk.renderWindowContainer = vtkFullScreenRenderWindow.newInstance({
-      rootContainer: this.$refs.vtkContainer,
-      containerStyle: {
-        width: '100%',
-        height: '100%',
-      },
-    });
-
-    this.vtk.selected = {};
-    this.vtk.renderer = this.vtk.renderWindowContainer.getRenderer();
-    this.vtk.renderWindow = this.vtk.renderWindowContainer.getRenderWindow();
+    const container = this.$refs.vtkContainer;
+    this.vtk.openglRenderWindow.setContainer(container);
+    this.vtk.interactor.bindEvents(container);
 
     this.createGeometry();
     this.createSpore();
@@ -116,12 +160,12 @@ export default {
     this.createNeutrophil();
     this.setStateData();
 
-    this.vtk.picker = vtkPointPicker.newInstance({
-      tolerance: 0.01,
-    });
-    this.vtk.renderWindow.getInteractor()
+    this.vtk.renderWindow
+      .getInteractor()
       .onLeftButtonPress((evt) => this.onLeftClick(evt));
-    this.vtk.renderer.resetCamera();
+    this.updateSize();
+    this.resetCamera();
+    this.render();
   },
   methods: {
     selectedPoint(center) {
@@ -151,53 +195,60 @@ export default {
       this.vtk.renderer.removeActor(this.vtk.selected.actor);
       this.vtk.selected = {};
     },
+    pick(x, y) {
+      // Reset previous activeDataSet
+      if (this.activeDataSet) {
+        const scaleArray = this.activeDataSet.getPointData().getArray('scale');
+        scaleArray.getData().fill(1);
+        scaleArray.modified();
+        this.activeDataSet.modified();
+        this.activeDataSet = null;
+      }
+
+      // Prevent volume rendering picking
+      this.vtk.geometryActor.setVisibility(false);
+
+      // Hardware selection picking
+      this.vtk.selector.setArea(x, y, x, y);
+      this.vtk.selector.releasePixBuffers();
+      const ok = this.vtk.selector.captureBuffers();
+      if (ok) {
+        const selection = this.vtk.selector.generateSelection(x, y, x, y);
+        if (selection && selection.length) {
+          const { compositeID, prop } = selection[0].getProperties();
+          const ds = prop.getMapper().getInputData();
+          const scaleArray = ds.getPointData().getArray('scale');
+
+          scaleArray.getData()[compositeID] = 2;
+          scaleArray.modified();
+          ds.modified();
+
+          this.activeDataSet = ds;
+          const info = ds.getPointData().getArrays().map((a) => {
+            const name = a.getName();
+            const numComponents = a.getNumberOfComponents();
+            const start = compositeID * numComponents;
+            const value = a.getData().slice(start, start + numComponents);
+            return [
+              name,
+              value,
+            ];
+          });
+
+          this.$emit('point', Object.fromEntries([['id', compositeID], ['type', this.activeType], ...info]));
+        }
+      }
+
+      // Make sure the volume is still visible for std rendering
+      this.vtk.geometryActor.setVisibility(true);
+    },
     onLeftClick(evt) {
       if (evt.pokedRenderer !== this.vtk.renderer) {
         return;
       }
 
-      const { position } = evt;
-      const point = [position.x, position.y, 0.0];
-      this.vtk.picker.pick(point, this.vtk.renderer);
-      this.removeSelected();
-
-      if (!this.vtk.picker.getActors().length) {
-        return;
-      }
-
-      const [actor] = this.vtk.picker.getActors();
-      const pointId = this.vtk.picker.getPointId();
-      if (pointId < 0) {
-        return;
-      }
-      const mapper = actor.getMapper();
-      const pointData = mapper.getInputData().getPointData();
-
-      this.vtk.selected = this.selectedPoint(
-        mapper.getInputData().getPoints().getTuple(pointId),
-      );
-      this.vtk.renderer.addActor(this.vtk.selected.actor);
-
-      const info = pointData.getArrays().map((a) => {
-        const name = a.getName();
-        let value = a.getTuple(pointId);
-        if (value.length === 1) {
-          [value] = value;
-        }
-        return [
-          name,
-          value,
-        ];
-      });
-      let type = null;
-      if (pointData === this.spore.getPointData()) {
-        type = 'A. fumigatus';
-      } else if (pointData === this.macrophage.getPointData()) {
-        type = 'macrophage';
-      } else if (pointData === this.neutrophil.getPointData()) {
-        type = 'neutrophil';
-      }
-      this.$emit('point', Object.fromEntries([['id', pointId], ['type', type], ...info]));
+      const { position: { x, y } } = evt;
+      this.pick(x, y);
     },
     setStateData() {
       this.vtk.geometryMapper.setInputData(this.geometry);
@@ -255,7 +306,8 @@ export default {
       });
 
       this.vtk.sporeMapper = vtkGlyph3DMapper.newInstance({
-        scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
+        scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
+        scaleArray: 'scale',
         scaleFactor: 5,
         colorMode: ColorMode.MAP_SCALARS,
         scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
@@ -281,7 +333,8 @@ export default {
       });
 
       this.vtk.macrophageMapper = vtkGlyph3DMapper.newInstance({
-        scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
+        scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
+        scaleArray: 'scale',
         scaleFactor: 8,
         colorMode: ColorMode.MAP_SCALARS,
         scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
@@ -310,7 +363,8 @@ export default {
       });
 
       this.vtk.neutrophilMapper = vtkGlyph3DMapper.newInstance({
-        scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_CONSTANT,
+        scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
+        scaleArray: 'scale',
         scaleFactor: 5,
         colorMode: ColorMode.MAP_SCALARS,
         scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
