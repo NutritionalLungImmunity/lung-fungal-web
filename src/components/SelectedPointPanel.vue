@@ -58,7 +58,7 @@ const valueMappers = {
   neutrophil: neutrophilValueMap,
 };
 
-const excludedKeys = new Set(['id']);
+const excludedKeys = new Set(['id', 'scale']);
 
 export default {
   props: {
