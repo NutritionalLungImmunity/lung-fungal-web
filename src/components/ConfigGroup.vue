@@ -1,5 +1,7 @@
 <template>
-  <v-expansion-panel class="params-panel">
+  <v-expansion-panel
+    class="params-panel"
+  >
     <v-expansion-panel-header>
       {{ name }}
     </v-expansion-panel-header>

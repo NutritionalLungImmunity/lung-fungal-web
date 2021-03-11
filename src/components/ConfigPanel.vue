@@ -1,38 +1,42 @@
 <template>
-  <v-card
-    class="param-card half-height border-right"
+  <v-expansion-panel
+    class="params-cols"
     color="grey darken-3"
-    dark
-    flat
-    tile
   >
-    <v-card-title>
+    <v-expansion-panel-header color="grey darken-3">
       {{ title }}
-    </v-card-title>
-
-    <v-divider />
-
-    <v-card-text class="pa-0 scrollable">
-      <v-expansion-panels
-        v-model="panel"
-        accordion
+    </v-expansion-panel-header>
+    <v-expansion-panel-content color="grey darken-3">
+      <v-card
+        class="param-cols border-right"
+        color="grey darken-3"
+        dark
         flat
-        multiple
         tile
       >
-        <config-group
-          v-for="(opts, module) in modules"
-          :key="module"
-          :name="module.charAt(0).toUpperCase() + module.slice(1)"
-          :options="opts"
-          :module="module"
-          :value="value"
-          :color="color"
-          @input="$emit('input', $event)"
-        />
-      </v-expansion-panels>
-    </v-card-text>
-  </v-card>
+        <v-card-text class="pa-0">
+          <v-expansion-panels
+            v-model="panel"
+            accordion
+            flat
+            multiple
+            tile
+          >
+            <config-group
+              v-for="(opts, module) in modules"
+              :key="module"
+              :name="module.charAt(0).toUpperCase() + module.slice(1)"
+              :options="opts"
+              :module="module"
+              :value="value"
+              :color="color"
+              @input="$emit('input', $event)"
+            />
+          </v-expansion-panels>
+        </v-card-text>
+      </v-card>
+    </v-expansion-panel-content>
+  </v-expansion-panel>
 </template>
 
 <script>
@@ -110,26 +114,32 @@ export default {
 .params-cols:first-of-type .param-card .v-card__title:before {
   background: #9575CD;
 }
-.params-cols:first-of-type .scrollable {
+.params-cols:first-of-type {
   border-left: 3px solid #9575CD;
 }
 .params-cols:nth-of-type(2) .param-card .v-card__title:before {
   background: #42A5F5;
 }
-.params-cols:nth-of-type(2) .scrollable {
+.params-cols:nth-of-type(2) {
   border-left: 3px solid #42A5F5;
 }
 .params-cols:nth-of-type(3) .param-card .v-card__title:before {
   background: #4DD0E1;
 }
-.params-cols:nth-of-type(3) .scrollable {
+.params-cols:nth-of-type(3) {
   border-left: 3px solid #4DD0E1;
 }
-.params-cols:last-of-type .param-card .v-card__title:before {
-  background: #D4E157;
+.params-cols:nth-of-type(4) {
+  border-left: 3px solid #43a047;
 }
-.params-cols:last-of-type .scrollable {
-  border-left: 3px solid #D4E157;
+.params-cols:nth-of-type(5) {
+  border-left: 3px solid #d4e157;
+}
+.params-cols:last-of-type .param-card .v-card__title:before {
+  background: #e53935;
+}
+.params-cols:last-of-type {
+  border-left: 3px solid #e53935;
 }
 </style>
 
