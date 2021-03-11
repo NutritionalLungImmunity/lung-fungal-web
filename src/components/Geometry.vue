@@ -1,8 +1,24 @@
 <template>
   <div
-    v-resize="resize"
     class="geometry"
-  />
+  >
+    <div
+      v-if="hasWebGL"
+      ref="vtkContainer"
+      v-resize="resize"
+      class="geometry"
+    />
+    <v-container
+      class="fill-height"
+      fluid
+    >
+      <v-row
+        justify="center"
+      >
+        No WebGL support detected.
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -13,12 +29,19 @@ import vtkPiecewiseFunction from 'vtk.js/Sources/Common/DataModel/PiecewiseFunct
 import vtkVolume from 'vtk.js/Sources/Rendering/Core/Volume';
 import vtkVolumeMapper from 'vtk.js/Sources/Rendering/Core/VolumeMapper';
 
+import hasWebGL from '@/webgl';
+
 export default {
   name: 'Geometry',
   props: {
     geometry: {
       type: Object,
       required: true,
+    },
+  },
+  computed: {
+    hasWebGL() {
+      return hasWebGL;
     },
   },
   static() {
@@ -42,7 +65,7 @@ export default {
   },
   mounted() {
     this.vtk.renderWindowContainer = vtkFullScreenRenderWindow.newInstance({
-      rootContainer: this.$el,
+      rootContainer: this.$refs.vtkContainer,
       containerStyle: {
         width: '100%',
         height: '100%',
