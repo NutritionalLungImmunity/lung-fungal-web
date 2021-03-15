@@ -1,38 +1,39 @@
 <template>
-  <v-card
-    class="param-card half-height border-right"
-    color="grey darken-3"
-    dark
-    flat
-    tile
-  >
-    <v-card-title>
-      {{ title }}
-    </v-card-title>
+    <v-expansion-panel color="grey darken-3">
+      <v-expansion-panel-header color="grey darken-3">{{ title }}</v-expansion-panel-header>
+      <v-expansion-panel-content color="grey darken-3">
+        <v-card
+          class="param-card border-right"
+          color="grey darken-3"
+          dark
+          flat
+          tile
+        >
+          <v-divider />
 
-    <v-divider />
-
-    <v-card-text class="pa-0 scrollable">
-      <v-expansion-panels
-        v-model="panel"
-        accordion
-        flat
-        multiple
-        tile
-      >
-        <config-group
-          v-for="(opts, module) in modules"
-          :key="module"
-          :name="module.charAt(0).toUpperCase() + module.slice(1)"
-          :options="opts"
-          :module="module"
-          :value="value"
-          :color="color"
-          @input="$emit('input', $event)"
-        />
-      </v-expansion-panels>
-    </v-card-text>
-  </v-card>
+          <v-card-text class="pa-0 scrollable">
+            <v-expansion-panels
+              v-model="panel"
+              accordion
+              flat
+              multiple
+              tile
+            >
+              <config-group
+                v-for="(opts, module) in modules"
+                :key="module"
+                :name="module.charAt(0).toUpperCase() + module.slice(1)"
+                :options="opts"
+                :module="module"
+                :value="value"
+                :color="color"
+                @input="$emit('input', $event)"
+              />
+            </v-expansion-panels>
+          </v-card-text>
+        </v-card>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
 </template>
 
 <script>

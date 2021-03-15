@@ -3,10 +3,11 @@
     <v-row no-gutters>
       <v-col cols="5">
         <v-row no-gutters>
+          <v-expansion-panels accordion dark flat multiple tile>
           <v-col
             v-for="(panel, id) in panels"
             :key="panel.title"
-            cols="6"
+            cols="12"
             class="params-cols"
           >
             <config-panel
@@ -16,6 +17,7 @@
               :color="colors[id]"
             />
           </v-col>
+          </v-expansion-panels>
         </v-row>
       </v-col>
       <v-col cols="7">
@@ -82,6 +84,11 @@ export default {
         dynamics: 'blue lighten-1',
         populations: 'cyan lighten-2',
         properties: 'lime lighten-1',
+        macrophage: 'red',
+        neutrophil: 'green',
+        epithelium: 'blue',
+        fungus: 'yellow',
+        molecules: 'purple',
       },
     };
   },

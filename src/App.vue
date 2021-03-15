@@ -5,7 +5,7 @@
       clipped-left
     >
       <v-toolbar-title>
-        FLungGui
+        Nutritional Lung Immunity Simulations
       </v-toolbar-title>
       <v-spacer />
       <v-toolbar-items>
