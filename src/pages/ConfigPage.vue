@@ -1,26 +1,28 @@
 <template>
-  <v-main class="px-0">
+  <v-main class="px-0" dark>
     <v-row no-gutters>
-      <v-col cols="5">
+      <v-col cols="3">
         <v-row no-gutters>
-          <v-expansion-panels accordion dark flat multiple tile>
-          <v-col
-            v-for="(panel, id) in panels"
-            :key="panel.title"
-            cols="12"
-            class="params-cols"
+          <v-expansion-panels
+            accordion
+            dark
+            flat
+            multiple
+            tile
+            vmodel="panel"
           >
             <config-panel
+              v-for="(panel, id) in panels"
+              :key="panel.title"
               v-model="values"
               :title="panel.title"
               :modules="panel.modules"
               :color="colors[id]"
             />
-          </v-col>
           </v-expansion-panels>
         </v-row>
       </v-col>
-      <v-col cols="7">
+      <v-col cols="9">
         <geometry
           v-if="geometry"
           class="viz"
@@ -80,15 +82,12 @@ export default {
       values: {},
       // These colors should match the colors embedded in the CSS for ConfigPanel.
       colors: {
-        geometry: 'deep-purple lighten-2',
-        dynamics: 'blue lighten-1',
-        populations: 'cyan lighten-2',
-        properties: 'lime lighten-1',
-        macrophage: 'red',
-        neutrophil: 'green',
-        epithelium: 'blue',
-        fungus: 'yellow',
-        molecules: 'purple',
+        properties: 'deep-purple lighten-2',
+        macrophage: 'blue lighten-1',
+        neutrophil: 'cyan lighten-2',
+        epithelium: 'lime lighten-1',
+        fungus: 'red darken-1',
+        molecules: 'green darken-1',
       },
     };
   },
