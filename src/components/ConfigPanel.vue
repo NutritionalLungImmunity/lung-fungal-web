@@ -1,6 +1,8 @@
 <template>
   <v-expansion-panel color="grey darken-3">
-    <v-expansion-panel-header color="grey darken-3">{{ title }}</v-expansion-panel-header>
+    <v-expansion-panel-header color="grey darken-3">
+      {{ title }}
+    </v-expansion-panel-header>
     <v-expansion-panel-content color="grey darken-3">
       <v-card
         class="param-cols border-right"

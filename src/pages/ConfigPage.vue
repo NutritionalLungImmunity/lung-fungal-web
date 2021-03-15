@@ -1,5 +1,8 @@
 <template>
-  <v-main class="px-0" dark>
+  <v-main
+    class="px-0"
+    dark
+  >
     <v-row no-gutters>
       <v-col cols="3">
         <v-row no-gutters>
