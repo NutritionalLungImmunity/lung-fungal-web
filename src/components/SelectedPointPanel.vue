@@ -86,11 +86,16 @@ export default {
       return (key, value) => value;
     },
     replaceValue(value, mapper) {
-      if (mapper instanceof Function) {
-        return mapper(value);
+      let v = value;
+      if (value.length === 1) {
+        // this is not a normal array but a Float64Array
+        v = value[0]; // eslint-disable-line prefer-destructuring
       }
-      if (Object.prototype.hasOwnProperty.call(mapper, value)) {
-        return mapper[value];
+      if (mapper instanceof Function) {
+        return mapper(v);
+      }
+      if (Object.prototype.hasOwnProperty.call(mapper, v)) {
+        return mapper[v];
       }
       return value;
     },
