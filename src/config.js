@@ -5,7 +5,7 @@ export default {
       simulation: [{
         id: 'run_time',
         min: 1,
-        max: 1000,
+        max: 336,
         default: 96,
         label: 'Simulation world time',
         help: 'Simulation world time (hours) as opposed to real world time',
@@ -114,8 +114,8 @@ export default {
           label: 'Max number of conidia in phagocyte',
           help: 'Maximum number of conidia in phagocyte',
         },
-      ]
-    }
+      ],
+    },
   },
   neutrophil: {
     title: 'Neutrophil',
@@ -196,9 +196,9 @@ export default {
           max: 100,
           default: 36,
           label: 'Neutrophil age limit',
-        }
-      ]
-    }
+        },
+      ],
+    },
   },
   epithelium: {
     title: 'Epithelium',
@@ -220,7 +220,7 @@ export default {
           step: 0.01,
           default: 0.03,
           label: 'p_internalization',
-        }
+        },
       ],
       misc: [
         {
@@ -254,9 +254,9 @@ export default {
           max: 100,
           default: 10,
           label: 'Maximum conidia in phag',
-        }, 
-      ]
-    }
+        },
+      ],
+    },
   },
   fungus: {
     title: 'Fungus',
@@ -270,7 +270,7 @@ export default {
           default: 1,
           label: 'Iron absorbtion rate',
           help: 'TODO',
-        }, 
+        },
       ],
       probabilities: [
         {
@@ -323,7 +323,7 @@ export default {
           label: 'Duration of growth stage',
           help: 'Duration of growth stage in minutes',
           units: 'minutes',
-        }, 
+        },
         {
           id: 'rest_time',
           min: 1,
@@ -343,9 +343,9 @@ export default {
           label: 'Duration of swollen stage',
           help: 'Duration of swollen stage in minutes',
           units: 'minutes',
-        }
-      ]
-    }
+        },
+      ],
+    },
   },
   molecules: {
     title: 'Molecules',
@@ -372,8 +372,8 @@ export default {
           step: 0.01,
           default: 0.2,
           label: 'Neutrophil cytokine evaporation rate',
-        }
+        },
       ],
-    }
+    },
   },
 };
