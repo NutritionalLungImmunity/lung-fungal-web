@@ -113,25 +113,25 @@ export default {
 .params-cols:first-of-type .param-card .v-card__title:before {
   background: #9575CD;
 }
-.params-cols:first-of-type .scrollable {
+.params-cols:first-of-type {
   border-left: 3px solid #9575CD;
 }
 .params-cols:nth-of-type(2) .param-card .v-card__title:before {
   background: #42A5F5;
 }
-.params-cols:nth-of-type(2) .scrollable {
+.params-cols:nth-of-type(2) {
   border-left: 3px solid #42A5F5;
 }
 .params-cols:nth-of-type(3) .param-card .v-card__title:before {
   background: #4DD0E1;
 }
-.params-cols:nth-of-type(3) .scrollable {
+.params-cols:nth-of-type(3) {
   border-left: 3px solid #4DD0E1;
 }
 .params-cols:last-of-type .param-card .v-card__title:before {
   background: #D4E157;
 }
-.params-cols:last-of-type .scrollable {
+.params-cols:last-of-type {
   border-left: 3px solid #D4E157;
 }
 </style>

@@ -5,7 +5,10 @@
   >
     <v-row no-gutters>
       <v-col cols="3">
-        <v-row no-gutters>
+        <v-row
+          class="scrollable"
+          no-gutters
+        >
           <v-expansion-panels
             accordion
             dark
@@ -157,3 +160,13 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.scrollable {
+  box-shadow: inset 0 -25px 25px -25px rgba(0, 0, 0, .35);
+  /* set height to 100% minus the height of the v-card-title and divider combined */
+  height: calc(100vh - 66px);
+  overflow: hidden;
+  overflow-y: auto;
+}
+</style>
