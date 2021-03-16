@@ -1,6 +1,6 @@
 export default {
   properties: {
-    title: 'Simulation Properties',
+    title: 'Main Settings',
     modules: {
       simulation: [{
         id: 'run_time',
@@ -8,9 +8,10 @@ export default {
         max: 336,
         default: 96,
         label: 'Simulation world time',
-        help: 'Simulation world time (hours) as opposed to real world time',
+        help: 'Simulated world time in hours',
         units: 'hours',
-      }, {
+      },
+      {
         id: 'validate',
         type: 'checkbox',
         default: true,

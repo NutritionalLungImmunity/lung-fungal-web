@@ -15,7 +15,7 @@
             flat
             multiple
             tile
-            vmodel="panel"
+            v-model="panel"
           >
             <config-panel
               v-for="(panel, id) in panels"
@@ -84,6 +84,7 @@ export default {
   },
   data() {
     return {
+      panel: [0],
       panels: config,
       values: {},
       // These colors should match the colors embedded in the CSS for ConfigPanel.
