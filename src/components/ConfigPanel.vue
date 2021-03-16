@@ -1,5 +1,8 @@
 <template>
-  <v-expansion-panel class="params-cols" color="grey darken-3">
+  <v-expansion-panel
+    class="params-cols"
+    color="grey darken-3"
+  >
     <v-expansion-panel-header color="grey darken-3">
       {{ title }}
     </v-expansion-panel-header>
