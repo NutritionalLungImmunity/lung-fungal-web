@@ -91,9 +91,9 @@ export default {
         properties: 'deep-purple lighten-2',
         macrophage: 'blue lighten-1',
         neutrophil: 'cyan lighten-2',
-        epithelium: 'lime lighten-1',
-        fungus: 'red darken-1',
-        molecules: 'green darken-1',
+        epithelium: 'green darken-1',
+        fungus: 'lime lighten-1',
+        molecules: 'red darken-1',
       },
     };
   },

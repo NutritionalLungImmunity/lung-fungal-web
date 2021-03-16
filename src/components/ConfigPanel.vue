@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel color="grey darken-3">
+  <v-expansion-panel class="params-cols" color="grey darken-3">
     <v-expansion-panel-header color="grey darken-3">
       {{ title }}
     </v-expansion-panel-header>
@@ -11,8 +11,6 @@
         flat
         tile
       >
-        <v-divider />
-
         <v-card-text class="pa-0">
           <v-expansion-panels
             v-model="panel"
@@ -128,11 +126,17 @@ export default {
 .params-cols:nth-of-type(3) {
   border-left: 3px solid #4DD0E1;
 }
+.params-cols:nth-of-type(4) {
+  border-left: 3px solid #43a047;
+}
+.params-cols:nth-of-type(5) {
+  border-left: 3px solid #d4e157;
+}
 .params-cols:last-of-type .param-card .v-card__title:before {
-  background: #D4E157;
+  background: #e53935;
 }
 .params-cols:last-of-type {
-  border-left: 3px solid #D4E157;
+  border-left: 3px solid #e53935;
 }
 </style>
 
