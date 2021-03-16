@@ -10,12 +10,12 @@
           no-gutters
         >
           <v-expansion-panels
+            v-model="configPanels"
             accordion
             dark
             flat
             multiple
             tile
-            v-model="panel"
           >
             <config-panel
               v-for="(panel, id) in panels"
@@ -84,7 +84,7 @@ export default {
   },
   data() {
     return {
-      panel: [0],
+      configPanels: [0],
       panels: config,
       values: {},
       // These colors should match the colors embedded in the CSS for ConfigPanel.
