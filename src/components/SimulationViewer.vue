@@ -8,6 +8,7 @@
       <Render3D
         :simulation="simulation"
         :time-step="timeStep"
+        :molecule="molecule"
         @point="selectedPointInfo = $event"
       />
       <v-container
@@ -42,6 +43,15 @@
         >
           <selected-point-panel
             :info="selectedPointInfo"
+          />
+        </v-row>
+        <v-row class="ma-4">
+          <v-select
+            v-model="molecule"
+            class="molecule"
+            :items="moleculeItems"
+            hint="Choose a molecule"
+            solo
           />
         </v-row>
       </v-container>
@@ -101,6 +111,7 @@ export default {
     const simulation = new Simulation(this.simulationFolder._id);
     simulation.update();
     return {
+      molecule: '',
       playing: false,
       timeStep: 0,
       timeStepShowDuration: 1000,
@@ -109,6 +120,20 @@ export default {
     };
   },
   computed: {
+    moleculeItems() {
+      if (this.simulation.timeSteps.length === 0) {
+        return [];
+      }
+      const pd = this.simulation.timeSteps[0].molecules.getPointData();
+      const arrayNames = ['', ...pd.getArrays().map((a) => a.getName())];
+      return arrayNames.map((name) => {
+        const text = name === '' ? 'Disabled' : name;
+        return {
+          text,
+          value: name,
+        };
+      });
+    },
     progress() {
       return (this.simulationFolder.nli || {}).progress || 0;
     },
@@ -237,5 +262,12 @@ export default {
 .full-screen-progress {
   height: calc(100vh - 112px);
   background: white;
+}
+</style>
+
+/* I'm bad and I feel bad */
+<style>
+.molecule .v-messages__message {
+  color: white;
 }
 </style>
