@@ -85,7 +85,7 @@ export default {
           min: 0,
           max: 10,
           step: 0.01,
-          default: 0.33,
+          default: 1,
           label: 'Time step',
         },
       ],
