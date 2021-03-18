@@ -28,6 +28,7 @@ import vtkGlyph3DMapper from 'vtk.js/Sources/Rendering/Core/Glyph3DMapper';
 import vtkInteractorStyleTrackballCamera from 'vtk.js/Sources/Interaction/Style/InteractorStyleTrackballCamera';
 import vtkLookupTable from 'vtk.js/Sources/Common/Core/LookupTable';
 import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
+import vtkImageMarchingCubes from 'vtk.js/Sources/Filters/General/ImageMarchingCubes';
 import vtkOpenGLHardwareSelector from 'vtk.js/Sources/Rendering/OpenGL/HardwareSelector';
 import vtkOpenGLRenderWindow from 'vtk.js/Sources/Rendering/OpenGL/RenderWindow';
 import vtkPiecewiseFunction from 'vtk.js/Sources/Common/DataModel/PiecewiseFunction';
@@ -59,6 +60,10 @@ export default {
       type: Number,
       required: true,
     },
+    molecule: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -81,6 +86,9 @@ export default {
     neutrophil() {
       return this.state.neutrophil;
     },
+    molecules() {
+      return this.state.molecules;
+    },
     hasWebGL() {
       return hasWebGL;
     },
@@ -99,6 +107,9 @@ export default {
   },
   watch: {
     state() {
+      this.setStateData();
+    },
+    molecule() {
       this.setStateData();
     },
   },
@@ -125,13 +136,23 @@ export default {
     selector.setFieldAssociation(FieldAssociations.FIELD_ASSOCIATION_POINTS);
     selector.attach(openglRenderWindow, renderer);
 
+    const marchingCubes = vtkImageMarchingCubes.newInstance({
+      contourValue: 1,
+      computeNormals: true,
+      mergePoints: true,
+    });
+
     this.vtk = {
       renderWindow,
       renderer,
       interactor,
       openglRenderWindow,
       selector,
-      //
+      molecule: {
+        marchingCubes,
+        mapper: vtkMapper.newInstance({ colorMode: ColorMode.MAP_SCALARS }),
+        actor: vtkActor.newInstance(),
+      },
       selected: {},
     };
 
@@ -155,6 +176,7 @@ export default {
     this.vtk.interactor.bindEvents(container);
 
     this.createGeometry();
+    this.createMolecules();
     this.createSpore();
     this.createMacrophage();
     this.createNeutrophil();
@@ -207,6 +229,7 @@ export default {
 
       // Prevent volume rendering picking
       this.vtk.geometryActor.setVisibility(false);
+      this.vtk.molecule.actor.setVisibility(false);
 
       // Hardware selection picking
       this.vtk.selector.setArea(x, y, x, y);
@@ -241,6 +264,7 @@ export default {
 
       // Make sure the volume is still visible for std rendering
       this.vtk.geometryActor.setVisibility(true);
+      this.vtk.molecule.actor.setVisibility(true);
     },
     onLeftClick(evt) {
       if (evt.pokedRenderer !== this.vtk.renderer) {
@@ -258,7 +282,21 @@ export default {
       this.vtk.macrophageMapper.setInputData(this.macrophage, 0);
       this.neutrophil.getPointData().setActiveScalars('dead');
       this.vtk.neutrophilMapper.setInputData(this.neutrophil, 0);
+      this.updateMolecules();
       this.render();
+    },
+    updateMolecules() {
+      this.vtk.renderer.removeActor(this.vtk.molecule.actor);
+      if (this.molecule === '') {
+        return;
+      }
+      this.vtk.renderer.addActor(this.vtk.molecule.actor);
+      const pd = this.molecules.getPointData();
+      pd.setActiveScalars(this.molecule);
+      this.vtk.molecule.marchingCubes.setInputData(this.molecules);
+      const dataRange = pd.getScalars().getRange();
+      const isoValue = (dataRange[0] + dataRange[1]) / 3;
+      this.vtk.molecule.marchingCubes.setContourValue(isoValue);
     },
     createGeometry() {
       this.vtk.geometryMapper = vtkVolumeMapper.newInstance();
@@ -325,6 +363,12 @@ export default {
       this.vtk.sporeActor.setMapper(this.vtk.sporeMapper);
 
       this.vtk.renderer.addActor(this.vtk.sporeActor);
+    },
+    createMolecules() {
+      this.vtk.molecule.actor.setMapper(this.vtk.molecule.mapper);
+      this.vtk.molecule.actor.getProperty().setColor(0, 1, 1);
+      this.vtk.molecule.actor.getProperty().setOpacity(0.8);
+      this.vtk.molecule.mapper.setInputConnection(this.vtk.molecule.marchingCubes.getOutputPort());
     },
     createMacrophage() {
       this.vtk.macrophageGlyphSource = vtkSphereSource.newInstance({
