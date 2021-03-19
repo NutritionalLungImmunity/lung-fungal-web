@@ -10,12 +10,14 @@ export default {
         label: 'Simulation world time',
         help: 'Simulated world time in hours',
         units: 'hours',
+        module: null,
       },
       {
         id: 'validate',
         type: 'checkbox',
         default: true,
         label: 'Perform validation per time step',
+        module: 'simulation',
       }],
       fungus: [{
         id: 'init_num',
@@ -24,6 +26,7 @@ export default {
         step: 1,
         default: 70,
         label: 'Initial count of Fungal spores',
+        module: 'fungus',
       }],
     },
   },
@@ -38,6 +41,7 @@ export default {
           step: 0.01,
           default: 0.05,
           label: 'Uptake rate of cytokine',
+          module: 'macrophage',
         },
         {
           id: 'Mn',
@@ -45,6 +49,7 @@ export default {
           max: 100,
           default: 2.0,
           label: 'Production rate of neutrophil cytokine',
+          module: 'macrophage',
         },
         {
           id: 'rec_rate_ph',
@@ -53,6 +58,7 @@ export default {
           default: 6,
           label: 'Macrophages recruited',
           help: 'Number of macrophages recruited per time step',
+          module: 'macrophage',
         },
       ],
       probabilities: [
@@ -63,6 +69,7 @@ export default {
           step: 0.01,
           default: 1.0,
           label: 'Probability of appearence',
+          module: 'macrophage',
         },
         {
           id: 'p_internalization',
@@ -71,6 +78,7 @@ export default {
           step: 0.01,
           default: 0.15,
           label: 'Probability of internalization',
+          module: 'macrophage',
         },
         {
           id: 'rm',
@@ -79,6 +87,7 @@ export default {
           step: 0.01,
           default: 0.1,
           label: 'Proportion of sporeless fungal cells to remove',
+          module: 'macrophage',
         },
       ],
       misc: [
@@ -88,6 +97,7 @@ export default {
           max: 100,
           default: 3,
           label: 'Cytokine recruitment threshold',
+          module: 'macrophage',
         },
         {
           id: 'kill',
@@ -97,6 +107,7 @@ export default {
           default: 2,
           label: 'Time steps to kill conidia',
           help: 'Number of time steps to kill conidia',
+          module: 'macrophage',
         },
         {
           id: 'm_det',
@@ -106,6 +117,7 @@ export default {
           label: 'Radius of detection',
           help: 'Macrophage radius of detection',
           units: 'voxels',
+          module: 'macrophage',
         },
         {
           id: 'max_conidia_in_phag',
@@ -114,6 +126,7 @@ export default {
           default: 50,
           label: 'Max number of conidia in phagocyte',
           help: 'Maximum number of conidia in phagocyte',
+          module: 'macrophage',
         },
       ],
     },
@@ -130,6 +143,7 @@ export default {
           default: 18,
           label: 'Neutrophils recruited',
           help: 'TODO',
+          module: 'neutrophil',
         }, {
           id: 'rec_r',
           min: 0,
@@ -138,6 +152,7 @@ export default {
           default: 5,
           label: 'Neutrophils recruited',
           help: 'TODO',
+          module: 'neutrophil',
         },
       ],
       probabilities: [
@@ -149,6 +164,7 @@ export default {
           default: 0.05,
           label: 'Neutrophil absorb cytokines',
           help: 'Probability',
+          module: 'neutrophil',
         },
       ],
       misc: [
@@ -157,6 +173,7 @@ export default {
           type: 'checkbox',
           default: false,
           label: 'Host is neutropenic',
+          module: 'neutrophil',
         },
         {
           id: 'Nn',
@@ -165,6 +182,7 @@ export default {
           step: 0.1,
           default: 2,
           label: 'Neutrophil produce neutrophil cytokine',
+          module: 'neutrophil',
         },
         {
           id: 'n_det',
@@ -175,6 +193,7 @@ export default {
           label: 'Radius of detection',
           help: 'Neutrophil radius of detection',
           units: 'voxels',
+          module: 'neutrophil',
         }, {
           id: 'granule_count',
           min: 0,
@@ -183,6 +202,7 @@ export default {
           default: 100,
           label: 'Initial neutrophil granuals',
           help: 'Initial number of neutrophil granuals',
+          module: 'neutrophil',
         }, {
           id: 'n_kill',
           min: 1,
@@ -191,12 +211,14 @@ export default {
           default: 2,
           label: 'Time taken to kill hyphae',
           help: 'Time taken for neutrophil to kill hyphae',
+          module: 'neutrophil',
         }, {
           id: 'age_limit',
           min: 1,
           max: 100,
           default: 36,
           label: 'Neutrophil age limit',
+          module: 'neutrophil',
         },
       ],
     },
@@ -211,6 +233,7 @@ export default {
           max: 200,
           default: 100,
           label: 'Cytokine production factor',
+          module: 'epithelium',
         },
       ],
       probabilities: [
@@ -221,6 +244,7 @@ export default {
           step: 0.01,
           default: 0.03,
           label: 'p_internalization',
+          module: 'epithelium',
         },
       ],
       misc: [
@@ -230,6 +254,7 @@ export default {
           max: 100,
           default: 30,
           label: 'Time taken to kill internal spore',
+          module: 'epithelium',
         },
         {
           id: 's_det',
@@ -239,6 +264,7 @@ export default {
           default: 1,
           label: 'Spore detection radius',
           units: 'voxels',
+          module: 'epithelium',
         },
         {
           id: 'h_det',
@@ -248,6 +274,7 @@ export default {
           default: 1,
           label: 'Hyphae detection radius',
           units: 'voxels',
+          module: 'epithelium',
         },
         {
           id: 'max_condia_in_phag',
@@ -255,6 +282,7 @@ export default {
           max: 100,
           default: 10,
           label: 'Maximum conidia in phag',
+          module: 'epithelium',
         },
       ],
     },
@@ -271,6 +299,7 @@ export default {
           default: 1,
           label: 'Iron absorbtion rate',
           help: 'TODO',
+          module: 'fungus',
         },
       ],
       probabilities: [
@@ -281,6 +310,7 @@ export default {
           step: 0.01,
           default: 1.0,
           label: 'Probability of lodging in the epithelium',
+          module: 'fungus',
         },
         {
           id: 'p_internal_swell',
@@ -289,6 +319,7 @@ export default {
           step: 0.01,
           default: 0.2,
           label: 'Probability of swelling when internalized',
+          module: 'fungus',
         },
         {
           id: 'p_branch',
@@ -297,6 +328,7 @@ export default {
           step: 0.01,
           default: 0.35,
           label: 'Probability of branching',
+          module: 'fungus',
         },
         {
           id: 'p_internalize',
@@ -305,6 +337,7 @@ export default {
           step: 0.01,
           default: 0.3,
           label: 'Probability of internalization',
+          module: 'fungus',
         },
       ],
       misc: [
@@ -314,6 +347,7 @@ export default {
           max: 100,
           default: 100,
           label: 'init_health',
+          module: 'fungus',
         },
         {
           id: 'grow_time',
@@ -324,6 +358,7 @@ export default {
           label: 'Duration of growth stage',
           help: 'Duration of growth stage in minutes',
           units: 'minutes',
+          module: 'fungus',
         },
         {
           id: 'rest_time',
@@ -334,6 +369,7 @@ export default {
           label: 'Duration of resting stage',
           help: 'Duration of resting stage in minutes',
           units: 'minutes',
+          module: 'fungus',
         },
         {
           id: 'swell_time',
@@ -344,6 +380,7 @@ export default {
           label: 'Duration of swollen stage',
           help: 'Duration of swollen stage in minutes',
           units: 'minutes',
+          module: 'fungus',
         },
       ],
     },
@@ -359,6 +396,7 @@ export default {
           step: 0.01,
           default: 0.8,
           label: 'Molecule diffusion rate',
+          module: 'molecules',
         }, {
           id: 'cyto_evap_m',
           min: 0,
@@ -366,6 +404,7 @@ export default {
           step: 0.01,
           default: 0.2,
           label: 'Macrophage cytokine evaporation rate',
+          module: 'molecules',
         }, {
           id: 'cyto_evap_n',
           min: 0,
@@ -373,6 +412,7 @@ export default {
           step: 0.01,
           default: 0.2,
           label: 'Neutrophil cytokine evaporation rate',
+          module: 'molecules',
         },
       ],
     },
