@@ -1,24 +1,34 @@
 <template>
-  <v-main class="px-0">
+  <v-main
+    class="px-0"
+    dark
+  >
     <v-row no-gutters>
-      <v-col cols="5">
-        <v-row no-gutters>
-          <v-col
-            v-for="(panel, id) in panels"
-            :key="panel.title"
-            cols="6"
-            class="params-cols"
+      <v-col cols="3">
+        <v-row
+          class="scrollable"
+          no-gutters
+        >
+          <v-expansion-panels
+            v-model="configPanels"
+            accordion
+            dark
+            flat
+            multiple
+            tile
           >
             <config-panel
+              v-for="(panel, id) in panels"
+              :key="panel.title"
               v-model="values"
               :title="panel.title"
               :modules="panel.modules"
               :color="colors[id]"
             />
-          </v-col>
+          </v-expansion-panels>
         </v-row>
       </v-col>
-      <v-col cols="7">
+      <v-col cols="9">
         <geometry
           v-if="geometry"
           class="viz"
@@ -74,14 +84,17 @@ export default {
   },
   data() {
     return {
+      configPanels: [0],
       panels: config,
       values: {},
       // These colors should match the colors embedded in the CSS for ConfigPanel.
       colors: {
-        geometry: 'deep-purple lighten-2',
-        dynamics: 'blue lighten-1',
-        populations: 'cyan lighten-2',
-        properties: 'lime lighten-1',
+        properties: 'deep-purple lighten-2',
+        macrophage: 'blue lighten-1',
+        neutrophil: 'cyan lighten-2',
+        epithelium: 'green darken-1',
+        fungus: 'lime lighten-1',
+        molecules: 'red darken-1',
       },
     };
   },
@@ -134,12 +147,12 @@ export default {
       // extract default values from the static configuration
       const values = {};
       Object.entries(config).forEach(([, panelOpts]) => {
-        Object.entries(panelOpts.modules).forEach(([module, moduleOpts]) => {
-          const initialValueModule = initialValues[module] || {};
-          values[module] = values[module] || {};
+        Object.entries(panelOpts.modules).forEach(([, moduleOpts]) => {
           Object.entries(moduleOpts).forEach(([, option]) => {
-            const initialValue = initialValueModule[option.id];
-            values[module][option.id] = initialValue === undefined ? option.default : initialValue;
+            const initialValue = initialValues[option.module][option.id];
+            values[option.module] = values[option.module] || {};
+            values[option.module][option.id] = initialValue === undefined
+              ? option.default : initialValue;
           });
         });
       });
@@ -148,3 +161,13 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.scrollable {
+  box-shadow: inset 0 -25px 25px -25px rgba(0, 0, 0, .35);
+  /* set height to 100% minus the height of the v-card-title and divider combined */
+  height: calc(100vh - 66px);
+  overflow: hidden;
+  overflow-y: auto;
+}
+</style>

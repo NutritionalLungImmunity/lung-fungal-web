@@ -1,5 +1,7 @@
 <template>
-  <v-expansion-panel class="params-panel">
+  <v-expansion-panel
+    class="params-panel"
+  >
     <v-expansion-panel-header>
       {{ name }}
     </v-expansion-panel-header>
@@ -8,7 +10,7 @@
         <config-option
           v-for="option in options"
           :key="option.id"
-          :value="value[module][option.id] || option.default"
+          :value="value[option.module][option.id] || option.default"
           :type="option.type || 'slider'"
           :label="option.label"
           :tooltip="option.help || option.label"
@@ -17,7 +19,7 @@
           :step="option.step"
           :color="color"
           :units="option.units || null"
-          @input="onChange(option.id, $event)"
+          @input="onChange(option.id, option.module, $event)"
         />
       </div>
     </v-expansion-panel-content>
@@ -55,12 +57,12 @@ export default {
     },
   },
   methods: {
-    onChange(id, value) {
+    onChange(id, module, value) {
       const modules = {
         ...this.value,
       };
-      modules[this.module] = {
-        ...this.value[this.module],
+      modules[module] = {
+        ...this.value[module],
         [id]: value,
       };
       this.$emit('input', modules);
