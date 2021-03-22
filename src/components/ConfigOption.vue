@@ -52,7 +52,7 @@
           </v-tooltip>
           <template v-slot:append>
             <v-text-field
-              v-model="value"
+              :value="value"
               class="mt-0 pt-0"
               type="number"
               style="width: 72px"
@@ -62,6 +62,7 @@
               dense
               hide-details
               outlined
+              @input="$emit('input', $event)"
             />
           </template>
         </v-slider>

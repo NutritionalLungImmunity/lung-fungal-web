@@ -147,12 +147,12 @@ export default {
       // extract default values from the static configuration
       const values = {};
       Object.entries(config).forEach(([, panelOpts]) => {
-        Object.entries(panelOpts.modules).forEach(([module, moduleOpts]) => {
-          const initialValueModule = initialValues[module] || {};
-          values[module] = values[module] || {};
+        Object.entries(panelOpts.modules).forEach(([, moduleOpts]) => {
           Object.entries(moduleOpts).forEach(([, option]) => {
-            const initialValue = initialValueModule[option.id];
-            values[module][option.id] = initialValue === undefined ? option.default : initialValue;
+            const initialValue = initialValues[option.module][option.id];
+            values[option.module] = values[option.module] || {};
+            values[option.module][option.id] = initialValue === undefined
+              ? option.default : initialValue;
           });
         });
       });
