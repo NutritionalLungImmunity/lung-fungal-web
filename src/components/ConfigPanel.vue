@@ -15,6 +15,22 @@
         tile
       >
         <v-card-text class="pa-0">
+          <div class="pt-4">
+            <config-option
+              v-for="option in options"
+              :key="option.id"
+              :value="value[option.module][option.id] || option.default"
+              :type="option.type || 'slider'"
+              :label="option.label"
+              :tooltip="option.help || option.label"
+              :min="option.min"
+              :max="option.max"
+              :step="option.step"
+              :color="color"
+              :units="option.units || null"
+              @input="onChange(option.id, option.module, $event)"
+            />
+          </div>
           <v-expansion-panels
             v-model="panel"
             accordion
@@ -23,11 +39,10 @@
             tile
           >
             <config-group
-              v-for="(opts, module) in modules"
-              :key="module"
-              :name="module.charAt(0).toUpperCase() + module.slice(1)"
+              v-for="(opts, subsection) in subsections"
+              :key="subsection"
+              :name="subsection.charAt(0).toUpperCase() + subsection.slice(1)"
               :options="opts"
-              :module="module"
               :value="value"
               :color="color"
               @input="$emit('input', $event)"
@@ -41,18 +56,16 @@
 
 <script>
 import ConfigGroup from '@/components/ConfigGroup.vue';
+import ConfigOption from '@/components/ConfigOption.vue';
 
 export default {
   components: {
     ConfigGroup,
+    ConfigOption,
   },
   props: {
     title: {
       type: String,
-      required: true,
-    },
-    modules: {
-      type: Object,
       required: true,
     },
     value: {
@@ -63,11 +76,31 @@ export default {
       type: String,
       required: true,
     },
+    options: {
+      type: Array,
+      required: true,
+    },
+    subsections: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
       panel: [],
     };
+  },
+  methods: {
+    onChange(id, module, value) {
+      const modules = {
+        ...this.value,
+      };
+      modules[module] = {
+        ...this.value[module],
+        [id]: value,
+      };
+      this.$emit('input', modules);
+    },
   },
 };
 </script>
