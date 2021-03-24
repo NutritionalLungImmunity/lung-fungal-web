@@ -90,6 +90,18 @@ export default {
       panel: [],
     };
   },
+  methods: {
+    onChange(id, module, value) {
+      const modules = {
+        ...this.value,
+      };
+      modules[module] = {
+        ...this.value[module],
+        [id]: value,
+      };
+      this.$emit('input', modules);
+    },
+  },
 };
 </script>
 

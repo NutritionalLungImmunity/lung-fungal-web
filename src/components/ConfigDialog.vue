@@ -73,9 +73,13 @@ export default {
   data() {
     return {
       simDialog: false,
-      time: 20,
       name: 'New Simulation',
     };
+  },
+  computed: {
+    time() {
+      return this.config.simulation.run_time;
+    },
   },
   methods: {
     async createSimulation() {
