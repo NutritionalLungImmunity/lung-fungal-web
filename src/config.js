@@ -1,8 +1,8 @@
 export default {
   properties: {
     title: 'Main Settings',
-    modules: {
-      simulation: [{
+    options: [
+      {
         id: 'run_time',
         min: 1,
         max: 336,
@@ -10,16 +10,9 @@ export default {
         label: 'Simulation world time',
         help: 'Simulated world time in hours',
         units: 'hours',
-        module: null,
+        module: 'simulation',
       },
       {
-        id: 'validate',
-        type: 'checkbox',
-        default: true,
-        label: 'Perform validation per time step',
-        module: 'simulation',
-      }],
-      fungus: [{
         id: 'init_num',
         min: 1,
         max: 2000,
@@ -27,12 +20,21 @@ export default {
         default: 70,
         label: 'Initial count of Fungal spores',
         module: 'fungus',
-      }],
-    },
+      },
+      {
+        id: 'validate',
+        type: 'checkbox',
+        default: true,
+        label: 'Perform validation per time step',
+        module: 'simulation',
+      },
+    ],
+    subsections: {},
   },
   macrophage: {
     title: 'Macrophage',
-    modules: {
+    options: [],
+    subsections: {
       rates: [
         {
           id: 'm_abs',
@@ -133,7 +135,16 @@ export default {
   },
   neutrophil: {
     title: 'Neutrophil',
-    modules: {
+    options: [
+      {
+        id: 'neutropenic',
+        type: 'checkbox',
+        default: false,
+        label: 'Host is neutropenic',
+        module: 'neutrophil',
+      },
+    ],
+    subsections: {
       rates: [
         {
           id: 'rec_rate_ph',
@@ -141,7 +152,7 @@ export default {
           max: 30,
           step: 1,
           default: 18,
-          label: 'Neutrophils recruited',
+          label: 'Neutrophils recruited by phagocytes',
           help: 'TODO',
           module: 'neutrophil',
         }, {
@@ -168,13 +179,6 @@ export default {
         },
       ],
       misc: [
-        {
-          id: 'neutropenic',
-          type: 'checkbox',
-          default: false,
-          label: 'Host is neutropenic',
-          module: 'neutrophil',
-        },
         {
           id: 'Nn',
           min: 0,
@@ -225,7 +229,8 @@ export default {
   },
   epithelium: {
     title: 'Epithelium',
-    modules: {
+    options: [],
+    subsections: {
       rates: [
         {
           id: 'cyto_rate',
@@ -289,7 +294,8 @@ export default {
   },
   fungus: {
     title: 'Fungus',
-    modules: {
+    options: [],
+    subsections: {
       rates: [
         {
           id: 'iron_absorb',
@@ -387,7 +393,8 @@ export default {
   },
   molecules: {
     title: 'Molecules',
-    modules: {
+    options: [],
+    subsections: {
       rates: [
         {
           id: 'diffusion_rate',

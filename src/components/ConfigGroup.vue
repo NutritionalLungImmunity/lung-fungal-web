@@ -39,10 +39,6 @@ export default {
       type: String,
       required: true,
     },
-    module: {
-      type: String,
-      required: true,
-    },
     options: {
       type: Array,
       required: true,

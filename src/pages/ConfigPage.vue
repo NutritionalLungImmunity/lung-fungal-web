@@ -22,7 +22,8 @@
               :key="panel.title"
               v-model="values"
               :title="panel.title"
-              :modules="panel.modules"
+              :options="panel.options"
+              :subsections="panel.subsections"
               :color="colors[id]"
             />
           </v-expansion-panels>
@@ -147,8 +148,20 @@ export default {
       // extract default values from the static configuration
       const values = {};
       Object.entries(config).forEach(([, panelOpts]) => {
-        Object.entries(panelOpts.modules).forEach(([, moduleOpts]) => {
-          Object.entries(moduleOpts).forEach(([, option]) => {
+        Object.entries(panelOpts.options).forEach(([, option]) => {
+          if (!initialValues[option.module]) {
+            initialValues[option.module] = {};
+          }
+          const initialValue = initialValues[option.module][option.id];
+          values[option.module] = values[option.module] || {};
+          values[option.module][option.id] = initialValue === undefined
+            ? option.default : initialValue;
+        });
+        Object.entries(panelOpts.subsections).forEach(([, subsectionOpts]) => {
+          Object.entries(subsectionOpts).forEach(([, option]) => {
+            if (!initialValues[option.module]) {
+              initialValues[option.module] = {};
+            }
             const initialValue = initialValues[option.module][option.id];
             values[option.module] = values[option.module] || {};
             values[option.module][option.id] = initialValue === undefined
