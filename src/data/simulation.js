@@ -6,9 +6,14 @@ class Simulation {
     this.id = id;
     this.timeSteps = [];
     this.totalTimeSteps = 0;
+    this.updating = false;
   }
 
   async update() {
+    if (this.updating) {
+      return;
+    }
+    this.updating = true;
     const folders = (await http.get('folder', {
       params: {
         parentType: 'folder',
@@ -24,12 +29,20 @@ class Simulation {
       timeStepIds[parseInt(folder.name, 10)] = folder._id;
     }
 
-    for (let i = this.timeSteps.length; i < timeStepIds.length; i += 1) {
-      const folderId = timeStepIds[i];
+    for (let i0 = this.timeSteps.length; i0 < timeStepIds.length; i0 += 1) {
+      const folderId = timeStepIds[i0];
+
       // We actually want to load these serially to support progressive loading.
-      // eslint-disable-next-line no-await-in-loop
-      this.timeSteps.push(await State.load(folderId));
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        this.timeSteps.push(await State.load(folderId));
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(`Failed to load folder ${folderId}`);
+        return;
+      }
     }
+    this.updating = false;
   }
 
   static async load(id) {
