@@ -5,7 +5,8 @@ import vtkDataArray from 'vtk.js/Sources/Common/Core/DataArray';
 import http from '@/http';
 
 class State {
-  constructor(time, geometry, molecules, spore, macrophage, neutrophil) {
+  constructor(id, time, geometry, molecules, spore, macrophage, neutrophil) {
+    this.id = id;
     this.time = time;
     this.geometry = State.loadImageData(geometry);
     this.molecules = State.loadImageData(molecules);
@@ -23,7 +24,7 @@ class State {
       State.loadFile(id, 'macrophage_001.vtp'),
       State.loadFile(id, 'neutrophil_001.vtp'),
     ]);
-    return new State(time, geometry, molecules, spore, macrophage, neutrophil);
+    return new State(id, time, geometry, molecules, spore, macrophage, neutrophil);
   }
 
   static async getTime(folderId) {
