@@ -193,10 +193,12 @@ export default {
       default: [],
       async get() {
         this.skipNextUpdate = true;
-        return this.girderRest.listSimulations(
+        const sims = await this.girderRest.listSimulations(
           sortPropertyMap[this.sortBy],
           this.sortDesc,
         );
+        this.skipNextUpdate = false;
+        return sims;
       },
       watch: ['updateState'],
     },
