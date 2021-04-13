@@ -95,7 +95,7 @@ export default {
       return hasWebGL;
     },
     activeType() {
-      if (this.activeDataSet === this.spore) {
+      if (this.activeDataSet === this.vtk.sporeColorFilter.getOutputData()) {
         return 'A. fumigatus';
       }
       if (this.activeDataSet === this.macrophage) {
