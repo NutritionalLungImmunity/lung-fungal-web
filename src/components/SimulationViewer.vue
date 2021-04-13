@@ -159,17 +159,28 @@ export default {
       return {
         labels: this.times,
         datasets: [
-          this.spores,
+          this.internalizedSpores,
+          this.freeSpores,
           this.macrophages,
           this.neutrophils,
         ],
       };
     },
-    spores() {
+    internalizedSpores() {
+      const color = 'rgb(33, 84, 19)';
+      return {
+        label: 'Internalized A. fumigatus',
+        data: this.simulation.timeSteps.map((t) => t.countCells('spore', 'internalized')),
+        borderColor: color,
+        backgroundColor: color,
+        fill: false,
+      };
+    },
+    freeSpores() {
       const color = 'rgb(92, 235, 53)';
       return {
-        label: 'A. fumigatus',
-        data: this.simulation.timeSteps.map((t) => t.spore.getNumberOfPoints()),
+        label: 'Free A. fumigatus',
+        data: this.simulation.timeSteps.map((t) => t.countCells('spore', 'internalized', (d) => !d)),
         borderColor: color,
         backgroundColor: color,
         fill: false,
@@ -179,7 +190,7 @@ export default {
       const color = 'rgb(255, 99, 132)';
       return {
         label: 'Macrophage',
-        data: this.simulation.timeSteps.map((t) => t.macrophage.getNumberOfPoints()),
+        data: this.simulation.timeSteps.map((t) => t.countCells('macrophage')),
         borderColor: color,
         backgroundColor: color,
         fill: false,
@@ -189,7 +200,7 @@ export default {
       const color = 'rgb(58, 0, 252)';
       return {
         label: 'Neutrophil',
-        data: this.simulation.timeSteps.map((t) => t.neutrophil.getNumberOfPoints()),
+        data: this.simulation.timeSteps.map((t) => t.countCells('neutrophil')),
         borderColor: color,
         backgroundColor: color,
         fill: false,

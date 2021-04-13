@@ -88,6 +88,16 @@ class State {
     ds.getPointData().addArray(vtkDataArray.newInstance({ name: 'scale', values }));
     return polyDataReader.getOutputData(0);
   }
+
+  countCells(cellType, array = null, filter = (d) => d) {
+    const polyData = this[cellType];
+    if (array === null) {
+      return polyData.getNumberOfPoints();
+    }
+    const pointData = polyData.getPointData();
+    const data = pointData.getArrayByName(array).getData();
+    return data.filter(filter).length;
+  }
 }
 
 export default State;
