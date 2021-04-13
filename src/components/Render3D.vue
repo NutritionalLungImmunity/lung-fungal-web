@@ -23,6 +23,7 @@
 
 <script>
 import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
+import vtkCalculator from 'vtk.js/Sources/Filters/General/Calculator';
 import vtkColorTransferFunction from 'vtk.js/Sources/Rendering/Core/ColorTransferFunction';
 import vtkGlyph3DMapper from 'vtk.js/Sources/Rendering/Core/Glyph3DMapper';
 import vtkInteractorStyleTrackballCamera from 'vtk.js/Sources/Interaction/Style/InteractorStyleTrackballCamera';
@@ -38,11 +39,12 @@ import vtkRenderer from 'vtk.js/Sources/Rendering/Core/Renderer';
 import vtkSphereSource from 'vtk.js/Sources/Filters/Sources/SphereSource';
 import vtkVolume from 'vtk.js/Sources/Rendering/Core/Volume';
 import vtkVolumeMapper from 'vtk.js/Sources/Rendering/Core/VolumeMapper';
-import { FieldAssociations } from 'vtk.js/Sources/Common/DataModel/DataSet/Constants';
 import {
   ColorMode,
   ScalarMode,
 } from 'vtk.js/Sources/Rendering/Core/Mapper/Constants';
+import { AttributeTypes } from 'vtk.js/Sources/Common/DataModel/DataSetAttributes/Constants';
+import { FieldAssociations, FieldDataTypes } from 'vtk.js/Sources/Common/DataModel/DataSet/Constants';
 
 import Simulation from '@/data/simulation';
 import hasWebGL from '@/webgl';
@@ -276,8 +278,7 @@ export default {
     },
     setStateData() {
       this.vtk.geometryMapper.setInputData(this.geometry);
-      this.spore.getPointData().setActiveScalars('status');
-      this.vtk.sporeMapper.setInputData(this.spore, 0);
+      this.vtk.sporeColorFilter.setInputData(this.spore, 0);
       this.macrophage.getPointData().setActiveScalars('dead');
       this.vtk.macrophageMapper.setInputData(this.macrophage, 0);
       this.neutrophil.getPointData().setActiveScalars('dead');
@@ -338,6 +339,24 @@ export default {
       this.vtk.renderer.addVolume(this.vtk.geometryActor);
     },
     createSpore() {
+      // TODO: I have no idea why the calculator filter inverts the color values...
+      const colors = [
+        Uint8Array.from([256 - 92, 256 - 235, 256 - 53]),
+        Uint8Array.from([256 - 33, 256 - 84, 256 - 19]),
+      ];
+
+      this.vtk.sporeColorFilter = vtkCalculator.newInstance();
+      this.vtk.sporeColorFilter.setFormulaSimple(
+        FieldDataTypes.POINT,
+        ['internalized'],
+        'color',
+        (internalized) => colors[internalized],
+        {
+          numberOfOutputComponents: 3,
+          outputAttribute: AttributeTypes.SCALARS,
+        },
+      );
+
       this.vtk.sporeGlyphSource = vtkSphereSource.newInstance({
         thetaResolution: SPHERE_RESOLUTION,
         phiResolution: SPHERE_RESOLUTION,
@@ -347,17 +366,10 @@ export default {
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
         scaleArray: 'scale',
         scaleFactor: 5,
-        colorMode: ColorMode.MAP_SCALARS,
-        scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
+        colorMode: ColorMode.DIRECT_SCALARS,
       });
-      this.vtk.sporeMapper.setColorByArrayName('status');
+      this.vtk.sporeMapper.setInputConnection(this.vtk.sporeColorFilter.getOutputPort(), 0);
       this.vtk.sporeMapper.setInputConnection(this.vtk.sporeGlyphSource.getOutputPort(), 1);
-
-      this.vtk.sporeLookupTable = vtkLookupTable.newInstance({
-        numberOfColors: 1,
-        hueRange: [0.3],
-      });
-      this.vtk.sporeMapper.setLookupTable(this.vtk.sporeLookupTable);
 
       this.vtk.sporeActor = vtkActor.newInstance();
       this.vtk.sporeActor.setMapper(this.vtk.sporeMapper);
