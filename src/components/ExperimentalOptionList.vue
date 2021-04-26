@@ -128,24 +128,24 @@ export default {
   methods: {
     onChange(index, value) {
       const values = Array.from(
-        [...this.values,]
+        [...this.values],
       );
       values[index] = value;
       this.$emit('input', values);
     },
     onParamAdd() {
       const values = Array.from([
-        ...this.values, this.defaultValue
+        ...this.values, this.defaultValue,
       ]);
       this.$emit('input', values);
     },
     onParamDel() {
       const values = Array.from([
-        ...this.values
+        ...this.values,
       ]);
       values.pop();
       this.$emit('input', values);
-    }
+    },
   },
 };
 </script>
