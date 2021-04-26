@@ -15,10 +15,26 @@
         tile
       >
         <v-card-text class="pa-0">
-          <div class="pt-4">
+          <div
+            v-for="option in options"
+            :key="option.id"
+            class="pt-4"
+          >
+            <experimental-option
+              v-if="option.experimental"
+              :values="value[option.module][option.id] || [option.default]"
+              :type="option.type || 'slider'"
+              :label="option.label"
+              :tooltip="option.help || option.label"
+              :min="option.min"
+              :max="option.max"
+              :step="option.step"
+              :color="color"
+              :units="option.units || null"
+              @input="onChange(option.id, option.module, $event)"
+            />
             <config-option
-              v-for="option in options"
-              :key="option.id"
+              v-else
               :value="value[option.module][option.id] || option.default"
               :type="option.type || 'slider'"
               :label="option.label"
@@ -57,11 +73,13 @@
 <script>
 import ConfigGroup from '@/components/ConfigGroup.vue';
 import ConfigOption from '@/components/ConfigOption.vue';
+import ExperimentalOption from '@/components/ExperimentalOption.vue';
 
 export default {
   components: {
     ConfigGroup,
     ConfigOption,
+    ExperimentalOption,
   },
   props: {
     title: {

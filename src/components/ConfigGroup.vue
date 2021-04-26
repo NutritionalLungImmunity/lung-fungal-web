@@ -6,10 +6,27 @@
       {{ name }}
     </v-expansion-panel-header>
     <v-expansion-panel-content>
-      <div class="pt-4">
+      <div
+        v-for="option in options"
+        :key="option.id"
+        class="pt-4"
+      >
+        <experimental-option
+          v-if="option.experimental"
+          :values="value[option.module][option.id] || [option.default]"
+          :type="option.type || 'slider'"
+          :label="option.label"
+          :tooltip="option.help || option.label"
+          :min="option.min"
+          :max="option.max"
+          :step="option.step"
+          :color="color"
+          :units="option.units || null"
+          :experimental="option.experimental"
+          @input="onChange(option.id, option.module, $event)"
+        />
         <config-option
-          v-for="option in options"
-          :key="option.id"
+          v-else
           :value="value[option.module][option.id] || option.default"
           :type="option.type || 'slider'"
           :label="option.label"
@@ -19,6 +36,7 @@
           :step="option.step"
           :color="color"
           :units="option.units || null"
+          :experimental="option.experimental"
           @input="onChange(option.id, option.module, $event)"
         />
       </div>
@@ -29,10 +47,12 @@
 
 <script>
 import ConfigOption from '@/components/ConfigOption.vue';
+import ExperimentalOption from '@/components/ExperimentalOption.vue';
 
 export default {
   components: {
     ConfigOption,
+    ExperimentalOption,
   },
   props: {
     name: {
