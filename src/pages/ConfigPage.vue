@@ -93,9 +93,9 @@ export default {
         properties: 'deep-purple lighten-2',
         macrophage: 'blue lighten-1',
         neutrophil: 'cyan lighten-2',
-        epithelium: 'green darken-1',
-        fungus: 'lime lighten-1',
-        molecules: 'red darken-1',
+        erythrocyte: 'green darken-1',
+        molecules: 'lime lighten-1',
+        // molecules: 'red darken-1',
       },
     };
   },
@@ -154,8 +154,13 @@ export default {
           }
           const initialValue = initialValues[option.module][option.id];
           values[option.module] = values[option.module] || {};
-          values[option.module][option.id] = initialValue === undefined
-            ? option.default : initialValue;
+          if (option.experimental && !Array.isArray(option.default)) {
+            values[option.module][option.id] = initialValue === undefined
+              ? [option.default] : initialValue;
+          } else {
+            values[option.module][option.id] = initialValue === undefined
+              ? option.default : initialValue;
+          }
         });
         Object.entries(panelOpts.subsections).forEach(([, subsectionOpts]) => {
           Object.entries(subsectionOpts).forEach(([, option]) => {
@@ -164,8 +169,13 @@ export default {
             }
             const initialValue = initialValues[option.module][option.id];
             values[option.module] = values[option.module] || {};
-            values[option.module][option.id] = initialValue === undefined
-              ? option.default : initialValue;
+            if (option.experimental && !Array.isArray(option.default)) {
+              values[option.module][option.id] = initialValue === undefined
+                ? [option.default] : initialValue;
+            } else {
+              values[option.module][option.id] = initialValue === undefined
+                ? option.default : initialValue;
+            }
           });
         });
       });

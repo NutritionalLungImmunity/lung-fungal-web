@@ -12,60 +12,43 @@
         >
           {{ labelWithUnits }}
         </v-subheader>
-        <v-slider
-          :color="color"
-          hide-details
-          thumb-size="24"
-          :thumb-label="true"
-          :title="tooltip"
+        <experimental-option
+          v-for="(value, index) in values"
+          :key="index"
+          :default-value="defaultValue"
           :value="value"
           :min="min"
           :max="max"
           :step="step"
-          @input="$emit('input', $event)"
-        >
-          <v-tooltip
-            slot="prepend"
-            bottom
+          :color="color"
+          :units="units"
+          @input="onChange(index, $event)"
+        />
+        <div align="right">
+          <v-btn
+            small
+            icon
+            @click="onParamAdd()"
           >
-            <template
-              v-slot:activator="{on, attrs}"
+            <v-icon
+              class="v-input__icon"
             >
-              <v-btn
-                slot="activator"
-                icon
-                text
-                :max-height="24"
-                :max-width="24"
-                v-bind="attrs"
-                v-on="on"
-                @click="reset"
-              >
-                <v-icon
-                  class="v-input__icon"
-                >
-                  mdi-undo
-                </v-icon>
-              </v-btn>
-            </template>
-            <span>Reset default</span>
-          </v-tooltip>
-          <template v-slot:append>
-            <v-text-field
-              :value="value"
-              class="mt-0 pt-0"
-              type="number"
-              style="width: 72px"
-              :min="min"
-              :max="max"
-              :step="step"
-              dense
-              hide-details
-              outlined
-              @input="$emit('input', $event)"
-            />
-          </template>
-        </v-slider>
+              mdi-plus-circle-outline
+            </v-icon>
+          </v-btn>
+          <v-btn
+            small
+            icon
+            :disabled="values.length == 1"
+            @click="onParamDel()"
+          >
+            <v-icon
+              class="v-input__icon"
+            >
+              mdi-minus-circle-outline
+            </v-icon>
+          </v-btn>
+        </div>
       </v-col>
     </v-row>
   </div>
@@ -77,19 +60,17 @@
         cols="12"
         class="py-0"
       >
-        <v-checkbox
-          :label="label"
-          :value="value"
-          :title="tooltip"
-          @input="$emit('input', $event)"
-        />
+        Unsupported at this time!
       </v-col>
     </v-row>
   </div>
 </template>
 
 <script>
+import ExperimentalOption from './ExperimentalOption.vue';
+
 export default {
+  components: { ExperimentalOption },
   props: {
     type: {
       type: String,
@@ -98,8 +79,12 @@ export default {
         return ['slider', 'checkbox'].indexOf(value) !== -1;
       },
     },
-    value: {
-      type: [String, Number, Boolean],
+    defaultValue: {
+      type: Number,
+      required: true,
+    },
+    values: {
+      type: Array,
       required: true,
     },
     label: {
@@ -116,7 +101,7 @@ export default {
     },
     max: {
       type: Number,
-      default: 0,
+      default: 1,
     },
     step: {
       type: Number,
@@ -141,9 +126,26 @@ export default {
     },
   },
   methods: {
-    reset() {
-      this.$emit('input', this.default);
+    onChange(index, value) {
+      const values = Array.from(
+        [...this.values,]
+      );
+      values[index] = value;
+      this.$emit('input', values);
     },
+    onParamAdd() {
+      const values = Array.from([
+        ...this.values, this.defaultValue
+      ]);
+      this.$emit('input', values);
+    },
+    onParamDel() {
+      const values = Array.from([
+        ...this.values
+      ]);
+      values.pop();
+      this.$emit('input', values);
+    }
   },
 };
 </script>

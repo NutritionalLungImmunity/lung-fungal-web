@@ -17,12 +17,13 @@
         <v-card-text class="pa-0">
           <div
             v-for="option in options"
-            :key="option.id"
+            :key="option.module+'.'+option.id"
             class="pt-4"
           >
-            <experimental-option
+            <experimental-option-list
               v-if="option.experimental"
-              :values="value[option.module][option.id] || [option.default]"
+              :default-value="option.default"
+              :values="value[option.module][option.id]"
               :type="option.type || 'slider'"
               :label="option.label"
               :tooltip="option.help || option.label"
@@ -31,6 +32,8 @@
               :step="option.step"
               :color="color"
               :units="option.units || null"
+              :option-id="option.id"
+              :option-module="option.module"
               @input="onChange(option.id, option.module, $event)"
             />
             <config-option
@@ -73,13 +76,13 @@
 <script>
 import ConfigGroup from '@/components/ConfigGroup.vue';
 import ConfigOption from '@/components/ConfigOption.vue';
-import ExperimentalOption from '@/components/ExperimentalOption.vue';
+import ExperimentalOptionList from '@/components/ExperimentalOptionList.vue';
 
 export default {
   components: {
     ConfigGroup,
     ConfigOption,
-    ExperimentalOption,
+    ExperimentalOptionList,
   },
   props: {
     title: {

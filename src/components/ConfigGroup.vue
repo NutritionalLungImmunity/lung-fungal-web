@@ -11,9 +11,10 @@
         :key="option.id"
         class="pt-4"
       >
-        <experimental-option
+        <experimental-option-list
           v-if="option.experimental"
-          :values="value[option.module][option.id] || [option.default]"
+          :default-value="option.default"
+          :values="value[option.module][option.id]"
           :type="option.type || 'slider'"
           :label="option.label"
           :tooltip="option.help || option.label"
@@ -47,12 +48,12 @@
 
 <script>
 import ConfigOption from '@/components/ConfigOption.vue';
-import ExperimentalOption from '@/components/ExperimentalOption.vue';
+import ExperimentalOptionList from '@/components/ExperimentalOptionList.vue';
 
 export default {
   components: {
     ConfigOption,
-    ExperimentalOption,
+    ExperimentalOptionList,
   },
   props: {
     name: {

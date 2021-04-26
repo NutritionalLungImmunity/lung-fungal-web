@@ -5,7 +5,7 @@ export default {
       {
         id: 'run_time',
         min: 1,
-        max: 336,
+        max: 10080,
         default: 5760,
         label: 'Simulation world time',
         help: 'Simulated world time in minutes',

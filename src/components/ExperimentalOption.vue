@@ -1,91 +1,57 @@
 <template>
-  <div
-    v-if="type === 'slider'"
+  <v-slider
+    :color="color"
+    hide-details
+    thumb-size="24"
+    :thumb-label="true"
+    :value="value"
+    :min="min"
+    :max="max"
+    :step="step"
+    @input="$emit('input', $event)"
   >
-    <v-row class="px-5 py-2">
-      <v-col
-        cols="12"
-        class="py-0"
+    <v-tooltip
+      slot="prepend"
+      bottom
+    >
+      <template
+        v-slot:activator="{on, attrs}"
       >
-        <v-subheader
-          class="panel-subheader pl-0"
+        <v-btn
+          slot="activator"
+          icon
+          text
+          :max-height="24"
+          :max-width="24"
+          v-bind="attrs"
+          v-on="on"
+          @click="reset"
         >
-          {{ labelWithUnits }}
-        </v-subheader>
-        <v-slider
-          :color="color"
-          hide-details
-          thumb-size="24"
-          :thumb-label="true"
-          :title="tooltip"
-          :value="val"
-          :min="min"
-          :max="max"
-          :step="step"
-          @input="$emit('input', $event)"
-        >
-          <v-tooltip
-            slot="prepend"
-            bottom
+          <v-icon
+            class="v-input__icon"
           >
-            <template
-              v-slot:activator="{on, attrs}"
-            >
-              <v-btn
-                slot="activator"
-                icon
-                text
-                :max-height="24"
-                :max-width="24"
-                v-bind="attrs"
-                v-on="on"
-                @click="reset"
-              >
-                <v-icon
-                  class="v-input__icon"
-                >
-                  mdi-close
-                </v-icon>
-              </v-btn>
-            </template>
-            <span>Reset default</span>
-          </v-tooltip>
-          <template v-slot:append>
-            <v-text-field
-              :value="value"
-              class="mt-0 pt-0"
-              type="number"
-              style="width: 72px"
-              :min="min"
-              :max="max"
-              :step="step"
-              dense
-              hide-details
-              outlined
-              @input="$emit('input', $event)"
-            />
-          </template>
-        </v-slider>
-      </v-col>
-    </v-row>
-  </div>
-  <div
-    v-else-if="type === 'checkbox'"
-  >
-    <v-row class="px-5 py-3">
-      <v-col
-        cols="12"
-        class="py-0"
-      >
-        <v-checkbox
-          :label="label"
-          :value="value"
-          :title="tooltip"
-          @input="$emit('input', $event)"
-        />
-      </v-col>
-    </v-row>
-  </div>
+            mdi-undo
+          </v-icon>
+        </v-btn>
+      </template>
+      <span>Reset default</span>
+    </v-tooltip>
+    <template v-slot:append>
+      <v-text-field
+        :value="value"
+        class="mt-0 pt-0"
+        type="number"
+        style="width: 72px"
+        :min="min"
+        :max="max"
+        :step="step"
+        dense
+        hide-details
+        outlined
+        @input="$emit('input', $event)"
+      />
+    </template>
+  </v-slider>
 </template>
 
 <script>
@@ -98,16 +64,12 @@ export default {
         return ['slider', 'checkbox'].indexOf(value) !== -1;
       },
     },
-    values: {
-      type: Array,
+    defaultValue: {
+      type: Number,
       required: true,
     },
-    label: {
-      type: String,
-      required: true,
-    },
-    tooltip: {
-      type: String,
+    value: {
+      type: Number,
       required: true,
     },
     min: {
@@ -142,7 +104,7 @@ export default {
   },
   methods: {
     reset() {
-      this.$emit('input', this.default);
+      this.$emit('input', this.defaultValue);
     },
   },
 };
