@@ -73,7 +73,7 @@
                 <template v-if="simulation.nli.version">
                   <span class="grey--text">#</span>
                   <div class="px-2">
-                    <a href="https://github.com/NutritionalLungImmunity/nlisim/releases/tag/v0.2.8">{{ simulation.nli.version }}</a>
+                    <a href="https://github.com/NutritionalLungImmunity/nlisim/releases">{{ simulation.nli.version }}</a>
                   </div>
                 </template>
               </div>
