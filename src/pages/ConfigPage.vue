@@ -94,8 +94,8 @@ export default {
         macrophage: 'blue lighten-1',
         neutrophil: 'cyan lighten-2',
         erythrocyte: 'green darken-1',
-        molecules: 'lime lighten-1',
-        // molecules: 'red darken-1',
+        // molecules: 'lime lighten-1',
+        molecules: 'red darken-1',
       },
     };
   },

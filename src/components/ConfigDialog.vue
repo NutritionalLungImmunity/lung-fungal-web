@@ -83,11 +83,31 @@ export default {
   },
   methods: {
     async createSimulation() {
-      const data = await this.girderRest.runSimulation({
-        targetTime: this.time,
-        name: this.name,
-      }, this.config);
-      this.$emit('create', (data.kwargs || {}).simulation_id);
+      // is it a simulation or an experiment?
+      let isExperiment = false;
+      Object.entries(this.config).forEach(([, moduleParams]) => {
+        Object.entries(moduleParams).forEach(([, paramValue]) => {
+          if (Array.isArray(paramValue)) {
+            if (paramValue.length > 1) {
+              isExperiment = true;
+            }
+          }
+        });
+      });
+
+      if (isExperiment) {
+        const data = await this.girderRest.runExperiment({
+          targetTime: this.time,
+          name: this.name,
+        }, this.config);
+        this.$emit('create', (data.kwargs || {}).simulation_id);
+      } else {
+        const data = await this.girderRest.runSimulation({
+          targetTime: this.time,
+          name: this.name,
+        }, this.config);
+        this.$emit('create', (data.kwargs || {}).simulation_id);
+      }
       this.simDialog = false;
     },
   },

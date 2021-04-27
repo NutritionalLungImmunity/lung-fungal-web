@@ -29,7 +29,23 @@ Object.assign(
       await this.post(`nli/simulation/${id}/archive`);
     },
     async runSimulation(params, config) {
-      const { data } = await this.post('nli/job', config, { params });
+      const unpackedConfig = {};
+      Object.entries(config).forEach(([moduleName, moduleParams]) => {
+        unpackedConfig[moduleName] = {};
+        Object.entries(moduleParams).forEach(([paramName, paramValue]) => {
+          if (Array.isArray(paramValue)) {
+            const [value] = paramValue;
+            unpackedConfig[moduleName][paramName] = value;
+          } else {
+            unpackedConfig[moduleName][paramName] = paramValue;
+          }
+        });
+      });
+      const { data } = await this.post('nli/job', unpackedConfig, { params });
+      return data;
+    },
+    async runExperiment(params, config) {
+      const { data } = await this.post('nli/experiment', config, { params });
       return data;
     },
   },

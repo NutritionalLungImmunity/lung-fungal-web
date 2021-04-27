@@ -8,7 +8,7 @@
     <v-expansion-panel-content>
       <div
         v-for="option in options"
-        :key="option.id"
+        :key="option.module+'.'+option.id"
         class="pt-4"
       >
         <experimental-option-list
@@ -23,7 +23,6 @@
           :step="option.step"
           :color="color"
           :units="option.units || null"
-          :experimental="option.experimental"
           @input="onChange(option.id, option.module, $event)"
         />
         <config-option
@@ -37,7 +36,6 @@
           :step="option.step"
           :color="color"
           :units="option.units || null"
-          :experimental="option.experimental"
           @input="onChange(option.id, option.module, $event)"
         />
       </div>

@@ -34,7 +34,7 @@
           </v-icon>
         </v-btn>
       </template>
-      <span>Reset default</span>
+      <span>Reset to default</span>
     </v-tooltip>
     <template v-slot:append>
       <v-text-field

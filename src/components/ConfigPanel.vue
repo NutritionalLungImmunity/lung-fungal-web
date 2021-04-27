@@ -32,8 +32,6 @@
               :step="option.step"
               :color="color"
               :units="option.units || null"
-              :option-id="option.id"
-              :option-module="option.module"
               @input="onChange(option.id, option.module, $event)"
             />
             <config-option
