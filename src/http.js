@@ -21,8 +21,21 @@ Object.assign(
       });
       return data;
     },
+    async listExperiments(sortBy, sortDesc) {
+      const { data } = await this.get('nli/experiment', {
+        params: {
+          sort: sortBy,
+          sortdir: sortDesc ? -1 : 1,
+        },
+      });
+      return data;
+    },
     async getSimulation(id) {
       const { data } = await this.get(`nli/simulation/${id}`);
+      return data;
+    },
+    async getExperiment(id) {
+      const { data } = await this.get(`nli/experiment/${id}`);
       return data;
     },
     async archiveSimulation(id) {

@@ -1,7 +1,7 @@
 import Router from 'vue-router';
 
 import ConfigPage from '@/pages/ConfigPage.vue';
-import ComparePage from '@/pages/ComparePage.vue';
+import ExperimentListPage from '@/pages/ExperimentListPage.vue';
 import SimulationListPage from '@/pages/SimulationListPage.vue';
 
 export default new Router({
@@ -37,9 +37,9 @@ export default new Router({
       },
     },
     {
-      path: '/compare',
-      name: 'compare',
-      component: ComparePage,
+      path: '/experiments',
+      name: 'experiments',
+      component: ExperimentListPage,
     },
   ],
 });

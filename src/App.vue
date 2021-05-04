@@ -22,8 +22,8 @@
           <v-tab :to="`/simulations?${query}`">
             Simulations
           </v-tab>
-          <v-tab :to="`/compare?${query}`">
-            Compare
+          <v-tab :to="`/experiments?${query}`">
+            Experiments
           </v-tab>
         </v-tabs>
       </v-toolbar-items>
