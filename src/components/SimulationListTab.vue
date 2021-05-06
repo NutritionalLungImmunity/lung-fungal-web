@@ -72,8 +72,8 @@
         <div class="sorting d-flex align-center mr-1 pr-1">
           <v-switch
             v-model="showExperimentalSimulations"
-            class="pt-5"
-            :label="`Show Experiment Components`"
+            class="mr-2 pt-5"
+            :label="`Experiment Parts`"
           />
           <v-select
             :value="sortBy"
