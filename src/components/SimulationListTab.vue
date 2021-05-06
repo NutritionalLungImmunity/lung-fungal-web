@@ -70,6 +70,11 @@
       <v-spacer />
       <v-toolbar-items class="align-center d-flex">
         <div class="sorting d-flex align-center mr-1 pr-1">
+          <v-switch
+            v-model="showExperimentalSimulations"
+            class="pt-5"
+            :label="`Show Experiment Components`"
+          />
           <v-select
             :value="sortBy"
             class="mr-1"
@@ -135,9 +140,28 @@
         </div>
       </v-toolbar-items>
     </v-toolbar>
-    <v-row class="pt-5">
+    <v-row
+      v-if="showExperimentalSimulations"
+      class="pt-5"
+    >
       <v-col
         v-for="sim in simulations"
+        :key="sim.name"
+        cols="3"
+      >
+        <simulation-card
+          :simulation="sim"
+          @refresh="refresh"
+          @view="$emit('view', $event)"
+        />
+      </v-col>
+    </v-row>
+    <v-row
+      v-else
+      class="pt-5"
+    >
+      <v-col
+        v-for="sim in nonExperimentalSimulations"
         :key="sim.name"
         cols="3"
       >
@@ -175,6 +199,11 @@ export default {
       type: Boolean,
       required: true,
     },
+    showExperimentalSimulations: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -199,6 +228,17 @@ export default {
         );
         this.skipNextUpdate = false;
         return sims;
+      },
+      watch: ['updateState'],
+    },
+    nonExperimentalSimulations: {
+      default: [],
+      async get() {
+        this.skipNextUpdate = true;
+        const sims = await this.simulations;
+        const nonExperimentalSims = sims.filter((sim) => !sim.nli.in_experiment);
+        this.skipNextUpdate = false;
+        return nonExperimentalSims;
       },
       watch: ['updateState'],
     },
