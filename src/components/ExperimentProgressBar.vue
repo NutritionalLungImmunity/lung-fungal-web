@@ -5,18 +5,19 @@
       :key="simId"
     >
       <v-progress-linear
+        v-if="!circular"
         :indeterminate="indeterminate[index]"
         :color="progressColor[index]"
         :value="progress[index]"
       />
+      <v-progress-circular
+        v-else
+        :indeterminate="indeterminate[index]"
+        :color="progressColor[index]"
+        :value="progress[index]"
+        :size="20"
+      />
     </div>
-  <!-- <v-progress-circular
-    v-else
-    :indeterminate="indeterminate"
-    :color="progressColor"
-    :value="progress"
-    :size="20"
-  /> -->
   </div>
 </template>
 
@@ -38,10 +39,10 @@ export default {
       type: Object,
       required: true,
     },
-    // circular: {
-    //   type: Boolean,
-    //   default: false,
-    // },
+    circular: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     complete() {
