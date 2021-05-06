@@ -1,7 +1,7 @@
 <template>
   <div v-if="experiment.nli">
     <div
-      v-for="(status, simId, index) in experiment.nli.per_sim_status"
+      v-for="(simId, index) in experiment.nli.component_simulations"
       :key="simId"
     >
       <v-progress-linear
