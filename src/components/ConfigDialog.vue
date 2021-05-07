@@ -5,7 +5,30 @@
     max-width="500px"
     transition="dialog-transition"
   >
-    <template v-slot:activator="{ on }">
+    <template
+      v-if="isExperiment"
+      v-slot:activator="{ on }"
+    >
+      <v-btn
+        color="primary"
+        class="ml-3"
+        :disabled="girderRest.user === null"
+        dark
+        depressed
+        large
+        v-on="on"
+      >
+        Run Experiment
+        <v-spacer />
+        <v-icon right>
+          mdi-chevron-right
+        </v-icon>
+      </v-btn>
+    </template>
+    <template
+      v-else
+      v-slot:activator="{ on }"
+    >
       <v-btn
         color="primary"
         class="ml-3"
@@ -80,10 +103,11 @@ export default {
     time() {
       return this.config.simulation.run_time;
     },
-  },
-  methods: {
-    async createSimulation() {
-      // is it a simulation or an experiment?
+    isExperiment() {
+      if (this.config.simulation && this.config.simulation.runs_per_config > 1) {
+        return true;
+      }
+
       let isExperiment = false;
       Object.entries(this.config).forEach(([, moduleParams]) => {
         Object.entries(moduleParams).forEach(([, paramValue]) => {
@@ -94,8 +118,12 @@ export default {
           }
         });
       });
-
-      if (isExperiment) {
+      return isExperiment;
+    },
+  },
+  methods: {
+    async createSimulation() {
+      if (this.isExperiment) {
         const data = await this.girderRest.runExperiment({
           targetTime: this.time,
           name: this.name,
