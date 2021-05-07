@@ -5,10 +5,7 @@
     max-width="500px"
     transition="dialog-transition"
   >
-    <template
-      v-if="isExperiment"
-      v-slot:activator="{ on }"
-    >
+    <template v-slot:activator="{ on }">
       <v-btn
         color="primary"
         class="ml-3"
@@ -18,27 +15,7 @@
         large
         v-on="on"
       >
-        Run Experiment
-        <v-spacer />
-        <v-icon right>
-          mdi-chevron-right
-        </v-icon>
-      </v-btn>
-    </template>
-    <template
-      v-else
-      v-slot:activator="{ on }"
-    >
-      <v-btn
-        color="primary"
-        class="ml-3"
-        :disabled="girderRest.user === null"
-        dark
-        depressed
-        large
-        v-on="on"
-      >
-        Run Simulation
+        Run {{ simulationOrExperimentUpper }}
         <v-spacer />
         <v-icon right>
           mdi-chevron-right
@@ -47,17 +24,17 @@
     </template>
     <v-card>
       <v-card-title class="headline">
-        New Simulation
+        New {{ simulationOrExperimentUpper }}
       </v-card-title>
       <v-card-subtitle>
-        Provide a name for your simulation.
+        Provide a name for your {{ simulationOrExperimentLower }}.
       </v-card-subtitle>
       <v-card-text class="pa-0">
         <v-list class="py-0">
           <v-list-item class="pt-2 px-6">
             <v-text-field
               v-model="name"
-              label="Simulation Name"
+              label="Name"
               outlined
             />
           </v-list-item>
@@ -75,7 +52,7 @@
         <v-btn
           color="primary"
           depressed
-          @click="createSimulation"
+          @click="createSimulationOrExperiment"
         >
           Create
         </v-btn>
@@ -120,21 +97,34 @@ export default {
       });
       return isExperiment;
     },
+    simulationOrExperimentUpper() {
+      return this.isExperiment ? 'Experiment' : 'Simulation';
+    },
+    simulationOrExperimentLower() {
+      return this.isExperiment ? 'experiment' : 'simulation';
+    },
+  },
+  created() {
+    if (this.isExperiment) {
+      this.name = 'New Experiment';
+    }
   },
   methods: {
-    async createSimulation() {
+    async createSimulationOrExperiment() {
       if (this.isExperiment) {
         const data = await this.girderRest.runExperiment({
           targetTime: this.time,
           name: this.name,
         }, this.config);
-        this.$emit('create', (data.kwargs || {}).simulation_id);
+        // data returned is a list of jobs, one for each sub-simulation
+        // each of these has the experiment's id as part of its kwargs
+        this.$emit('create', { id: (data[0].kwargs || {}).experiment_id, is_experiment: true });
       } else {
         const data = await this.girderRest.runSimulation({
           targetTime: this.time,
           name: this.name,
         }, this.config);
-        this.$emit('create', (data.kwargs || {}).simulation_id);
+        this.$emit('create', { id: (data.kwargs || {}).simulation_id, is_experiment: true });
       }
       this.simDialog = false;
     },
