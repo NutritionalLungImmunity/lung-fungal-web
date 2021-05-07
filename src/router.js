@@ -40,6 +40,17 @@ export default new Router({
       path: '/experiments',
       name: 'experiments',
       component: ExperimentListPage,
+      props(route) {
+        let { tabs } = route.query;
+        if (!Array.isArray(tabs)) {
+          if (tabs) {
+            tabs = [tabs];
+          } else {
+            tabs = [];
+          }
+        }
+        return { ...route.query, tabs };
+      },
     },
   ],
 });

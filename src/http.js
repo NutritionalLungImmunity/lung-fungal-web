@@ -42,6 +42,8 @@ Object.assign(
       await this.post(`nli/simulation/${id}/archive`);
     },
     async runSimulation(params, config) {
+      // single-value parameters get packed into length 1 arrays to support
+      // the possibility of multi-value paramters, we unpack them here
       const unpackedConfig = {};
       Object.entries(config).forEach(([moduleName, moduleParams]) => {
         unpackedConfig[moduleName] = {};

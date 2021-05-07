@@ -93,8 +93,8 @@ export default {
         properties: 'deep-purple lighten-2',
         macrophage: 'blue lighten-1',
         neutrophil: 'cyan lighten-2',
-        erythrocyte: 'green darken-1',
-        // molecules: 'lime lighten-1',
+        epithelium: 'green darken-1',
+        fungus: 'lime lighten-1',
         molecules: 'red darken-1',
       },
     };
@@ -117,7 +117,9 @@ export default {
     this.setDefaults();
   },
   methods: {
-    async onCreate(simulationId) {
+    async onCreate(creation) {
+      // calling it simulationId here, but it could also be an experiment
+      const { id: simulationId, isExperiment } = creation;
       const { query } = this.$route;
       let tabs = query.tabs || [];
       let activeTab = '_simulationList';
@@ -134,14 +136,25 @@ export default {
         activeTab = simulationId;
       }
 
-      this.$router.push({
-        path: 'simulations',
-        query: {
-          ...query,
-          tabs,
-          activeTab,
-        },
-      });
+      if (isExperiment) {
+        this.$router.push({
+          path: 'experiments',
+          // query: {
+          //   ...query,
+          //   tabs,
+          //   activeTab,
+          // },
+        });
+      } else {
+        this.$router.push({
+          path: 'simulations',
+          query: {
+            ...query,
+            tabs,
+            activeTab,
+          },
+        });
+      }
     },
     setDefaults() {
       const initialValues = JSON.parse(this.initialValues);

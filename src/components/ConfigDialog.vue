@@ -73,7 +73,7 @@ export default {
   data() {
     return {
       simDialog: false,
-      name: 'New Simulation',
+      name: 'New Simulation or Experiment',
     };
   },
   computed: {
@@ -103,11 +103,6 @@ export default {
     simulationOrExperimentLower() {
       return this.isExperiment ? 'experiment' : 'simulation';
     },
-  },
-  created() {
-    if (this.isExperiment) {
-      this.name = 'New Experiment';
-    }
   },
   methods: {
     async createSimulationOrExperiment() {
