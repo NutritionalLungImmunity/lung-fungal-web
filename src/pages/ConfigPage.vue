@@ -119,33 +119,33 @@ export default {
   methods: {
     async onCreate(creation) {
       // calling it simulationId here, but it could also be an experiment
-      const { id: simulationId, isExperiment } = creation;
+      const { id: simulationId, is_experiment: isExperiment } = creation;
       const { query } = this.$route;
       let tabs = query.tabs || [];
-      let activeTab = '_simulationList';
+      let activeTab = isExperiment ? '_experimentList' : '_simulationList';
 
       if (!Array.isArray(tabs)) {
         tabs = [tabs];
       }
 
-      // TODO: this is to mitigate a bug when the simulation id is not returned, remove when fixed
-      if (simulationId) {
-        // TODO: this logic should be moved to vuex
-        this.$set(cache, simulationId, await this.girderRest.getSimulation(simulationId));
-        tabs.push(simulationId);
-        activeTab = simulationId;
-      }
-
       if (isExperiment) {
         this.$router.push({
           path: 'experiments',
-          // query: {
-          //   ...query,
-          //   tabs,
-          //   activeTab,
-          // },
+          query: {
+            ...query,
+            tabs,
+            activeTab,
+          },
         });
       } else {
+        // TODO: this is to mitigate a bug when the simulation id is not returned, remove when fixed
+        if (simulationId) {
+          // TODO: this logic should be moved to vuex
+          this.$set(cache, simulationId, await this.girderRest.getSimulation(simulationId));
+          tabs.push(simulationId);
+          activeTab = simulationId;
+        }
+
         this.$router.push({
           path: 'simulations',
           query: {

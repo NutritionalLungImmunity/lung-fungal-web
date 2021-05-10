@@ -24,12 +24,6 @@
           v-for="tab in tabObjects"
           :key="tab._id"
         >
-          <!-- TODO: need to monitor progress for experiment
-          <simulation-progress-bar
-            v-if="tab.nli.progress < 100"
-            :simulation="simulationCache[tab._id]"
-            :circular="true"
-          /> -->
           <span class="ms-2">{{ tab.name }}</span>
           <v-btn
             icon
