@@ -129,6 +129,14 @@ export default {
       }
 
       if (isExperiment) {
+        // TODO: this is to mitigate a bug when the simulation id is not returned, remove when fixed
+        if (simulationId) {
+          // TODO: this logic should be moved to vuex
+          this.$set(cache, simulationId, await this.girderRest.getExperiment(simulationId));
+          tabs.push(simulationId);
+          activeTab = simulationId;
+        }
+
         this.$router.push({
           path: 'experiments',
           query: {
