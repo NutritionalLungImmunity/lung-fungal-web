@@ -199,11 +199,6 @@ export default {
       type: Boolean,
       required: true,
     },
-    showExperimentalSimulations: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
   data() {
     return {
@@ -215,6 +210,7 @@ export default {
       simDialog: false,
       sortOptions: ['Alphabetical', 'Author', 'Date'],
       updateState: new Date(),
+      showExperimentalSimulations: false,
     };
   },
   asyncComputed: {
