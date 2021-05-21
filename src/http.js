@@ -38,6 +38,18 @@ Object.assign(
       const { data } = await this.get(`nli/experiment/${id}`);
       return data;
     },
+    async getExperiment2DData(id) {
+      // As of 19May2021, the respose will have the sections:
+      // ['experiment_complete',
+      //  'experimental_variables',
+      //  'names',
+      //  'runs_per_config',
+      //  'simulation completion',
+      //  'simulation config',
+      //  'stats']
+      const { data } = await this.get(`nli/experiment/${id}/json`);
+      return data;
+    },
     async archiveSimulation(id) {
       await this.post(`nli/simulation/${id}/archive`);
     },
