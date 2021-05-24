@@ -5,50 +5,215 @@
       fluid
     >
       <v-row>
-        <v-col id="y-axis-config">
-          <v-row>
-            <v-select
-              v-model="selectedModuleYAxis"
-              :items="modules"
-              label="Module"
-              dense
-            />
-          </v-row>
-          <v-row>
-            <v-select
-              v-model="selectedVariableYAxis"
-              :items="variables[selectedModuleYAxis]"
-              label="Variable"
-              dense
-            />
-          </v-row>
+        <v-col
+          id="axis-config"
+          cols="4"
+        >
+          <v-expansion-panels
+            v-model="panels"
+            multiple
+          >
+            <!-- configuration for x-axis -->
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                X axis configuration
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-expansion-panels>
+                  <!-- x-axis data source -->
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      Data Source
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-select
+                        v-model="selectedModuleXAxis"
+                        :items="modules"
+                        label="Module"
+                        dense
+                      />
+                      <v-select
+                        v-if="!(selectedModuleXAxis === 'time')"
+                        v-model="selectedVariableXAxis"
+                        :items="variables[selectedModuleXAxis]"
+                        label="Variable"
+                        dense
+                      />
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      Graph Options
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-btn-toggle
+                        v-model="xAxisScale"
+                        align="center"
+                        mandatory
+                      >
+                        <v-btn>
+                          Linear
+                        </v-btn>
+                        <v-btn>
+                          Logarithmic
+                        </v-btn>
+                      </v-btn-toggle>
+                      <v-switch
+                        v-model="xAxisAutoBounds"
+                        :label="`Automatic bounds`"
+                      />
+                      <v-range-slider
+                        v-if="!xAxisAutoBounds"
+                        v-model="xRange"
+                        :max="xBounds[1]"
+                        :min="xBounds[0]"
+                      >
+                        <template v-slot:prepend>
+                          <v-text-field
+                            :value="xRange[0]"
+                            class="mt-0 pt-0"
+                            hide-details
+                            single-line
+                            type="number"
+                            style="width: 60px"
+                            @change="$set(xRange, 0, $event)"
+                          />
+                        </template>
+                        <template v-slot:append>
+                          <v-text-field
+                            :value="xRange[1]"
+                            class="mt-0 pt-0"
+                            hide-details
+                            single-line
+                            type="number"
+                            style="width: 60px"
+                            @change="$set(xRange, 1, $event)"
+                          />
+                        </template>
+                      </v-range-slider>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+
+            <!-- configuration for y-axis -->
+
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                Y axis configuration
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-expansion-panels>
+                  <!-- y-axis data source -->
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      Data Source
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-select
+                        v-model="selectedModuleYAxis"
+                        :items="modules"
+                        label="Module"
+                        dense
+                      />
+                      <v-select
+                        v-if="!(selectedModuleYAxis === 'time')"
+                        v-model="selectedVariableYAxis"
+                        :items="variables[selectedModuleYAxis]"
+                        label="Variable"
+                        dense
+                      />
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      Graph Options
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <v-btn-toggle
+                        v-model="yAxisScale"
+                        align="center"
+                        mandatory
+                      >
+                        <v-btn>
+                          Linear
+                        </v-btn>
+                        <v-btn>
+                          Logarithmic
+                        </v-btn>
+                      </v-btn-toggle>
+                      <v-switch
+                        v-model="yAxisAutoBounds"
+                        :label="`Automatic bounds`"
+                      />
+                      <v-range-slider
+                        v-if="!yAxisAutoBounds"
+                        v-model="yRange"
+                        :max="yBounds[1]"
+                        :min="yBounds[0]"
+                      >
+                        <template v-slot:prepend>
+                          <v-text-field
+                            :value="yRange[0]"
+                            class="mt-0 pt-0"
+                            hide-details
+                            single-line
+                            type="number"
+                            style="width: 60px"
+                            @change="$set(yRange, 0, $event)"
+                          />
+                        </template>
+                        <template v-slot:append>
+                          <v-text-field
+                            :value="yRange[1]"
+                            class="mt-0 pt-0"
+                            hide-details
+                            single-line
+                            type="number"
+                            style="width: 60px"
+                            @change="$set(yRange, 1, $event)"
+                          />
+                        </template>
+                      </v-range-slider>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+
+            <!-- Configuration for colors, etc. -->
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                Title
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                Options <br>
+                Connected vs Not <br>
+                Here we will have a list of all the experimental groupings,
+                each with a selected color, represented as (for example) a
+                solid circle of the appropriate color. "Group 1", "Group 2",
+                etc. Mousing over them gives a tooltip with their experimental
+                options and clicking on them brings up the color picker.
+                Default colors should be selected from some standard set.
+                <v-color-picker
+                  dot-size="8"
+                  show-swatches
+                  swatches-max-height="100"
+                />
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
         </v-col>
 
         <v-col>
-          <v-row>
-            <experiment-graph
-              :plot-data="graphData"
-            />
-          </v-row>
-
-          <v-row id="x-axis-config">
-            <v-col class="d-flex">
-              <v-select
-                v-model="selectedModuleXAxis"
-                :items="modules"
-                label="Module"
-                dense
-              />
-            </v-col>
-            <v-col class="d-flex">
-              <v-select
-                v-model="selectedVariableXAxis"
-                :items="variables[selectedModuleXAxis]"
-                label="Variable"
-                dense
-              />
-            </v-col>
-          </v-row>
+          <experiment-graph
+            :plot-data="graphData"
+            :x-range="xRange"
+            :x-scale="xAxisScale"
+            :y-range="yRange"
+            :y-scale="yAxisScale"
+          />
         </v-col>
       </v-row>
     </v-container>
@@ -70,15 +235,21 @@ export default {
   },
   data() {
     return {
+      panels: [0, 1],
       svgWidth: 500,
       svgHeight: 500,
-      maxCompleteTime: -1,
-      maxPresentTime: -1,
-      timeAxisPresent: true,
       selectedModuleXAxis: undefined,
       selectedVariableXAxis: undefined,
       selectedModuleYAxis: undefined,
       selectedVariableYAxis: undefined,
+      yAxisAutoBounds: true,
+      yRange: [0, 100], // range to graph
+      yBounds: [0, 100], // hard bounds for the range
+      yAxisScale: 0, // 0: linear, 1: logarithmic
+      xAxisAutoBounds: true,
+      xRange: [0, 100], // range to graph
+      xBounds: [0, 100], // hard bounds for the range
+      xAxisScale: 0, // 0: linear, 1: logarithmic
     };
   },
   asyncComputed: {
@@ -90,6 +261,90 @@ export default {
     },
   },
   computed: {
+    xDataMax() {
+      // bail with default value if data isn't loaded or the user hasn't chosen a variable
+      if (!this.experimentData
+          || !this.experimentData.stats
+          || !this.selectedModuleXAxis
+          || (this.selectedModuleXAxis !== 'time' && !this.selectedVariableXAxis)) {
+        return 100; // arbitrary
+      }
+
+      if (this.selectedModuleXAxis === 'time') {
+        return Math.max(...this.simIds.map((id) => {
+          const simData = this.experimentData.stats[id];
+          return Math.max(...Object.keys(simData).map((time) => +time));
+        }));
+      }
+      return Math.max(...this.simIds.map((id) => {
+        const simData = this.experimentData.stats[id];
+        return Math.max(...Object.values(simData)
+          .map((data) => data[this.selectedModuleXAxis][this.selectedVariableXAxis]));
+      }));
+    },
+    xDataMin() {
+      // bail with default value if data isn't loaded or the user hasn't chosen a variable
+      if (!this.experimentData
+          || !this.experimentData.stats
+          || !this.selectedModuleXAxis
+          || (this.selectedModuleXAxis !== 'time' && !this.selectedVariableXAxis)) {
+        return 0; // arbitrary
+      }
+
+      if (this.selectedModuleXAxis === 'time') {
+        return 0; // no need to compute
+      }
+      return Math.min(...this.simIds.map((id) => {
+        const simData = this.experimentData.stats[id];
+        return Math.min(...Object.values(simData)
+          .map((data) => data[this.selectedModuleXAxis][this.selectedVariableXAxis]));
+      }));
+    },
+    yDataMax() {
+      // bail with default value if data isn't loaded or the user hasn't chosen a variable
+      if (!this.experimentData
+          || !this.experimentData.stats
+          || !this.selectedModuleYAxis
+          || (this.selectedModuleYAxis !== 'time' && !this.selectedVariableYAxis)) {
+        return 100; // arbitrary
+      }
+
+      if (this.selectedModuleYAxis === 'time') {
+        return Math.max(...this.simIds.map((id) => {
+          const simData = this.experimentData.stats[id];
+          return Math.max(...Object.keys(simData).map((time) => +time));
+        }));
+      }
+      return Math.max(...this.simIds.map((id) => {
+        const simData = this.experimentData.stats[id];
+        return Math.max(...Object.values(simData)
+          .map((data) => data[this.selectedModuleYAxis][this.selectedVariableYAxis]));
+      }));
+    },
+    yDataMin() {
+      // bail with default value if data isn't loaded or the user hasn't chosen a variable
+      if (!this.experimentData
+          || !this.experimentData.stats
+          || !this.selectedModuleYAxis
+          || (this.selectedModuleYAxis !== 'time' && !this.selectedVariableYAxis)) {
+        return 0; // arbitrary
+      }
+
+      if (this.selectedModuleYAxis === 'time') {
+        return 0; // no need to compute
+      }
+      return Math.min(...this.simIds.map((id) => {
+        const simData = this.experimentData.stats[id];
+        return Math.min(...Object.values(simData)
+          .map((data) => data[this.selectedModuleYAxis][this.selectedVariableYAxis]));
+      }));
+    },
+    simIds() {
+      if (!this.experimentData || !this.experimentData.names) {
+        return [];
+      }
+      return Object.keys(this.experimentData.names);
+    },
     variables() {
       //
       if (!this.experimentData || !this.experimentData.stats) {
@@ -114,61 +369,79 @@ export default {
       return Object.keys(this.variables);
     },
     graphData() {
-      if (!this.experimentData || !this.experimentData.stats) {
-        return [];
+      // make sure that everything is selected
+      if (!this.experimentData
+          || !this.experimentData.stats
+          || !this.selectedModuleXAxis
+          || !this.selectedModuleYAxis
+          || (this.selectedModuleXAxis !== 'time' && !this.selectedVariableXAxis)
+          || (this.selectedModuleYAxis !== 'time' && !this.selectedVariableYAxis)) {
+        return {};
       }
-      // collect the data
-      const simDat = Object.entries(this.experimentData.stats['60a5229490dd22798cddc4fe'])
-        .map(([key, data]) => [parseFloat(key), data])
-        .sort((a, b) => a - b);
 
-      const data = simDat.map(([t, dat]) => [t, dat.fungus.count]);
-
-      return data;
+      if (this.selectedModuleXAxis === 'time') {
+        return Object
+          .entries(this.experimentData.stats)
+          .reduce((filteredData, [simId, simData]) => {
+            /* eslint no-param-reassign: ["error", { "props": false }] */
+            filteredData[simId] = Object
+              .entries(simData)
+              .map(([timeStep, data]) => [parseFloat(timeStep),
+                parseFloat(timeStep),
+                data[this.selectedModuleYAxis][this.selectedVariableYAxis]]);
+            return filteredData;
+          }, {});
+      } if (this.selectedModuleXAxis === 'time') {
+        return Object
+          .entries(this.experimentData.stats)
+          .reduce((filteredData, [simId, simData]) => {
+            /* eslint no-param-reassign: ["error", { "props": false }] */
+            filteredData[simId] = Object
+              .entries(simData)
+              .map(([timeStep, data]) => [parseFloat(timeStep),
+                data[this.selectedModuleXAxis][this.selectedVariableXAxis],
+                parseFloat(timeStep)]);
+            return filteredData;
+          }, {});
+      }
+      return Object
+        .entries(this.experimentData.stats)
+        .reduce((filteredData, [simId, simData]) => {
+          /* eslint no-param-reassign: ["error", { "props": false }] */
+          filteredData[simId] = Object
+            .entries(simData)
+            .map(([timeStep, data]) => [parseFloat(timeStep),
+              data[this.selectedModuleXAxis][this.selectedVariableXAxis],
+              data[this.selectedModuleYAxis][this.selectedVariableYAxis]]);
+          return filteredData;
+        }, {});
+    },
+  },
+  watch: {
+    xDataMax(dataMax) {
+      // allow you to go up a bit above the max
+      const ub = dataMax + 0.1 * (dataMax - this.xDataMin);
+      this.xRange[1] = ub;
+      this.xBounds[1] = ub;
+    },
+    xDataMin(dataMin) {
+      // allow you to go up a bit below the min; allow 0
+      const lb = this.xDataMin - 0.1 * (this.xDataMax - dataMin);
+      this.xRange[0] = lb;
+      this.xBounds[0] = Math.min(0, lb);
+    },
+    yDataMax(dataMax) {
+      // allow you to go up a bit above the max
+      const ub = dataMax + 0.1 * (dataMax - this.yDataMin);
+      this.yRange[1] = ub;
+      this.yBounds[1] = ub;
+    },
+    yDataMin(dataMin) {
+      // allow you to go up a bit below the min; allow 0
+      const lb = this.yDataMin - 0.1 * (this.yDataMax - dataMin);
+      this.yRange[0] = lb;
+      this.yBounds[0] = Math.min(0, lb);
     },
   },
 };
 </script>
-
-
-<style scoped>
-.toolbar-items{
-  width: 90%;
-}
-.drawer-wrapper {
-  height: 100%;
-}
-.plot {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  height: 400px;
-  width: 600px;
-  background: white;
-}
-
-.plot-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.time-control {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  max-width: 300px;
-}
-
-.full-screen-progress {
-  height: calc(100vh - 112px);
-  background: white;
-}
-</style>
-
-/* I'm bad and I feel bad */
-<style>
-.molecule .v-messages__message {
-  color: white;
-}
-</style>
