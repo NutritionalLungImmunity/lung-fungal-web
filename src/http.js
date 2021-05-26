@@ -39,13 +39,14 @@ Object.assign(
       return data;
     },
     async getExperiment2DData(id) {
-      // As of 19May2021, the respose will have the sections:
-      // ['experiment_complete',
-      //  'experimental_variables',
+      // As of 26May2021, the respose will have the sections:
+      // ['experimental_group_params',
+      //  'experiment_complete',
       //  'names',
       //  'runs_per_config',
-      //  'simulation completion',
       //  'simulation config',
+      //  'simulation completion',
+      //  'simulation group map',
       //  'stats']
       const { data } = await this.get(`nli/experiment/${id}/json`);
       return data;

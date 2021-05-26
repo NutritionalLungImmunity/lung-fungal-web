@@ -4,28 +4,52 @@
       class="px-5"
       fluid
     >
+      <v-toolbar
+        fixed
+        flat
+        class="elevation-2 mt-2"
+      >
+        <v-switch
+          v-model="connectedGraph"
+          :label="`Connected Graph`"
+        />
+        <!--
+        Options <br>
+        Connected vs Not <br>
+        Here we will have a list of all the experimental groupings,
+        each with a selected color, represented as (for example) a
+        solid circle of the appropriate color. "Group 1", "Group 2",
+        etc. Mousing over them gives a tooltip with their experimental
+        options and clicking on them brings up the color picker.
+        Default colors should be selected from some standard set. -->
+        <!-- <v-color-picker
+                  dot-size="8"
+                  show-swatches
+                  swatches-max-height="100"
+                /> -->
+      </v-toolbar>
       <v-row>
         <v-col
           id="axis-config"
           cols="4"
         >
-          <v-expansion-panels
-            v-model="panels"
-            multiple
-          >
-            <!-- configuration for x-axis -->
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                X axis configuration
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-expansion-panels>
-                  <!-- x-axis data source -->
-                  <v-expansion-panel>
-                    <v-expansion-panel-header>
+          <!-- configuration for x-axis -->
+          <v-card class="ma-2">
+            <v-card-title>
+              X axis configuration
+            </v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col>
+                  <v-card
+                    outlined
+                    class=".rounded-0"
+                  >
+                    <!-- x-axis data source -->
+                    <v-card-title>
                       Data Source
-                    </v-expansion-panel-header>
-                    <v-expansion-panel-content>
+                    </v-card-title>
+                    <v-card-text>
                       <v-select
                         v-model="selectedModuleXAxis"
                         :items="modules"
@@ -33,19 +57,20 @@
                         dense
                       />
                       <v-select
-                        v-if="!(selectedModuleXAxis === 'time')"
                         v-model="selectedVariableXAxis"
                         :items="variables[selectedModuleXAxis]"
+                        :disabled="selectedModuleXAxis === 'time'"
                         label="Variable"
                         dense
                       />
-                    </v-expansion-panel-content>
-                  </v-expansion-panel>
-                  <v-expansion-panel>
-                    <v-expansion-panel-header>
-                      Graph Options
-                    </v-expansion-panel-header>
-                    <v-expansion-panel-content>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+                <v-col>
+                  <v-card
+                    outlined
+                  >
+                    <v-card-text>
                       <v-btn-toggle
                         v-model="xAxisScale"
                         align="center"
@@ -91,26 +116,27 @@
                           />
                         </template>
                       </v-range-slider>
-                    </v-expansion-panel-content>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
 
-            <!-- configuration for y-axis -->
+          <!-- configuration for y-axis -->
 
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                Y axis configuration
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-expansion-panels>
-                  <!-- y-axis data source -->
-                  <v-expansion-panel>
-                    <v-expansion-panel-header>
+          <v-card class="ma-2">
+            <v-card-title>
+              Y axis configuration
+            </v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col>
+                  <v-card>
+                    <v-card-title>
                       Data Source
-                    </v-expansion-panel-header>
-                    <v-expansion-panel-content>
+                    </v-card-title>
+                    <v-card-text>
                       <v-select
                         v-model="selectedModuleYAxis"
                         :items="modules"
@@ -124,13 +150,12 @@
                         label="Variable"
                         dense
                       />
-                    </v-expansion-panel-content>
-                  </v-expansion-panel>
-                  <v-expansion-panel>
-                    <v-expansion-panel-header>
-                      Graph Options
-                    </v-expansion-panel-header>
-                    <v-expansion-panel-content>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+                <v-col>
+                  <v-card>
+                    <v-card-text>
                       <v-btn-toggle
                         v-model="yAxisScale"
                         align="center"
@@ -176,34 +201,12 @@
                           />
                         </template>
                       </v-range-slider>
-                    </v-expansion-panel-content>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-
-            <!-- Configuration for colors, etc. -->
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                Title
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                Options <br>
-                Connected vs Not <br>
-                Here we will have a list of all the experimental groupings,
-                each with a selected color, represented as (for example) a
-                solid circle of the appropriate color. "Group 1", "Group 2",
-                etc. Mousing over them gives a tooltip with their experimental
-                options and clicking on them brings up the color picker.
-                Default colors should be selected from some standard set.
-                <v-color-picker
-                  dot-size="8"
-                  show-swatches
-                  swatches-max-height="100"
-                />
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
         </v-col>
 
         <v-col>
@@ -213,6 +216,10 @@
             :x-scale="xAxisScale"
             :y-range="yRange"
             :y-scale="yAxisScale"
+            :x-label="xLabel"
+            :y-label="yLabel"
+            :connected-graph="connectedGraph"
+            :color-map="colorMap"
           />
         </v-col>
       </v-row>
@@ -250,6 +257,7 @@ export default {
       xRange: [0, 100], // range to graph
       xBounds: [0, 100], // hard bounds for the range
       xAxisScale: 0, // 0: linear, 1: logarithmic
+      connectedGraph: true,
     };
   },
   asyncComputed: {
@@ -261,6 +269,45 @@ export default {
     },
   },
   computed: {
+    colorMap() {
+      if (!this.experimentData || !this.experimentData['simulation group map']) return undefined;
+
+      // TODO: what if there are more than 10 groups?
+      const bigColorList = [
+        '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2',
+        '#7f7f7f', '#bcbd22', '#17becf',
+      ];
+
+      return Object.fromEntries(
+        Object
+          .entries(this.experimentData['simulation group map'])
+          .map(([id, group]) => [id, bigColorList[group % bigColorList.length]]),
+      );
+    },
+    xLabel() {
+      if (!this.selectedModuleXAxis) {
+        return 'No Variable Selected';
+      }
+      if (this.selectedModuleXAxis === 'time') {
+        return 'time';
+      }
+      if (!this.selectedVariableXAxis) {
+        return `Select a variable from ${this.selectedModuleXAxis}`;
+      }
+      return `${this.selectedModuleXAxis} ${this.selectedVariableXAxis}`;
+    },
+    yLabel() {
+      if (!this.selectedModuleYAxis) {
+        return 'No Variable Selected';
+      }
+      if (this.selectedModuleYAxis === 'time') {
+        return 'time';
+      }
+      if (!this.selectedVariableYAxis) {
+        return `Select a variable from ${this.selectedModuleYAxis}`;
+      }
+      return `${this.selectedModuleYAxis} ${this.selectedVariableYAxis}`;
+    },
     xDataMax() {
       // bail with default value if data isn't loaded or the user hasn't chosen a variable
       if (!this.experimentData
@@ -421,25 +468,25 @@ export default {
     xDataMax(dataMax) {
       // allow you to go up a bit above the max
       const ub = dataMax + 0.1 * (dataMax - this.xDataMin);
-      this.xRange[1] = ub;
+      this.xRange[1] = dataMax;
       this.xBounds[1] = ub;
     },
     xDataMin(dataMin) {
       // allow you to go up a bit below the min; allow 0
       const lb = this.xDataMin - 0.1 * (this.xDataMax - dataMin);
-      this.xRange[0] = lb;
+      this.xRange[0] = dataMin;
       this.xBounds[0] = Math.min(0, lb);
     },
     yDataMax(dataMax) {
       // allow you to go up a bit above the max
       const ub = dataMax + 0.1 * (dataMax - this.yDataMin);
-      this.yRange[1] = ub;
+      this.yRange[1] = dataMax;
       this.yBounds[1] = ub;
     },
     yDataMin(dataMin) {
       // allow you to go up a bit below the min; allow 0
       const lb = this.yDataMin - 0.1 * (this.yDataMax - dataMin);
-      this.yRange[0] = lb;
+      this.yRange[0] = dataMin;
       this.yBounds[0] = Math.min(0, lb);
     },
   },
