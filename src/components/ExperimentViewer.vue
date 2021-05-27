@@ -15,6 +15,7 @@
           v-model="connectedGraph"
           class="align-center mr-2 pt-5"
           :label="`Connect Time Series`"
+          :disabled="!timeAxisPresent && timeSeriesType === 'Single'"
         />
         <v-spacer />
         <template v-if="!timeAxisPresent">
@@ -23,43 +24,47 @@
             :items="['Single', 'Range']"
             label="Type"
             dense
+            class="align-center mr-2 pt-5"
           />
-          <v-range-slider
-            v-if="timeSeriesType == 'Range'"
-            v-model="timeRange"
-            :max="timeBounds[1]"
-            :min="timeBounds[0]"
-          >
-            <template v-slot:prepend>
-              <v-text-field
-                :value="timeRange[0]"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="$set(timeRange, 0, $event)"
-              />
-            </template>
-            <template v-slot:append>
-              <v-text-field
-                :value="timeRange[1]"
-                class="mt-0 pt-0"
-                hide-details
-                single-line
-                type="number"
-                style="width: 60px"
-                @change="$set(timeRange, 1, $event)"
-              />
-            </template>
-          </v-range-slider>
-          <v-slider
-            v-else
-            v-model="timePoint"
-            :max="timeBounds[1]"
-            :min="timeBounds[0]"
-            :label="`Time`"
-          />
+          <v-row class="even-layout">
+            <v-range-slider
+              v-if="timeSeriesType == 'Range'"
+              v-model="timeRange"
+              :max="timeBounds[1]"
+              :min="timeBounds[0]"
+              class="align-center"
+              thumb-label
+            >
+              <template v-slot:prepend>
+                <v-text-field
+                  :value="timeRange[0]"
+                  class="mt-0 pt-0"
+                  hide-details
+                  type="number"
+                  style="width: 60px"
+                  @change="$set(timeRange, 0, $event)"
+                />
+              </template>
+              <template v-slot:append>
+                <v-text-field
+                  :value="timeRange[1]"
+                  class="align-center mt-0 pt-0"
+                  hide-details
+                  single-line
+                  type="number"
+                  style="width: 60px"
+                  @change="$set(timeRange, 1, $event)"
+                />
+              </template>
+            </v-range-slider>
+            <v-slider
+              v-else
+              v-model="timePoint"
+              :max="timeBounds[1]"
+              :min="timeBounds[0]"
+              :label="`Time`"
+            />
+          </v-row>
         </template>
         <v-spacer />
         <!--
@@ -620,3 +625,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+
+.even-slider {
+   margin-top: -18px !important;
+}
+</style>
