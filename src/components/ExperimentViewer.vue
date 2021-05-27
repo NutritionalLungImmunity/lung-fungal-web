@@ -7,12 +7,61 @@
       <v-toolbar
         fixed
         flat
-        class="elevation-2 mt-2"
+        class="list-toolbar elevation-2 mt-2"
       >
+        <h2>Graph Options</h2>
+        <v-spacer />
         <v-switch
           v-model="connectedGraph"
-          :label="`Connected Graph`"
+          class="align-center mr-2 pt-5"
+          :label="`Connect Time Series`"
         />
+        <v-spacer />
+        <template v-if="!timeAxisPresent">
+          <v-select
+            v-model="timeSeriesType"
+            :items="['Single', 'Range']"
+            label="Type"
+            dense
+          />
+          <v-range-slider
+            v-if="timeSeriesType == 'Range'"
+            v-model="timeRange"
+            :max="timeBounds[1]"
+            :min="timeBounds[0]"
+          >
+            <template v-slot:prepend>
+              <v-text-field
+                :value="timeRange[0]"
+                class="mt-0 pt-0"
+                hide-details
+                single-line
+                type="number"
+                style="width: 60px"
+                @change="$set(timeRange, 0, $event)"
+              />
+            </template>
+            <template v-slot:append>
+              <v-text-field
+                :value="timeRange[1]"
+                class="mt-0 pt-0"
+                hide-details
+                single-line
+                type="number"
+                style="width: 60px"
+                @change="$set(timeRange, 1, $event)"
+              />
+            </template>
+          </v-range-slider>
+          <v-slider
+            v-else
+            v-model="timePoint"
+            :max="timeBounds[1]"
+            :min="timeBounds[0]"
+            :label="`Time`"
+          />
+        </template>
+        <v-spacer />
         <!--
         Options <br>
         Connected vs Not <br>
@@ -33,6 +82,91 @@
           id="axis-config"
           cols="4"
         >
+          <!-- configuration for y-axis -->
+
+          <v-card class="ma-2">
+            <v-card-title>
+              Y axis configuration
+            </v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col>
+                  <v-card>
+                    <v-card-title>
+                      Data Source
+                    </v-card-title>
+                    <v-card-text>
+                      <v-select
+                        v-model="selectedModuleYAxis"
+                        :items="modules"
+                        label="Module"
+                        dense
+                      />
+                      <v-select
+                        v-model="selectedVariableYAxis"
+                        :items="variables[selectedModuleYAxis]"
+                        :disabled="!selectedModuleYAxis || selectedModuleYAxis === 'time'"
+                        label="Variable"
+                        dense
+                      />
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+                <v-col>
+                  <v-card>
+                    <v-card-text>
+                      <v-btn-toggle
+                        v-model="yAxisScale"
+                        align="center"
+                        mandatory
+                      >
+                        <v-btn>
+                          Linear
+                        </v-btn>
+                        <v-btn>
+                          Logarithmic
+                        </v-btn>
+                      </v-btn-toggle>
+                      <v-switch
+                        v-model="yAxisAutoBounds"
+                        :label="`Automatic bounds`"
+                      />
+                      <v-range-slider
+                        v-if="!yAxisAutoBounds"
+                        v-model="yRange"
+                        :max="yBounds[1]"
+                        :min="yBounds[0]"
+                      >
+                        <template v-slot:prepend>
+                          <v-text-field
+                            :value="yRange[0]"
+                            class="mt-0 pt-0"
+                            hide-details
+                            single-line
+                            type="number"
+                            style="width: 60px"
+                            @change="$set(yRange, 0, $event)"
+                          />
+                        </template>
+                        <template v-slot:append>
+                          <v-text-field
+                            :value="yRange[1]"
+                            class="mt-0 pt-0"
+                            hide-details
+                            single-line
+                            type="number"
+                            style="width: 60px"
+                            @change="$set(yRange, 1, $event)"
+                          />
+                        </template>
+                      </v-range-slider>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+
           <!-- configuration for x-axis -->
           <v-card class="ma-2">
             <v-card-title>
@@ -122,91 +256,6 @@
               </v-row>
             </v-card-text>
           </v-card>
-
-          <!-- configuration for y-axis -->
-
-          <v-card class="ma-2">
-            <v-card-title>
-              Y axis configuration
-            </v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col>
-                  <v-card>
-                    <v-card-title>
-                      Data Source
-                    </v-card-title>
-                    <v-card-text>
-                      <v-select
-                        v-model="selectedModuleYAxis"
-                        :items="modules"
-                        label="Module"
-                        dense
-                      />
-                      <v-select
-                        v-if="!(selectedModuleYAxis === 'time')"
-                        v-model="selectedVariableYAxis"
-                        :items="variables[selectedModuleYAxis]"
-                        label="Variable"
-                        dense
-                      />
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-                <v-col>
-                  <v-card>
-                    <v-card-text>
-                      <v-btn-toggle
-                        v-model="yAxisScale"
-                        align="center"
-                        mandatory
-                      >
-                        <v-btn>
-                          Linear
-                        </v-btn>
-                        <v-btn>
-                          Logarithmic
-                        </v-btn>
-                      </v-btn-toggle>
-                      <v-switch
-                        v-model="yAxisAutoBounds"
-                        :label="`Automatic bounds`"
-                      />
-                      <v-range-slider
-                        v-if="!yAxisAutoBounds"
-                        v-model="yRange"
-                        :max="yBounds[1]"
-                        :min="yBounds[0]"
-                      >
-                        <template v-slot:prepend>
-                          <v-text-field
-                            :value="yRange[0]"
-                            class="mt-0 pt-0"
-                            hide-details
-                            single-line
-                            type="number"
-                            style="width: 60px"
-                            @change="$set(yRange, 0, $event)"
-                          />
-                        </template>
-                        <template v-slot:append>
-                          <v-text-field
-                            :value="yRange[1]"
-                            class="mt-0 pt-0"
-                            hide-details
-                            single-line
-                            type="number"
-                            style="width: 60px"
-                            @change="$set(yRange, 1, $event)"
-                          />
-                        </template>
-                      </v-range-slider>
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
         </v-col>
 
         <v-col>
@@ -245,7 +294,7 @@ export default {
       panels: [0, 1],
       svgWidth: 500,
       svgHeight: 500,
-      selectedModuleXAxis: undefined,
+      selectedModuleXAxis: 'time',
       selectedVariableXAxis: undefined,
       selectedModuleYAxis: undefined,
       selectedVariableYAxis: undefined,
@@ -258,6 +307,9 @@ export default {
       xBounds: [0, 100], // hard bounds for the range
       xAxisScale: 0, // 0: linear, 1: logarithmic
       connectedGraph: true,
+      timeRange: [0, 100],
+      timePoint: 0,
+      timeSeriesType: 'Range',
     };
   },
   asyncComputed: {
@@ -269,6 +321,25 @@ export default {
     },
   },
   computed: {
+    timeBounds() {
+      if (!this.experimentData || !this.experimentData.stats) return [0, 0];
+
+      const timeMax = Math.max(...this.simIds.map((id) => {
+        const simData = this.experimentData.stats[id];
+        return Math.max(...Object.keys(simData).map((time) => +time));
+      }));
+
+      const timeMin = Math.min(...this.simIds.map((id) => {
+        const simData = this.experimentData.stats[id];
+        return Math.min(...Object.keys(simData).map((time) => +time));
+      }));
+
+      return [timeMin, timeMax];
+    },
+    timeAxisPresent() {
+      return (!!this.selectedModuleXAxis && this.selectedModuleXAxis === 'time')
+        || (!!this.selectedModuleYAxis && this.selectedModuleYAxis === 'time');
+    },
     colorMap() {
       if (!this.experimentData || !this.experimentData['simulation group map']) return undefined;
 
@@ -426,6 +497,20 @@ export default {
         return {};
       }
 
+      if (this.selectedModuleYAxis === 'time' && this.selectedModuleXAxis === 'time') {
+        return Object
+          .entries(this.experimentData.stats)
+          .reduce((filteredData, [simId, simData]) => {
+            /* eslint no-param-reassign: ["error", { "props": false }] */
+            filteredData[simId] = Object
+              .entries(simData)
+              .map(([timeStep]) => [parseFloat(timeStep),
+                parseFloat(timeStep),
+                parseFloat(timeStep)]);
+            return filteredData;
+          }, {});
+      }
+
       if (this.selectedModuleXAxis === 'time') {
         return Object
           .entries(this.experimentData.stats)
@@ -438,7 +523,9 @@ export default {
                 data[this.selectedModuleYAxis][this.selectedVariableYAxis]]);
             return filteredData;
           }, {});
-      } if (this.selectedModuleXAxis === 'time') {
+      }
+
+      if (this.selectedModuleYAxis === 'time') {
         return Object
           .entries(this.experimentData.stats)
           .reduce((filteredData, [simId, simData]) => {
@@ -451,12 +538,33 @@ export default {
             return filteredData;
           }, {});
       }
+
+      // now, we know that neither axis is time, so we may have to filter by time
+      // according to ranges or only a specific time step
+
+      if (this.timeSeriesType === 'Range') {
+        return Object
+          .entries(this.experimentData.stats)
+          .reduce((filteredData, [simId, simData]) => {
+          /* eslint no-param-reassign: ["error", { "props": false }] */
+            filteredData[simId] = Object
+              .entries(simData)
+              .filter(([timeStep]) => (this.timeRange[0] <= parseFloat(timeStep))
+               && parseFloat(timeStep) <= this.timeRange[1])
+              .map(([timeStep, data]) => [parseFloat(timeStep),
+                data[this.selectedModuleXAxis][this.selectedVariableXAxis],
+                data[this.selectedModuleYAxis][this.selectedVariableYAxis]]);
+            return filteredData;
+          }, {});
+      }
+      // assert: timeSeriesType === 'Single'
       return Object
         .entries(this.experimentData.stats)
         .reduce((filteredData, [simId, simData]) => {
           /* eslint no-param-reassign: ["error", { "props": false }] */
           filteredData[simId] = Object
             .entries(simData)
+            .filter(([timeStep]) => (this.timePoint === parseFloat(timeStep)))
             .map(([timeStep, data]) => [parseFloat(timeStep),
               data[this.selectedModuleXAxis][this.selectedVariableXAxis],
               data[this.selectedModuleYAxis][this.selectedVariableYAxis]]);
@@ -488,6 +596,26 @@ export default {
       const lb = this.yDataMin - 0.1 * (this.yDataMax - dataMin);
       this.yRange[0] = dataMin;
       this.yBounds[0] = Math.min(0, lb);
+    },
+    selectedModuleYAxis(selectedModule) {
+      if (selectedModule === 'time') {
+        this.selectedVariableYAxis = undefined;
+      }
+    },
+    selectedModuleXAxis(selectedModule) {
+      if (selectedModule === 'time') {
+        this.selectedVariableXAxis = undefined;
+      }
+    },
+    yAxisAutoBounds(autobounds) {
+      if (autobounds) {
+        this.yRange = [this.yDataMin, this.yDataMax];
+      }
+    },
+    xAxisAutoBounds(autobounds) {
+      if (autobounds) {
+        this.xRange = [this.xDataMin, this.xDataMax];
+      }
     },
   },
 };

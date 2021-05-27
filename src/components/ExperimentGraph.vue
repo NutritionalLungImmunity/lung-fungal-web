@@ -1,22 +1,28 @@
 <template>
-  <div
-    id="graph-container"
-    align="center"
-    background-color="white"
-  >
-    <svg
-      id="graph"
-      :width="svgWidth"
-      :height="svgHeight"
-    />
-    <v-btn
-      elevation="2"
-      fab
-    >
-      <v-icon @click="printElement('graph')">
-        mdi-printer
-      </v-icon>
-    </v-btn>
+  <div class="container">
+    <v-card>
+      <v-card-text>
+        <div
+          id="graph-container"
+          align="center"
+          class="center"
+        >
+          <svg
+            id="graph"
+            :width="svgWidth"
+            :height="svgHeight"
+          />
+          <v-btn
+            elevation="2"
+            fab
+          >
+            <v-icon @click="printElement('graph')">
+              mdi-printer
+            </v-icon>
+          </v-btn>
+        </div>
+      </v-card-text>
+    </v-card>
   </div>
 </template>
 
@@ -69,19 +75,81 @@ export default {
   }),
   watch: {
     plotData(pltData) {
-      this.redrawSVG(pltData, this.xRange, this.yRange, this.connectedGraph, this.colorMap);
+      this.redrawSVG(
+        pltData,
+        this.xRange,
+        this.yRange,
+        this.connectedGraph,
+        this.colorMap,
+        this.xScale,
+        this.yScale,
+      );
     },
     xRange(range) {
-      this.redrawSVG(this.plotData, range, this.yRange, this.connectedGraph, this.colorMap);
+      this.redrawSVG(
+        this.plotData,
+        range,
+        this.yRange,
+        this.connectedGraph,
+        this.colorMap,
+        this.xScale,
+        this.yScale,
+      );
     },
     yRange(range) {
-      this.redrawSVG(this.plotData, this.xRange, range, this.connectedGraph, this.colorMap);
+      this.redrawSVG(
+        this.plotData,
+        this.xRange,
+        range,
+        this.connectedGraph,
+        this.colorMap,
+        this.xScale,
+        this.yScale,
+      );
     },
     connectedGraph(isConnected) {
-      this.redrawSVG(this.plotData, this.xRange, this.yRange, isConnected, this.colorMap);
+      this.redrawSVG(
+        this.plotData,
+        this.xRange,
+        this.yRange,
+        isConnected,
+        this.colorMap,
+        this.xScale,
+        this.yScale,
+      );
     },
     colorMap(cMap) {
-      this.redrawSVG(this.plotData, this.xRange, this.yRange, this.connectedGraph, cMap);
+      this.redrawSVG(
+        this.plotData,
+        this.xRange,
+        this.yRange,
+        this.connectedGraph,
+        cMap,
+        this.xScale,
+        this.yScale,
+      );
+    },
+    xScale(xscale) {
+      this.redrawSVG(
+        this.plotData,
+        this.xRange,
+        this.yRange,
+        this.connectedGraph,
+        this.colorMap,
+        xscale,
+        this.yScale,
+      );
+    },
+    yScale(yscale) {
+      this.redrawSVG(
+        this.plotData,
+        this.xRange,
+        this.yRange,
+        this.connectedGraph,
+        this.colorMap,
+        this.xScale,
+        yscale,
+      );
     },
   },
   methods: {
@@ -99,7 +167,7 @@ export default {
       popupWindow.document.write(`<html><head><style></style></head><body onload="window.print()">${contents}</html>`);
       popupWindow.document.close();
     },
-    redrawSVG(pltData, xRange, yRange, isConnected, colorMap) {
+    redrawSVG(pltData, xRange, yRange, isConnected, colorMap, xScale, yScale) {
       this.clearSVG();
 
       const svg = d3
@@ -120,10 +188,15 @@ export default {
           `translate(${margin.left},${margin.top})`);
 
       // y axis
-      const y = d3.scaleLinear()
-        .domain(yRange)
-        .range([height, 0])
-        .nice();
+      const y = yScale === 0
+        ? d3.scaleLinear()
+          .domain(yRange)
+          .range([height, 0])
+          .nice()
+        : d3.scaleLog()
+          .domain([Math.max(1e-6, yRange[0]), yRange[1]]) // because it is log scale
+          .range([height, 0])
+          .nice();
       const yaxis = svg.append('g')
         .attr('transform', `translate(${margin.left},0)`)
         .call(d3.axisLeft(y).tickSize(-width * 1.0).ticks(10));
@@ -137,16 +210,21 @@ export default {
       // y axis label
       svg.append('text')
         .attr('text-anchor', 'middle')
-        .attr('transform', 'rotate(-90)')
         .attr('alignment-baseline', 'hanging')
+        .attr('transform', 'rotate(-90)')
         .attr('x', -height / 2.0)
         .text(this.yLabel);
 
       // x axis
-      const x = d3.scaleLinear()
-        .domain(xRange)
-        .range([0, width])
-        .nice();
+      const x = xScale === 0
+        ? d3.scaleLinear()
+          .domain(xRange)
+          .range([0, width])
+          .nice()
+        : d3.scaleLog()
+          .domain([Math.max(1e-6, xRange[0]), xRange[1]])
+          .range([0, width])
+          .nice();
       const xaxis = svg.append('g')
         .attr('transform', `translate(${margin.left},${height})`)
         .call(d3.axisBottom(x).tickSize(-height * 1.0).ticks(10));
@@ -162,6 +240,7 @@ export default {
       // x axis label
       svg.append('text')
         .attr('text-anchor', 'middle')
+        .attr('alignment-baseline', 'ideographic')
         .attr('x', width / 2.0 + margin.left)
         .attr('y', height + margin.top + margin.bottom)
         .text(this.xLabel);
@@ -203,5 +282,17 @@ export default {
 
 
 <style scoped>
-path {fill: none;stroke: #999;}
+path {fill: none; stroke: #999;}
+
+.container {
+  height: 100%;
+  position: relative;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
 </style>
