@@ -67,9 +67,9 @@
           </v-row>
         </template>
         <v-spacer />
+        
         <!--
         Options <br>
-        Connected vs Not <br>
         Here we will have a list of all the experimental groupings,
         each with a selected color, represented as (for example) a
         solid circle of the appropriate color. "Group 1", "Group 2",
@@ -315,6 +315,10 @@ export default {
       timeRange: [0, 100],
       timePoint: 0,
       timeSeriesType: 'Range',
+      colorList: [
+        '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2',
+        '#7f7f7f', '#bcbd22', '#17becf',
+      ],
     };
   },
   asyncComputed: {
@@ -348,16 +352,10 @@ export default {
     colorMap() {
       if (!this.experimentData || !this.experimentData['simulation group map']) return undefined;
 
-      // TODO: what if there are more than 10 groups?
-      const bigColorList = [
-        '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2',
-        '#7f7f7f', '#bcbd22', '#17becf',
-      ];
-
       return Object.fromEntries(
         Object
           .entries(this.experimentData['simulation group map'])
-          .map(([id, group]) => [id, bigColorList[group % bigColorList.length]]),
+          .map(([id, group]) => [id, this.colorList[group % this.colorList.length]]),
       );
     },
     xLabel() {
