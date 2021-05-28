@@ -67,7 +67,7 @@
           </v-row>
         </template>
         <v-spacer />
-        
+
         <!--
         Options <br>
         Here we will have a list of all the experimental groupings,
