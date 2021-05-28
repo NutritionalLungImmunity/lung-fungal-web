@@ -58,7 +58,7 @@
         />
       </v-tab-item>
       <v-tab-item
-        v-for="tab in tabs"
+        v-for="tab in experimentTabs"
         :key="tab"
       >
         <experiment-viewer :experiment-folder="experimentCache[tab]" />
@@ -87,11 +87,11 @@ export default {
       type: String,
       default: 'true',
     },
-    activeTab: {
+    activeExperimentTab: {
       type: String,
       default: '_experimentList',
     },
-    tabs: {
+    experimentTabs: {
       type: Array,
       default() {
         return [];
@@ -106,19 +106,19 @@ export default {
   },
   computed: {
     currentTab() {
-      return this.tabs.indexOf(this.activeTab) + 1;
+      return this.experimentTabs.indexOf(this.activeExperimentTab) + 1;
     },
     sortDescBoolean() {
       return boolean(this.sortDesc);
     },
     tabObjects() {
-      return this.tabs.map(
+      return this.experimentTabs.map(
         (id) => this.experimentCache[id],
       ).filter((tab) => tab !== undefined);
     },
   },
   async created() {
-    await Promise.all(this.tabs.map((tab) => this.fetchExperiment(tab)));
+    await Promise.all(this.experimentTabs.map((tab) => this.fetchExperiment(tab)));
     this.loaded = true;
   },
   activated() {
@@ -130,8 +130,8 @@ export default {
     viewExperiment(experiment) {
       const id = experiment._id;
       this.experimentCache[id] = experiment;
-      if (!this.tabs.filter((t) => t === id)[0]) {
-        this.updateTabList([...this.tabs, id]);
+      if (!this.experimentTabs.filter((t) => t === id)[0]) {
+        this.updateTabList([...this.experimentTabs, id]);
       }
       this.setTab(id);
     },
@@ -144,7 +144,7 @@ export default {
     setTab(experimentId) {
       const query = {
         ...this.$route.query,
-        activeTab: experimentId,
+        activeExperimentTab: experimentId,
       };
       this.$router.push({ path: 'experiments', query });
     },
@@ -153,17 +153,17 @@ export default {
       if (index === 0) {
         tab = '_experimentList';
       } else {
-        tab = this.tabs[index - 1];
+        tab = this.experimentTabs[index - 1];
       }
       this.setTab(tab);
     },
     closeTab(id) {
-      this.updateTabList(this.tabs.filter((tab) => tab !== id));
+      this.updateTabList(this.experimentTabs.filter((tab) => tab !== id));
     },
-    updateTabList(tabs) {
+    updateTabList(experimentTabs) {
       const query = {
         ...this.$route.query,
-        tabs,
+        experimentTabs,
       };
       this.$router.replace({ path: 'experiments', query });
     },
