@@ -41,15 +41,15 @@ export default new Router({
       name: 'experiments',
       component: ExperimentListPage,
       props(route) {
-        let { tabs } = route.query;
-        if (!Array.isArray(tabs)) {
-          if (tabs) {
-            tabs = [tabs];
+        let { experimentTabs } = route.query;
+        if (!Array.isArray(experimentTabs)) {
+          if (experimentTabs) {
+            experimentTabs = [experimentTabs];
           } else {
-            tabs = [];
+            experimentTabs = [];
           }
         }
-        return { ...route.query, tabs };
+        return { ...route.query, experimentTabs };
       },
     },
   ],
