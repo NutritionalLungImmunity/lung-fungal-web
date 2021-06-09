@@ -67,7 +67,7 @@
           </v-row>
         </template>
         <v-spacer />
-        
+
       </v-toolbar>
       <v-row>
         <v-col
@@ -251,7 +251,7 @@
         </v-col>
 
         <v-col>
-          <experiment-graph
+          <experiment-scatter-graph
             :plot-data="graphData"
             :x-range="xRange"
             :x-scale="xAxisScale"
@@ -269,12 +269,12 @@
 </template>
 
 <script>
-import ExperimentGraph from '@/components/ExperimentGraph.vue';
+import ExperimentScatterGraph from '@/components/ExperimentScatterGraph.vue';
 import http from '@/http';
 
 export default {
   name: 'ExperimentViewer',
-  components: { ExperimentGraph },
+  components: { ExperimentScatterGraph },
   props: {
     experimentFolder: {
       type: Object,
