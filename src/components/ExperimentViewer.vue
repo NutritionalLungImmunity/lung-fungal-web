@@ -67,20 +67,7 @@
           </v-row>
         </template>
         <v-spacer />
-
-        <!--
-        Options <br>
-        Here we will have a list of all the experimental groupings,
-        each with a selected color, represented as (for example) a
-        solid circle of the appropriate color. "Group 1", "Group 2",
-        etc. Mousing over them gives a tooltip with their experimental
-        options and clicking on them brings up the color picker.
-        Default colors should be selected from some standard set. -->
-        <!-- <v-color-picker
-                  dot-size="8"
-                  show-swatches
-                  swatches-max-height="100"
-                /> -->
+        
       </v-toolbar>
       <v-row>
         <v-col
