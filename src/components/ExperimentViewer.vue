@@ -67,7 +67,6 @@
           </v-row>
         </template>
         <v-spacer />
-
       </v-toolbar>
       <v-row>
         <v-col
