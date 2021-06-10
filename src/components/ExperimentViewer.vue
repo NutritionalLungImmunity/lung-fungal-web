@@ -73,180 +73,26 @@
           id="axis-config"
           cols="4"
         >
-          <!-- configuration for y-axis -->
+          <axis-config
+            name="Y"
+            :variables="variables"
+            :data-bounds="yDataBounds"
+            @module-update="selectedModuleYAxis = $event"
+            @variable-update="selectedVariableYAxis = $event"
+            @scale-update="yAxisScale = $event"
+            @range-update="yRange = $event"
+          />
 
-          <v-card class="ma-2">
-            <v-card-title>
-              Y axis configuration
-            </v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col>
-                  <v-card>
-                    <v-card-title>
-                      Data Source
-                    </v-card-title>
-                    <v-card-text>
-                      <v-select
-                        v-model="selectedModuleYAxis"
-                        :items="modules"
-                        label="Module"
-                        dense
-                      />
-                      <v-select
-                        v-model="selectedVariableYAxis"
-                        :items="variables[selectedModuleYAxis]"
-                        :disabled="!selectedModuleYAxis || selectedModuleYAxis === 'time'"
-                        label="Variable"
-                        dense
-                      />
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-                <v-col>
-                  <v-card>
-                    <v-card-text>
-                      <v-btn-toggle
-                        v-model="yAxisScale"
-                        align="center"
-                        mandatory
-                      >
-                        <v-btn>
-                          Linear
-                        </v-btn>
-                        <v-btn>
-                          Logarithmic
-                        </v-btn>
-                      </v-btn-toggle>
-                      <v-switch
-                        v-model="yAxisAutoBounds"
-                        :label="`Automatic bounds`"
-                      />
-                      <v-range-slider
-                        v-if="!yAxisAutoBounds"
-                        v-model="yRange"
-                        :max="yBounds[1]"
-                        :min="yBounds[0]"
-                      >
-                        <template v-slot:prepend>
-                          <v-text-field
-                            :value="yRange[0]"
-                            class="mt-0 pt-0"
-                            hide-details
-                            single-line
-                            type="number"
-                            style="width: 60px"
-                            @change="$set(yRange, 0, $event)"
-                          />
-                        </template>
-                        <template v-slot:append>
-                          <v-text-field
-                            :value="yRange[1]"
-                            class="mt-0 pt-0"
-                            hide-details
-                            single-line
-                            type="number"
-                            style="width: 60px"
-                            @change="$set(yRange, 1, $event)"
-                          />
-                        </template>
-                      </v-range-slider>
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-
-          <!-- configuration for x-axis -->
-          <v-card class="ma-2">
-            <v-card-title>
-              X axis configuration
-            </v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col>
-                  <v-card
-                    outlined
-                    class=".rounded-0"
-                  >
-                    <!-- x-axis data source -->
-                    <v-card-title>
-                      Data Source
-                    </v-card-title>
-                    <v-card-text>
-                      <v-select
-                        v-model="selectedModuleXAxis"
-                        :items="modules"
-                        label="Module"
-                        dense
-                      />
-                      <v-select
-                        v-model="selectedVariableXAxis"
-                        :items="variables[selectedModuleXAxis]"
-                        :disabled="selectedModuleXAxis === 'time'"
-                        label="Variable"
-                        dense
-                      />
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-                <v-col>
-                  <v-card
-                    outlined
-                  >
-                    <v-card-text>
-                      <v-btn-toggle
-                        v-model="xAxisScale"
-                        align="center"
-                        mandatory
-                      >
-                        <v-btn>
-                          Linear
-                        </v-btn>
-                        <v-btn>
-                          Logarithmic
-                        </v-btn>
-                      </v-btn-toggle>
-                      <v-switch
-                        v-model="xAxisAutoBounds"
-                        :label="`Automatic bounds`"
-                      />
-                      <v-range-slider
-                        v-if="!xAxisAutoBounds"
-                        v-model="xRange"
-                        :max="xBounds[1]"
-                        :min="xBounds[0]"
-                      >
-                        <template v-slot:prepend>
-                          <v-text-field
-                            :value="xRange[0]"
-                            class="mt-0 pt-0"
-                            hide-details
-                            single-line
-                            type="number"
-                            style="width: 60px"
-                            @change="$set(xRange, 0, $event)"
-                          />
-                        </template>
-                        <template v-slot:append>
-                          <v-text-field
-                            :value="xRange[1]"
-                            class="mt-0 pt-0"
-                            hide-details
-                            single-line
-                            type="number"
-                            style="width: 60px"
-                            @change="$set(xRange, 1, $event)"
-                          />
-                        </template>
-                      </v-range-slider>
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
+          <axis-config
+            name="X"
+            default-to-time
+            :variables="variables"
+            :data-bounds="xDataBounds"
+            @module-update="selectedModuleXAxis = $event"
+            @variable-update="selectedVariableXAxis = $event"
+            @scale-update="xAxisScale = $event"
+            @range-update="xRange = $event"
+          />
         </v-col>
 
         <v-col>
@@ -256,8 +102,10 @@
             :x-scale="xAxisScale"
             :y-range="yRange"
             :y-scale="yAxisScale"
-            :x-label="xLabel"
-            :y-label="yLabel"
+            :x-axis-module="selectedModuleXAxis"
+            :x-axis-variable="selectedVariableXAxis"
+            :y-axis-module="selectedModuleYAxis"
+            :y-axis-variable="selectedVariableYAxis"
             :connected-graph="connectedGraph"
             :color-map="colorMap"
           />
@@ -268,12 +116,13 @@
 </template>
 
 <script>
+import AxisConfig from '@/components/AxisConfig.vue';
 import ExperimentScatterGraph from '@/components/ExperimentScatterGraph.vue';
 import http from '@/http';
 
 export default {
   name: 'ExperimentViewer',
-  components: { ExperimentScatterGraph },
+  components: { ExperimentScatterGraph, AxisConfig },
   props: {
     experimentFolder: {
       type: Object,
@@ -282,20 +131,13 @@ export default {
   },
   data() {
     return {
-      panels: [0, 1],
-      svgWidth: 500,
-      svgHeight: 500,
       selectedModuleXAxis: 'time',
       selectedVariableXAxis: undefined,
       selectedModuleYAxis: undefined,
       selectedVariableYAxis: undefined,
-      yAxisAutoBounds: true,
       yRange: [0, 100], // range to graph
-      yBounds: [0, 100], // hard bounds for the range
       yAxisScale: 0, // 0: linear, 1: logarithmic
-      xAxisAutoBounds: true,
       xRange: [0, 100], // range to graph
-      xBounds: [0, 100], // hard bounds for the range
       xAxisScale: 0, // 0: linear, 1: logarithmic
       connectedGraph: true,
       timeRange: [0, 100],
@@ -343,30 +185,6 @@ export default {
           .entries(this.experimentData['simulation group map'])
           .map(([id, group]) => [id, this.colorList[group % this.colorList.length]]),
       );
-    },
-    xLabel() {
-      if (!this.selectedModuleXAxis) {
-        return 'No Variable Selected';
-      }
-      if (this.selectedModuleXAxis === 'time') {
-        return 'time';
-      }
-      if (!this.selectedVariableXAxis) {
-        return `Select a variable from ${this.selectedModuleXAxis}`;
-      }
-      return `${this.selectedModuleXAxis} ${this.selectedVariableXAxis}`;
-    },
-    yLabel() {
-      if (!this.selectedModuleYAxis) {
-        return 'No Variable Selected';
-      }
-      if (this.selectedModuleYAxis === 'time') {
-        return 'time';
-      }
-      if (!this.selectedVariableYAxis) {
-        return `Select a variable from ${this.selectedModuleYAxis}`;
-      }
-      return `${this.selectedModuleYAxis} ${this.selectedVariableYAxis}`;
     },
     xDataMax() {
       // bail with default value if data isn't loaded or the user hasn't chosen a variable
@@ -446,6 +264,12 @@ export default {
           .map((data) => data[this.selectedModuleYAxis][this.selectedVariableYAxis]));
       }));
     },
+    xDataBounds() {
+      return [this.xDataMin, this.xDataMax];
+    },
+    yDataBounds() {
+      return [this.yDataMin, this.yDataMax];
+    },
     simIds() {
       if (!this.experimentData || !this.experimentData.names) {
         return [];
@@ -471,9 +295,6 @@ export default {
         });
       });
       return variableDict;
-    },
-    modules() {
-      return Object.keys(this.variables);
     },
     graphData() {
       // make sure that everything is selected
@@ -559,52 +380,6 @@ export default {
               data[this.selectedModuleYAxis][this.selectedVariableYAxis]]);
           return filteredData;
         }, {});
-    },
-  },
-  watch: {
-    xDataMax(dataMax) {
-      // allow you to go up a bit above the max
-      const ub = dataMax + 0.1 * (dataMax - this.xDataMin);
-      this.xRange[1] = dataMax;
-      this.xBounds[1] = ub;
-    },
-    xDataMin(dataMin) {
-      // allow you to go up a bit below the min; allow 0
-      const lb = this.xDataMin - 0.1 * (this.xDataMax - dataMin);
-      this.xRange[0] = dataMin;
-      this.xBounds[0] = Math.min(0, lb);
-    },
-    yDataMax(dataMax) {
-      // allow you to go up a bit above the max
-      const ub = dataMax + 0.1 * (dataMax - this.yDataMin);
-      this.yRange[1] = dataMax;
-      this.yBounds[1] = ub;
-    },
-    yDataMin(dataMin) {
-      // allow you to go up a bit below the min; allow 0
-      const lb = this.yDataMin - 0.1 * (this.yDataMax - dataMin);
-      this.yRange[0] = dataMin;
-      this.yBounds[0] = Math.min(0, lb);
-    },
-    selectedModuleYAxis(selectedModule) {
-      if (selectedModule === 'time') {
-        this.selectedVariableYAxis = undefined;
-      }
-    },
-    selectedModuleXAxis(selectedModule) {
-      if (selectedModule === 'time') {
-        this.selectedVariableXAxis = undefined;
-      }
-    },
-    yAxisAutoBounds(autobounds) {
-      if (autobounds) {
-        this.yRange = [this.yDataMin, this.yDataMax];
-      }
-    },
-    xAxisAutoBounds(autobounds) {
-      if (autobounds) {
-        this.xRange = [this.xDataMin, this.xDataMax];
-      }
     },
   },
 };

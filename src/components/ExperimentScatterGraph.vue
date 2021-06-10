@@ -1,29 +1,19 @@
 <template>
-  <div class="container">
-    <v-card>
-      <v-card-text>
-        <div
-          id="graph-container"
-          align="center"
-          class="center"
-        >
-          <svg
-            id="graph"
-            :width="svgWidth"
-            :height="svgHeight"
-          />
-          <v-btn
-            elevation="2"
-            fab
-          >
-            <v-icon @click="printElement('graph')">
-              mdi-printer
-            </v-icon>
-          </v-btn>
-        </div>
-      </v-card-text>
-    </v-card>
-  </div>
+  <v-container class="container grey lighten-5 flex align">
+    <svg
+      id="graph"
+      :width="svgWidth"
+      :height="svgHeight"
+    />
+    <v-btn
+      elevation="2"
+      fab
+    >
+      <v-icon @click="printElement('graph')">
+        mdi-printer
+      </v-icon>
+    </v-btn>
+  </v-container>
 </template>
 
 <script>
@@ -51,11 +41,19 @@ export default {
       type: Number,
       required: true,
     },
-    xLabel: {
+    xAxisModule: {
       type: String,
       required: true,
     },
-    yLabel: {
+    xAxisVariable: {
+      type: String,
+      required: true,
+    },
+    yAxisModule: {
+      type: String,
+      required: true,
+    },
+    yAxisVariable: {
       type: String,
       required: true,
     },
@@ -73,6 +71,32 @@ export default {
     svgWidth: 700,
     svgHeight: 500,
   }),
+  computed: {
+    xLabel() {
+      if (!this.xAxisModule) {
+        return 'No Variable Selected';
+      }
+      if (this.xAxisModule === 'time') {
+        return 'time';
+      }
+      if (!this.xAxisVariable) {
+        return `Select a variable from ${this.xAxisModule}`;
+      }
+      return `${this.xAxisModule} ${this.xAxisVariable}`;
+    },
+    yLabel() {
+      if (!this.yAxisModule) {
+        return 'No Variable Selected';
+      }
+      if (this.yAxisModule === 'time') {
+        return 'time';
+      }
+      if (!this.yAxisVariable) {
+        return `Select a variable from ${this.yAxisModule}`;
+      }
+      return `${this.yAxisModule} ${this.yAxisVariable}`;
+    },
+  },
   watch: {
     plotData(pltData) {
       this.redrawSVG(
