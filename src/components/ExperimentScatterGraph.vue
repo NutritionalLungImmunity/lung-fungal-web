@@ -43,23 +43,23 @@ export default {
     },
     xAxisModule: {
       type: String,
-      required: true,
+      default: undefined,
     },
     xAxisVariable: {
       type: String,
-      required: true,
+      default: undefined,
     },
     yAxisModule: {
       type: String,
-      required: true,
+      default: undefined,
     },
     yAxisVariable: {
       type: String,
-      required: true,
+      default: undefined,
     },
     connectedGraph: {
       type: Boolean,
-      required: true,
+      default: undefined,
     },
     colorMap: {
       type: Object,

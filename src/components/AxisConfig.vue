@@ -17,7 +17,7 @@
           </v-row>
           <v-row
             class="px-2 pb-2 ma-0"
-            justify="space-around  shrink-1"
+            justify="space-around"
           >
             <v-select
               v-model="selectedModule"

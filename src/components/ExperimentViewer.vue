@@ -10,14 +10,23 @@
         class="list-toolbar elevation-2 mt-2"
       >
         <h2>Graph Options</h2>
-        <v-spacer />
+
+        <v-divider
+          vertical
+          inset
+          class="px-6 ma-2"
+        />
         <v-switch
           v-model="connectedGraph"
           class="align-center mr-2 pt-5"
           :label="`Connect Time Series`"
           :disabled="!timeAxisPresent && timeSeriesType === 'Single'"
         />
-        <v-spacer />
+        <v-divider
+          vertical
+          inset
+          class="px-6 ma-2"
+        />
         <template v-if="!timeAxisPresent">
           <v-select
             v-model="timeSeriesType"
@@ -25,6 +34,7 @@
             label="Type"
             dense
             class="align-center mr-2 pt-5"
+            style="width: 100px"
           />
           <v-row class="even-layout">
             <v-range-slider
@@ -51,6 +61,7 @@
                   class="align-center mt-0 pt-0"
                   hide-details
                   single-line
+                  thumb-label
                   type="number"
                   style="width: 60px"
                   @change="$set(timeRange, 1, $event)"
