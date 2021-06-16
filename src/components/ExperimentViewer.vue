@@ -14,114 +14,157 @@
         <v-divider
           vertical
           inset
-          class="px-6 ma-2"
+          class="mx-4"
         />
-        <v-switch
-          v-model="connectedGraph"
-          class="align-center mr-2 pt-5"
-          :label="`Connect Time Series`"
-          :disabled="!timeAxisPresent && timeSeriesType === 'Single'"
-        />
+        <v-btn-toggle
+          v-model="graphType"
+          mandatory
+        >
+          <v-btn>
+            <v-icon>mdi-chart-timeline-variant</v-icon>
+          </v-btn>
+          <v-btn>
+            <v-icon>mdi-poll</v-icon>
+          </v-btn>
+        </v-btn-toggle>
         <v-divider
           vertical
           inset
-          class="px-6 ma-2"
+          class="mx-4"
         />
-        <template v-if="!timeAxisPresent">
-          <v-select
-            v-model="timeSeriesType"
-            :items="['Single', 'Range']"
-            label="Type"
-            dense
+        <template v-if="graphType === 0">
+          <v-switch
+            v-model="connectedGraph"
             class="align-center mr-2 pt-5"
-            style="width: 100px"
+            :label="`Connect Time Series`"
+            :disabled="!timeAxisPresent && timeSeriesType === 'Single'"
           />
-          <v-row class="even-layout">
-            <v-range-slider
-              v-if="timeSeriesType == 'Range'"
-              v-model="timeRange"
-              :max="timeBounds[1]"
-              :min="timeBounds[0]"
-              class="align-center"
-              thumb-label
-            >
-              <template v-slot:prepend>
-                <v-text-field
-                  :value="timeRange[0]"
-                  class="mt-0 pt-0"
-                  hide-details
-                  type="number"
-                  style="width: 60px"
-                  @change="$set(timeRange, 0, $event)"
-                />
-              </template>
-              <template v-slot:append>
-                <v-text-field
-                  :value="timeRange[1]"
-                  class="align-center mt-0 pt-0"
-                  hide-details
-                  single-line
-                  thumb-label
-                  type="number"
-                  style="width: 60px"
-                  @change="$set(timeRange, 1, $event)"
-                />
-              </template>
-            </v-range-slider>
-            <v-slider
-              v-else
-              v-model="timePoint"
-              :max="timeBounds[1]"
-              :min="timeBounds[0]"
-              :label="`Time`"
+          <v-divider
+            vertical
+            inset
+            class="mx-4"
+          />
+          <template v-if="!timeAxisPresent">
+            <v-select
+              v-model="timeSeriesType"
+              :items="['Single', 'Range']"
+              label="Type"
+              dense
+              class="align-center mr-2 pt-5"
+              style="width: 100px"
             />
-          </v-row>
+            <v-row class="even-layout">
+              <v-range-slider
+                v-if="timeSeriesType == 'Range'"
+                v-model="timeRange"
+                :max="timeBounds[1]"
+                :min="timeBounds[0]"
+                class="align-center"
+                thumb-label
+              >
+                <template v-slot:prepend>
+                  <v-text-field
+                    :value="timeRange[0]"
+                    class="mt-0 pt-0"
+                    hide-details
+                    type="number"
+                    style="width: 60px"
+                    @change="$set(timeRange, 0, $event)"
+                  />
+                </template>
+                <template v-slot:append>
+                  <v-text-field
+                    :value="timeRange[1]"
+                    class="align-center mt-0 pt-0"
+                    hide-details
+                    single-line
+                    thumb-label
+                    type="number"
+                    style="width: 60px"
+                    @change="$set(timeRange, 1, $event)"
+                  />
+                </template>
+              </v-range-slider>
+              <v-slider
+                v-else
+                v-model="timePoint"
+                :max="timeBounds[1]"
+                :min="timeBounds[0]"
+                :label="`Time`"
+              />
+            </v-row>
+          </template>
         </template>
         <v-spacer />
       </v-toolbar>
-      <v-row>
-        <v-col
-          id="axis-config"
-          cols="4"
-        >
-          <axis-config
-            name="Y"
-            :variables="variables"
-            :data-bounds="yDataBounds"
-            @module-update="selectedModuleYAxis = $event"
-            @variable-update="selectedVariableYAxis = $event"
-            @scale-update="yAxisScale = $event"
-            @range-update="yRange = $event"
-          />
+      <template v-if="graphType===0">
+        <v-row>
+          <v-col
+            id="axis-config"
+            cols="5"
+          >
+            <axis-config
+              name="Y"
+              :variables="variables"
+              :data-bounds="yDataBounds"
+              @module-update="selectedModuleYAxis = $event"
+              @variable-update="selectedVariableYAxis = $event"
+              @scale-update="yAxisScale = $event"
+              @range-update="yRange = $event"
+            />
 
-          <axis-config
-            name="X"
-            default-to-time
-            :variables="variables"
-            :data-bounds="xDataBounds"
-            @module-update="selectedModuleXAxis = $event"
-            @variable-update="selectedVariableXAxis = $event"
-            @scale-update="xAxisScale = $event"
-            @range-update="xRange = $event"
-          />
-        </v-col>
+            <axis-config
+              name="X"
+              default-to-time
+              :variables="variables"
+              :data-bounds="xDataBounds"
+              @module-update="selectedModuleXAxis = $event"
+              @variable-update="selectedVariableXAxis = $event"
+              @scale-update="xAxisScale = $event"
+              @range-update="xRange = $event"
+            />
+          </v-col>
 
-        <v-col>
-          <experiment-scatter-graph
-            :plot-data="graphData"
-            :x-range="xRange"
-            :x-scale="xAxisScale"
-            :y-range="yRange"
-            :y-scale="yAxisScale"
-            :x-axis-module="selectedModuleXAxis"
-            :x-axis-variable="selectedVariableXAxis"
-            :y-axis-module="selectedModuleYAxis"
-            :y-axis-variable="selectedVariableYAxis"
-            :connected-graph="connectedGraph"
-            :color-map="colorMap"
-          />
-        </v-col>
-      </v-row>
+          <v-col>
+            <experiment-scatter-graph
+              :plot-data="graphData"
+              :x-range="xRange"
+              :x-scale="xAxisScale"
+              :y-range="yRange"
+              :y-scale="yAxisScale"
+              :x-axis-module="selectedModuleXAxis"
+              :x-axis-variable="selectedVariableXAxis"
+              :y-axis-module="selectedModuleYAxis"
+              :y-axis-variable="selectedVariableYAxis"
+              :connected-graph="connectedGraph"
+              :color-map="colorMap"
+            />
+          </v-col>
+        </v-row>
+      </template>
+      <template v-else>
+        <v-row>
+          <v-col
+            id="data-source-config"
+            cols="4"
+          >
+            <experiment-bar-graph-data-source-config
+              :variables="variables"
+              :time-bounds="timeBounds"
+              @bar-graph-variable-update="barGraphVariables = $event"
+              @time-point-update="timePoint = $event"
+            />
+          </v-col>
+          <v-col>
+            <experiment-bar-graph
+              :graphed-variables="barGraphVariables"
+              :time="timePoint"
+              :color-list="colorList"
+              :experiment-data="experimentData"
+            />
+          </v-col>
+        </v-row>
+      </template>
     </v-container>
   </div>
 </template>
@@ -129,11 +172,15 @@
 <script>
 import AxisConfig from '@/components/AxisConfig.vue';
 import ExperimentScatterGraph from '@/components/ExperimentScatterGraph.vue';
+import ExperimentBarGraphDataSourceConfig from '@/components/ExperimentBarGraphDataSourceConfig.vue';
+import ExperimentBarGraph from '@/components/ExperimentBarGraph.vue';
 import http from '@/http';
 
 export default {
   name: 'ExperimentViewer',
-  components: { ExperimentScatterGraph, AxisConfig },
+  components: {
+    ExperimentScatterGraph, AxisConfig, ExperimentBarGraphDataSourceConfig, ExperimentBarGraph,
+  },
   props: {
     experimentFolder: {
       type: Object,
@@ -142,6 +189,7 @@ export default {
   },
   data() {
     return {
+      graphType: 0,
       selectedModuleXAxis: 'time',
       selectedVariableXAxis: undefined,
       selectedModuleYAxis: undefined,
@@ -158,6 +206,7 @@ export default {
         '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2',
         '#7f7f7f', '#bcbd22', '#17becf',
       ],
+      barGraphVariables: undefined,
     };
   },
   asyncComputed: {

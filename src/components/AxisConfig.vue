@@ -8,9 +8,9 @@
         class="px-2 pb-2 ma-0"
         justify="space-around"
       >
-        <v-col>
+        <v-col cols="4">
           <v-row
-            class="px-2 pb-2 ma-0"
+            class="px-2 pb-2 ma-2"
             justify="space-around"
           >
             <h2>Data Source</h2>
@@ -69,8 +69,7 @@
             />
           </v-row>
           <v-row
-            class="px-2 pb-2 ma-0"
-            justify="space-between"
+            class="px-2 pb-2 ma-2"
           >
             <v-range-slider
               v-model="range"

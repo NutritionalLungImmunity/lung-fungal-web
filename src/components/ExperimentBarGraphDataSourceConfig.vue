@@ -32,17 +32,22 @@
     </v-row>
     <v-row>
       <v-col>
-        Bars vs Box and Whiskers
+        TODO: Explicit range setting
       </v-col>
     </v-row>
     <v-row>
       <v-col>
-        Show Outliers vs Not vs Show all
+        TODO: Bars vs Box and Whiskers
       </v-col>
     </v-row>
     <v-row>
       <v-col>
-        Group by experiment vs group by variable
+        TODO: Show Outliers vs Not vs Show all
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        TODO: Group by experiment vs group by variable
       </v-col>
     </v-row>
   </v-container>

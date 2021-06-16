@@ -39,12 +39,11 @@ Object.assign(
       return data;
     },
     async getExperiment2DData(id) {
-      // As of 26May2021, the respose will have the sections:
+      // As of 10Jun2021, the respose will have the sections:
       // ['experimental_group_params',
       //  'experiment_complete',
       //  'names',
       //  'runs_per_config',
-      //  'simulation config',
       //  'simulation completion',
       //  'simulation group map',
       //  'stats']
