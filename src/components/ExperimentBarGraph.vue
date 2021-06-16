@@ -38,10 +38,15 @@ export default {
       required: false,
       default: undefined,
     },
+    plotType: {
+      type: String,
+      required: true,
+    },
   },
   data: () => ({
     svgWidth: 700,
     svgHeight: 500,
+    perturbPoints: true,
   }),
   computed: {
     numExperimentalGroups() {
@@ -87,6 +92,8 @@ export default {
           const iqr = q3 - q1;
           const ub = q3 + 1.5 * iqr;
           const lb = q1 - 1.5 * iqr;
+          const mean = d3.mean(dataSet);
+          const stdev = d3.deviation(dataSet);
           const stats = {
             trueMin,
             q1,
@@ -94,6 +101,9 @@ export default {
             q3,
             trueMax,
             iqr,
+            mean,
+            stdev,
+            dataSet,
             iqrMin: Math.min(q1, ...dataSet.filter((d) => d >= lb)),
             iqrMax: Math.max(q3, ...dataSet.filter((d) => d <= ub)),
             outliers: dataSet.filter((d) => d < lb || d > ub),
@@ -107,6 +117,9 @@ export default {
   watch: {
     plotData(newPlotData) {
       this.redrawSVG(newPlotData);
+    },
+    plotType() {
+      this.redrawSVG(this.plotData);
     },
   },
   methods: {
@@ -137,8 +150,16 @@ export default {
         (minmax, experiment) => {
           const [expMin, expMax] = experiment.reduce(
             (expminmax, data) => [
-              Math.min(data.trueMin, expminmax[0]),
-              Math.max(data.trueMax, expminmax[1])],
+              Math.min(
+                data.trueMin,
+                this.plotType === 'bar' ? data.mean - 1.96 * data.stdev : Number.POSITIVE_INFINITY,
+                expminmax[0],
+              ),
+              Math.max(
+                data.trueMax,
+                this.plotType === 'bar' ? data.mean + 1.96 * data.stdev : Number.NEGATIVE_INFINITY,
+                expminmax[1],
+              )],
             [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY],
           );
           return [
@@ -147,6 +168,7 @@ export default {
           ];
         }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY],
       );
+      if (this.plotType === 'bar') yRange[0] = Math.min(0, yRange[0]);
 
       const svg = d3
         .select('#graph');
@@ -182,9 +204,6 @@ export default {
 
       svg.selectAll('.tick line').attr('stroke', '#EBEBEB');
 
-      // Object.entries(pltData).forEach(([simId, simData]) => {
-      //   const color = (!!colorMap && !!colorMap[simId]) ? colorMap[simId] : '#69b3a2';
-
       const x = d3.scaleBand()
         .domain(d3.range(this.numExperimentalGroups * this.graphedVariables.length))
         .range([margin.left, width - margin.right])
@@ -206,21 +225,25 @@ export default {
         .attr('stroke-width', 1)
         // .attr('x', (d, i) => x(i)) // group by experiment
         .attr('x', (d, i) => x(this.reorder(i))) // group by variable
-        .attr('y', (d) => y(d.q3))
-        .attr('height', (d) => y(d.q1) - y(d.q3))
+        .attr('y', (d) => (this.plotType === 'box' ? y(d.q3) : y(d.mean)))
+        .attr('height', (d) => (this.plotType === 'box' ? y(d.q1) - y(d.q3) : y(0) - y(d.mean)))
         .attr('width', x.bandwidth());
 
       // median line
-      g.append('path')
-        .attr('d', (d, i) => `M${x(this.reorder(i))} ${y(d.median)} H${x(this.reorder(i)) + x.bandwidth()}`)
-        .attr('stroke', 'black')
-        .attr('stroke-width', 2);
+      if (this.plotType === 'box') {
+        g.append('path')
+          .attr('d', (d, i) => `M${x(this.reorder(i))} ${y(d.median)} H${x(this.reorder(i)) + x.bandwidth()}`)
+          .attr('stroke', 'black')
+          .attr('stroke-width', 2);
+      }
 
       // top whisker
+      const twBase = (d) => (this.plotType === 'box' ? y(d.q3) : y(d.mean));
+      const twTop = (d) => (this.plotType === 'box' ? y(d.iqrMax) : y(d.mean + 1.96 * d.stdev)); // TODO: t-test
       g.append('path')
         .attr('d', (d, i) => `
-         M${x(this.reorder(i)) + x.bandwidth() * 0.5} ${y(d.q3)}
-         V${y(d.iqrMax)}
+         M${x(this.reorder(i)) + x.bandwidth() * 0.5} ${twBase(d)}
+         V${twTop(d)}
          H${x(this.reorder(i)) + x.bandwidth() * 0.25}
          H${x(this.reorder(i)) + x.bandwidth() * 0.75}`)
         .attr('stroke', 'black')
@@ -228,10 +251,12 @@ export default {
         .attr('fill', 'none');
 
       // bottom whisker
+      const bwBase = (d) => (this.plotType === 'box' ? y(d.q1) : y(d.mean));
+      const bwBottom = (d) => (this.plotType === 'box' ? y(d.iqrMin) : y(d.mean - 1.96 * d.stdev)); // TODO: t-test
       g.append('path')
         .attr('d', (d, i) => `
-         M${x(this.reorder(i)) + x.bandwidth() * 0.5} ${y(d.q1)}
-         V${y(d.iqrMin)}
+         M${x(this.reorder(i)) + x.bandwidth() * 0.5} ${bwBase(d)}
+         V${bwBottom(d)}
          H${x(this.reorder(i)) + x.bandwidth() * 0.25}
          H${x(this.reorder(i)) + x.bandwidth() * 0.75}`)
         .attr('stroke', 'black')
@@ -239,16 +264,18 @@ export default {
         .attr('fill', 'none');
 
       // outliers
+      const random = d3.randomNormal(0, x.bandwidth() / 16);
       svg.append('g')
         .selectAll('g')
         .data([].concat(...plotdata)) // flatten (i,j) -> i * lenJ + j
         .join('g')
         .attr('transform', (d, i) => `translate(${x(this.reorder(i)) + x.bandwidth() / 2},0)`)
         .selectAll('circle')
-        .data((d) => ((d && d.outliers) ? d.outliers : []))
+        .data((d) => d.dataSet) // d.outliers)
         .join('circle')
         .attr('cy', (d) => y(d))
-        .attr('cx', 0)
+        .attr('cx', () => (!this.perturbPoints ? 0
+          : Math.max(-x.bandwidth() / 8, Math.min(x.bandwidth() / 8, random()))))
         .attr('r', 5)
         .attr('fill-opacity', 0.5)
         .attr('fill', 'grey');

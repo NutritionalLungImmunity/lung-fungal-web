@@ -153,6 +153,7 @@
               :time-bounds="timeBounds"
               @bar-graph-variable-update="barGraphVariables = $event"
               @time-point-update="timePoint = $event"
+              @bar-graph-type-update="barGraphType = $event"
             />
           </v-col>
           <v-col>
@@ -161,6 +162,7 @@
               :time="timePoint"
               :color-list="colorList"
               :experiment-data="experimentData"
+              :plot-type="barGraphType"
             />
           </v-col>
         </v-row>
@@ -207,6 +209,7 @@ export default {
         '#7f7f7f', '#bcbd22', '#17becf',
       ],
       barGraphVariables: undefined,
+      barGraphType: 'box',
     };
   },
   asyncComputed: {
