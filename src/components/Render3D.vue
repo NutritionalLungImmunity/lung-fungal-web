@@ -9,6 +9,7 @@
       class="render3d"
     />
     <v-container
+      v-else
       class="fill-height"
       fluid
     >
