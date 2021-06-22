@@ -66,15 +66,10 @@
     <v-toolbar
       class="list-toolbar elevation-2 mt-2"
     >
-      <h2>Simulations</h2>
+      <h2>Experiments</h2>
       <v-spacer />
       <v-toolbar-items class="align-center d-flex">
         <div class="sorting d-flex align-center mr-1 pr-1">
-          <v-switch
-            v-model="showExperimentalSimulations"
-            class="mr-2 pt-5"
-            :label="`Experiment Parts`"
-          />
           <v-select
             :value="sortBy"
             class="mr-1"
@@ -140,33 +135,15 @@
         </div>
       </v-toolbar-items>
     </v-toolbar>
-    <v-row
-      v-if="showExperimentalSimulations"
-      class="pt-5"
-    >
+
+    <v-row class="pt-5">
       <v-col
-        v-for="sim in simulations"
-        :key="sim.name"
+        v-for="experiment in experiments"
+        :key="experiment.name"
         cols="3"
       >
-        <simulation-card
-          :simulation="sim"
-          @refresh="refresh"
-          @view="$emit('view', $event)"
-        />
-      </v-col>
-    </v-row>
-    <v-row
-      v-else
-      class="pt-5"
-    >
-      <v-col
-        v-for="sim in nonExperimentalSimulations"
-        :key="sim.name"
-        cols="3"
-      >
-        <simulation-card
-          :simulation="sim"
+        <experiment-card
+          :experiment="experiment"
           @refresh="refresh"
           @view="$emit('view', $event)"
         />
@@ -176,7 +153,7 @@
 </template>
 
 <script>
-import SimulationCard from '@/components/SimulationCard.vue';
+import ExperimentCard from '@/components/ExperimentCard.vue';
 
 const sortPropertyMap = {
   Alphabetical: 'name',
@@ -186,8 +163,9 @@ const sortPropertyMap = {
 const WAIT_INTERVAL = 5000;
 
 export default {
+  name: 'ExperimentListTab',
   components: {
-    SimulationCard,
+    ExperimentCard,
   },
   inject: ['girderApi', 'girderRest'],
   props: {
@@ -210,31 +188,19 @@ export default {
       simDialog: false,
       sortOptions: ['Alphabetical', 'Author', 'Date'],
       updateState: new Date(),
-      showExperimentalSimulations: false,
     };
   },
   asyncComputed: {
-    simulations: {
+    experiments: {
       default: [],
       async get() {
         this.skipNextUpdate = true;
-        const sims = await this.girderRest.listSimulations(
+        const experiments = await this.girderRest.listExperiments(
           sortPropertyMap[this.sortBy],
           this.sortDesc,
         );
         this.skipNextUpdate = false;
-        return sims;
-      },
-      watch: ['updateState'],
-    },
-    nonExperimentalSimulations: {
-      default: [],
-      async get() {
-        this.skipNextUpdate = true;
-        const sims = await this.simulations;
-        const nonExperimentalSims = sims.filter((sim) => !sim.nli.in_experiment);
-        this.skipNextUpdate = false;
-        return nonExperimentalSims;
+        return experiments;
       },
       watch: ['updateState'],
     },
@@ -257,18 +223,18 @@ export default {
       });
     },
     async updateInProgress(index) {
-      const simulation = this.simulations[index];
-      if (simulation.nli.status <= 2 && !this.skipNextUpdate) {
-        const data = await this.girderRest.getSimulation(simulation._id);
+      const experiment = this.experiments[index];
+      if (experiment.nli.status <= 2 && !this.skipNextUpdate) {
+        const data = await this.girderRest.getExperiment(experiment._id);
         this.$emit('update', data);
         if (!this.skipNextUpdate) {
-          this.$set(this.simulations, index, data);
+          this.$set(this.experiments, index, data);
         }
       }
     },
     async updateAllInProgress() {
       await Promise.all(
-        this.simulations.map((_, index) => this.updateInProgress(index)),
+        this.experiments.map((_, index) => this.updateInProgress(index)),
       );
       if (!this.cancelUpdate) {
         await new Promise((resolve) => setTimeout(resolve, WAIT_INTERVAL));

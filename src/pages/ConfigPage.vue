@@ -117,31 +117,52 @@ export default {
     this.setDefaults();
   },
   methods: {
-    async onCreate(simulationId) {
+    async onCreate(creation) {
+      // calling it simulationId here, but it could also be an experiment
+      const { id: simulationId, is_experiment: isExperiment } = creation;
       const { query } = this.$route;
       let tabs = query.tabs || [];
-      let activeTab = '_simulationList';
+      let activeTab = isExperiment ? '_experimentList' : '_simulationList';
 
       if (!Array.isArray(tabs)) {
         tabs = [tabs];
       }
 
-      // TODO: this is to mitigate a bug when the simulation id is not returned, remove when fixed
-      if (simulationId) {
-        // TODO: this logic should be moved to vuex
-        this.$set(cache, simulationId, await this.girderRest.getSimulation(simulationId));
-        tabs.push(simulationId);
-        activeTab = simulationId;
-      }
+      if (isExperiment) {
+        // TODO: this is to mitigate a bug when the simulation id is not returned, remove when fixed
+        if (simulationId) {
+          // TODO: this logic should be moved to vuex
+          this.$set(cache, simulationId, await this.girderRest.getExperiment(simulationId));
+          tabs.push(simulationId);
+          activeTab = simulationId;
+        }
 
-      this.$router.push({
-        path: 'simulations',
-        query: {
-          ...query,
-          tabs,
-          activeTab,
-        },
-      });
+        this.$router.push({
+          path: 'experiments',
+          query: {
+            ...query,
+            tabs,
+            activeTab,
+          },
+        });
+      } else {
+        // TODO: this is to mitigate a bug when the simulation id is not returned, remove when fixed
+        if (simulationId) {
+          // TODO: this logic should be moved to vuex
+          this.$set(cache, simulationId, await this.girderRest.getSimulation(simulationId));
+          tabs.push(simulationId);
+          activeTab = simulationId;
+        }
+
+        this.$router.push({
+          path: 'simulations',
+          query: {
+            ...query,
+            tabs,
+            activeTab,
+          },
+        });
+      }
     },
     setDefaults() {
       const initialValues = JSON.parse(this.initialValues);
@@ -154,8 +175,13 @@ export default {
           }
           const initialValue = initialValues[option.module][option.id];
           values[option.module] = values[option.module] || {};
-          values[option.module][option.id] = initialValue === undefined
-            ? option.default : initialValue;
+          if (option.experimental && !Array.isArray(option.default)) {
+            values[option.module][option.id] = initialValue === undefined
+              ? [option.default] : initialValue;
+          } else {
+            values[option.module][option.id] = initialValue === undefined
+              ? option.default : initialValue;
+          }
         });
         Object.entries(panelOpts.subsections).forEach(([, subsectionOpts]) => {
           Object.entries(subsectionOpts).forEach(([, option]) => {
@@ -164,8 +190,13 @@ export default {
             }
             const initialValue = initialValues[option.module][option.id];
             values[option.module] = values[option.module] || {};
-            values[option.module][option.id] = initialValue === undefined
-              ? option.default : initialValue;
+            if (option.experimental && !Array.isArray(option.default)) {
+              values[option.module][option.id] = initialValue === undefined
+                ? [option.default] : initialValue;
+            } else {
+              values[option.module][option.id] = initialValue === undefined
+                ? option.default : initialValue;
+            }
           });
         });
       });
