@@ -159,28 +159,17 @@ export default {
       return {
         labels: this.times,
         datasets: [
-          this.internalizedSpores,
-          this.freeSpores,
+          this.afumigatus,
           this.macrophages,
           this.neutrophils,
         ],
       };
     },
-    internalizedSpores() {
-      const color = 'rgb(33, 84, 19)';
-      return {
-        label: 'Internalized A. fumigatus',
-        data: this.simulation.timeSteps.map((t) => t.countCells('spore', 'internalized')),
-        borderColor: color,
-        backgroundColor: color,
-        fill: false,
-      };
-    },
-    freeSpores() {
+    afumigatus() {
       const color = 'rgb(92, 235, 53)';
       return {
-        label: 'Free A. fumigatus',
-        data: this.simulation.timeSteps.map((t) => t.countCells('spore', 'internalized', (d) => !d)),
+        label: 'A. fumigatus',
+        data: this.simulation.timeSteps.map((t) => t.countCells('afumigatus')),
         borderColor: color,
         backgroundColor: color,
         fill: false,

@@ -76,26 +76,29 @@ export default {
     state() {
       return this.simulation.timeSteps[this.timeStep];
     },
+    afumigatus() {
+      return this.state.afumigatus;
+    },
     geometry() {
       return this.state.geometry;
-    },
-    spore() {
-      return this.state.spore;
     },
     macrophage() {
       return this.state.macrophage;
     },
+    molecules() {
+      return this.state.molecules;
+    },
     neutrophil() {
       return this.state.neutrophil;
     },
-    molecules() {
-      return this.state.molecules;
+    pneumocyte() {
+      return this.state.pneumocyte;
     },
     hasWebGL() {
       return hasWebGL;
     },
     activeType() {
-      if (this.activeDataSet === this.vtk.sporeColorFilter.getOutputData()) {
+      if (this.activeDataSet === this.afumigatus) {
         return 'A. fumigatus';
       }
       if (this.activeDataSet === this.macrophage) {
@@ -103,6 +106,9 @@ export default {
       }
       if (this.activeDataSet === this.neutrophil) {
         return 'neutrophil';
+      }
+      if (this.activeDataSet === this.pneumocyte) {
+        return 'pneumocyte';
       }
       return '';
     },
@@ -179,9 +185,10 @@ export default {
 
     this.createGeometry();
     this.createMolecules();
-    this.createSpore();
+    this.createAFumigatus();
     this.createMacrophage();
     this.createNeutrophil();
+    this.createPneumocyte();
     this.setStateData();
 
     this.vtk.renderWindow
@@ -278,11 +285,19 @@ export default {
     },
     setStateData() {
       this.vtk.geometryMapper.setInputData(this.geometry);
-      this.vtk.sporeColorFilter.setInputData(this.spore, 0);
+      // this.vtk.sporeColorFilter.setInputData(this.afumigatus, 0); // TODO: rename all 'spore'
+
+      this.afumigatus.getPointData().setActiveScalars('dead');
+      this.vtk.afumigatusMapper.setInputData(this.afumigatus, 0);
+
       this.macrophage.getPointData().setActiveScalars('dead');
       this.vtk.macrophageMapper.setInputData(this.macrophage, 0);
+
       this.neutrophil.getPointData().setActiveScalars('dead');
       this.vtk.neutrophilMapper.setInputData(this.neutrophil, 0);
+
+      this.pneumocyte.getPointData().setActiveScalars('dead');
+      this.vtk.pneumocyteMapper.setInputData(this.pneumocyte, 0);
       this.updateMolecules();
       this.render();
     },
@@ -338,15 +353,15 @@ export default {
 
       this.vtk.renderer.addVolume(this.vtk.geometryActor);
     },
-    createSpore() {
+    createAFumigatus() {
       // TODO: I have no idea why the calculator filter inverts the color values...
       const colors = [
         Uint8Array.from([256 - 92, 256 - 235, 256 - 53]),
         Uint8Array.from([256 - 33, 256 - 84, 256 - 19]),
       ];
 
-      this.vtk.sporeColorFilter = vtkCalculator.newInstance();
-      this.vtk.sporeColorFilter.setFormulaSimple(
+      this.vtk.afumigatusColorFilter = vtkCalculator.newInstance();
+      this.vtk.afumigatusColorFilter.setFormulaSimple(
         FieldDataTypes.POINT,
         ['internalized'],
         'color',
@@ -357,24 +372,26 @@ export default {
         },
       );
 
-      this.vtk.sporeGlyphSource = vtkSphereSource.newInstance({
+      this.vtk.afumigatusGlyphSource = vtkSphereSource.newInstance({
         thetaResolution: SPHERE_RESOLUTION,
         phiResolution: SPHERE_RESOLUTION,
       });
 
-      this.vtk.sporeMapper = vtkGlyph3DMapper.newInstance({
+      this.vtk.afumigatusMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
         scaleArray: 'scale',
         scaleFactor: 5,
         colorMode: ColorMode.DIRECT_SCALARS,
       });
-      this.vtk.sporeMapper.setInputConnection(this.vtk.sporeColorFilter.getOutputPort(), 0);
-      this.vtk.sporeMapper.setInputConnection(this.vtk.sporeGlyphSource.getOutputPort(), 1);
+      this.vtk.afumigatusMapper
+        .setInputConnection(this.vtk.afumigatusColorFilter.getOutputPort(), 0);
+      this.vtk.afumigatusMapper
+        .setInputConnection(this.vtk.afumigatusGlyphSource.getOutputPort(), 1);
 
-      this.vtk.sporeActor = vtkActor.newInstance();
-      this.vtk.sporeActor.setMapper(this.vtk.sporeMapper);
+      this.vtk.afumigatusActor = vtkActor.newInstance();
+      this.vtk.afumigatusActor.setMapper(this.vtk.afumigatusMapper);
 
-      this.vtk.renderer.addActor(this.vtk.sporeActor);
+      this.vtk.renderer.addActor(this.vtk.afumigatusActor);
     },
     createMolecules() {
       this.vtk.molecule.actor.setMapper(this.vtk.molecule.mapper);
@@ -440,6 +457,34 @@ export default {
 
       // TODO: Rendering can be disabled here
       this.vtk.renderer.addActor(this.vtk.neutrophilActor);
+    },
+    createPneumocyte() {
+      this.vtk.pneumocyteGlyphSource = vtkSphereSource.newInstance({
+        thetaResolution: SPHERE_RESOLUTION,
+        phiResolution: SPHERE_RESOLUTION,
+      });
+
+      this.vtk.pneumocyteMapper = vtkGlyph3DMapper.newInstance({
+        scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
+        scaleArray: 'scale',
+        scaleFactor: 5,
+        colorMode: ColorMode.MAP_SCALARS,
+        scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
+      });
+      this.vtk.pneumocyteMapper
+        .setInputConnection(this.vtk.pneumocyteGlyphSource.getOutputPort(), 1);
+
+      this.vtk.pneumocyteLookupTable = vtkLookupTable.newInstance({
+        numberOfColors: 1,
+        hueRange: [0.7], // TODO: (ACK) what color is this anyway?
+      });
+      this.vtk.pneumocyteMapper.setLookupTable(this.vtk.pneumocyteLookupTable);
+
+      this.vtk.pneumocyteActor = vtkActor.newInstance();
+      this.vtk.pneumocyteActor.setMapper(this.vtk.pneumocyteMapper);
+
+      // TODO: Rendering can be disabled here
+      this.vtk.renderer.addActor(this.vtk.pneumocyteActor);
     },
     render() {
       this.vtk.renderWindow.render();
