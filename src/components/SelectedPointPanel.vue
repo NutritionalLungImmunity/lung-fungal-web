@@ -1,19 +1,24 @@
 <template>
-  <v-simple-table
-    :dense="true"
-  >
-    <template v-slot:default>
-      <tbody>
-        <tr
-          v-for="row in rows"
-          :key="row[1]"
-        >
-          <td>{{ row[1] }}</td>
-          <td>{{ row[0] }}</td>
-        </tr>
-      </tbody>
-    </template>
-  </v-simple-table>
+  <v-card>
+    <v-card-title>
+      {{ info['type'] }}
+    </v-card-title>
+    <v-simple-table
+      :dense="true"
+    >
+      <template v-slot:default>
+        <tbody>
+          <tr
+            v-for="row in rows"
+            :key="row[1]"
+          >
+            <td>{{ row[1].replace("_", " ") }}</td>
+            <td>{{ row[0] }}</td>
+          </tr>
+        </tbody>
+      </template>
+    </v-simple-table>
+  </v-card>
 </template>
 
 <script>
@@ -25,40 +30,90 @@ function toFixedIfNumeric(value) {
 }
 const fungusValueMap = {
   status: {
-    99: 'drifting',
+    // 99: 'drifting',
     0: 'resting',
     1: 'swollen',
-    2: 'germinated',
-    3: 'growable',
-    4: 'grown',
+    2: 'germ tube',
+    3: 'hyphae',
+    4: 'dying',
     5: 'dead',
+    6: 'sterile conidia',
   },
-  form: {
-    0: 'condia',
-    1: 'hyphae',
+  state: {
+    0: 'free',
+    1: 'internalizing',
+    2: 'releasing',
   },
+  // form: {
+  //   0: 'condia',
+  //   1: 'hyphae',
+  // },
   mobile: (value) => !!value,
   internalized: (value) => !!value,
   dead: (value) => !!value,
-  iron: toFixedIfNumeric,
-  health: toFixedIfNumeric,
+  iron_pool: toFixedIfNumeric,
 };
+
+const phagocyteStatusMap = {
+  0: 'Inactive',
+  1: 'Inactivating',
+  2: 'Resting',
+  3: 'Activating',
+  4: 'Active',
+  5: 'Apoptotic',
+  6: 'Necrotic',
+  7: 'Dead',
+  8: 'Anergic',
+  9: 'Interacting',
+};
+const phagocyteStateMap = {
+  0: 'Free',
+  1: 'Interacting',
+};
+
 const macrophageValueMap = {
+  status: phagocyteStatusMap,
+  state: phagocyteStateMap,
   dead: (value) => !!value,
   phagosome(value) {
-    return value.filter((v) => (v !== null) && (v >= 0));
+    return value.filter((v) => (v !== null) && (v >= 0)).length;
   },
+  iron_pool: toFixedIfNumeric,
+  tf: (value) => !!value,
+  tnfa: (value) => !!value,
+  fpn: (value) => !!value,
+  engaged: (value) => !!value,
+  has_conidia: (value) => !!value,
 };
 const neutrophilValueMap = {
+  status: phagocyteStatusMap,
+  state: phagocyteStateMap,
+  phagosome(value) {
+    return value.filter((v) => (v !== null) && (v >= 0)).length;
+  },
   dead: (value) => !!value,
+  has_conidia: (value) => !!value,
 };
+const pneumocyteValueMap = {
+  status: phagocyteStatusMap,
+  state: phagocyteStateMap,
+  phagosome(value) {
+    return value.filter((v) => (v !== null) && (v >= 0)).length;
+  },
+  dead: (value) => !!value,
+  has_conidia: (value) => !!value,
+};
+
 const valueMappers = {
   'A. fumigatus': fungusValueMap,
   macrophage: macrophageValueMap,
   neutrophil: neutrophilValueMap,
+  pneumocyte: pneumocyteValueMap,
 };
 
-const excludedKeys = new Set(['id', 'scale', 'color']);
+const excludedKeys = new Set(['type', 'id', 'scale', 'color', 'next_branch',
+  'next_septa', 'previous_septa', 'is_root', 'root', 'vec', 'tip',
+  'max_move_step', 'move_step']);
 
 export default {
   props: {

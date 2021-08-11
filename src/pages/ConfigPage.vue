@@ -66,7 +66,8 @@ import State from '@/data/state';
 import config from '@/config';
 import cache from '@/cache';
 
-const geometryFileUrl = 'https://data.kitware.com/api/v1/file/5fbbc06950a41e3d1968d2ad/download';
+// const geometryFileUrl = 'https://data.kitware.com/api/v1/file/5fbbc06950a41e3d1968d2ad/download';
+const geometryFileUrl = 'https://data.nutritionallungimmunity.org/api/v1/item/61084872542af43cd20bd3df/download';
 
 export default {
   name: 'ConfigPage',
@@ -93,8 +94,8 @@ export default {
         properties: 'deep-purple lighten-2',
         macrophage: 'blue lighten-1',
         neutrophil: 'cyan lighten-2',
-        epithelium: 'green darken-1',
-        fungus: 'lime lighten-1',
+        erythrocyte: 'green darken-1',
+        // fungus: 'lime lighten-1',
         molecules: 'red darken-1',
       },
     };

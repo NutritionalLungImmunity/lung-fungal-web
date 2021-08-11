@@ -5,26 +5,34 @@ import vtkDataArray from 'vtk.js/Sources/Common/Core/DataArray';
 import http from '@/http';
 
 class State {
-  constructor(id, time, geometry, molecules, spore, macrophage, neutrophil) {
+  constructor(id, time, afumigatus, geometry, macrophage, molecules, neutrophil, pneumocyte) {
     this.id = id;
     this.time = time;
+    this.afumigatus = State.loadPolyData(afumigatus);
     this.geometry = State.loadImageData(geometry);
-    this.molecules = State.loadImageData(molecules);
-    this.spore = State.loadPolyData(spore);
     this.macrophage = State.loadPolyData(macrophage);
+    this.molecules = State.loadImageData(molecules);
     this.neutrophil = State.loadPolyData(neutrophil);
+    this.pneumocyte = State.loadPolyData(pneumocyte);
   }
 
   static async load(id) {
-    const [time, geometry, molecules, spore, macrophage, neutrophil] = await Promise.all([
+    const [time,
+      afumigatus,
+      geometry,
+      macrophage,
+      molecules,
+      neutrophil,
+      pneumocyte] = await Promise.all([
       State.getTime(id),
+      State.loadFile(id, 'afumigatus_001.vtp'),
       State.loadFile(id, 'geometry_001.vti'),
-      State.loadFile(id, 'molecules_001.vti'),
-      State.loadFile(id, 'spore_001.vtp'),
       State.loadFile(id, 'macrophage_001.vtp'),
+      State.loadFile(id, 'molecules_001.vti'),
       State.loadFile(id, 'neutrophil_001.vtp'),
+      State.loadFile(id, 'pneumocyte_001.vtp'),
     ]);
-    return new State(id, time, geometry, molecules, spore, macrophage, neutrophil);
+    return new State(id, time, afumigatus, geometry, macrophage, molecules, neutrophil, pneumocyte);
   }
 
   static async getTime(folderId) {

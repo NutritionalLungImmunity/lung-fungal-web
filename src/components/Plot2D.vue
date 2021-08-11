@@ -70,7 +70,7 @@ export default {
             xAxes: [{
               scaleLabel: {
                 display: true,
-                labelString: 'Time (hours)',
+                labelString: 'Time (minutes)',
               },
             }],
           },
