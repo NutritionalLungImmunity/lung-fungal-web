@@ -423,7 +423,7 @@ export default {
       this.vtk.macrophageMapper.setLookupTable(this.vtk.macrophageLookupTable);
 
       this.vtk.macrophageActor = vtkActor.newInstance();
-      this.vtk.macrophageActor.getProperty().setColor(253 / 255, 98 / 255, 132 / 255);
+      this.vtk.macrophageActor.getProperty().setColor(66 / 255, 245 / 255, 75 / 255);
       this.vtk.macrophageActor.setMapper(this.vtk.macrophageMapper);
 
       // TODO: Rendering can be disabled here
@@ -448,11 +448,12 @@ export default {
 
       this.vtk.neutrophilLookupTable = vtkLookupTable.newInstance({
         numberOfColors: 1,
-        hueRange: [0.7], // TODO: (ACK) what color is this anyway?
+        hueRange: [0.7],
       });
       this.vtk.neutrophilMapper.setLookupTable(this.vtk.neutrophilLookupTable);
 
       this.vtk.neutrophilActor = vtkActor.newInstance();
+      this.vtk.neutrophilActor.getProperty().setColor(66 / 255, 245 / 255, 75 / 255);
       this.vtk.neutrophilActor.setMapper(this.vtk.neutrophilMapper);
 
       // TODO: Rendering can be disabled here
@@ -476,11 +477,12 @@ export default {
 
       this.vtk.pneumocyteLookupTable = vtkLookupTable.newInstance({
         numberOfColors: 1,
-        hueRange: [0.7], // TODO: (ACK) what color is this anyway?
+        hueRange: [0.6],
       });
       this.vtk.pneumocyteMapper.setLookupTable(this.vtk.pneumocyteLookupTable);
 
       this.vtk.pneumocyteActor = vtkActor.newInstance();
+      this.vtk.pneumocyteActor.getProperty().setColor(174 / 255, 65 / 255, 186 / 255);
       this.vtk.pneumocyteActor.setMapper(this.vtk.pneumocyteMapper);
 
       // TODO: Rendering can be disabled here
