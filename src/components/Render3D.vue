@@ -37,6 +37,7 @@ import vtkRenderWindow from 'vtk.js/Sources/Rendering/Core/RenderWindow';
 import vtkRenderWindowInteractor from 'vtk.js/Sources/Rendering/Core/RenderWindowInteractor';
 import vtkRenderer from 'vtk.js/Sources/Rendering/Core/Renderer';
 import vtkSphereSource from 'vtk.js/Sources/Filters/Sources/SphereSource';
+import vtkCylinderSource from 'vtk.js/Sources/Filters/Sources/CylinderSource';
 import vtkVolume from 'vtk.js/Sources/Rendering/Core/Volume';
 import vtkVolumeMapper from 'vtk.js/Sources/Rendering/Core/VolumeMapper';
 import {
@@ -45,6 +46,7 @@ import {
 } from 'vtk.js/Sources/Rendering/Core/Mapper/Constants';
 import { AttributeTypes } from 'vtk.js/Sources/Common/DataModel/DataSetAttributes/Constants';
 import { FieldAssociations, FieldDataTypes } from 'vtk.js/Sources/Common/DataModel/DataSet/Constants';
+import vtkPolydata from 'vtk.js/Sources/Common/DataModel/PolyData';
 
 import Simulation from '@/data/simulation';
 import hasWebGL from '@/webgl';
@@ -287,8 +289,31 @@ export default {
       this.vtk.geometryMapper.setInputData(this.geometry);
       // this.vtk.sporeColorFilter.setInputData(this.afumigatus, 0); // TODO: rename all 'spore'
 
-      this.afumigatus.getPointData().setActiveScalars('dead');
-      this.vtk.afumigatusMapper.setInputData(this.afumigatus, 0);
+      this.afumigatus.getPointData().setActiveScalars('dead', 'root', 'tip', 'vec');
+
+      const conidia = vtkPolydata.newInstance();
+      conidia.shallowCopy(this.afumigatus);
+      const hyphae = vtkPolydata.newInstance();
+      hyphae.shallowCopy(this.afumigatus);
+
+      const vertexConidia = [];
+      const vertexHyphae = [];
+      this.afumigatus.getPointData().getArray('state').getData().forEach((v, index) => {
+        if (v === 1 /* RESTING_CONIDIA */ || v === 2 /* SWELLING_CONIDIA */) {
+          vertexConidia.push(index);
+        }
+        if (v === 4/* HYPHAE */) {
+          vertexHyphae.push(index);
+        }
+      });
+
+      // vertexConidia.insert(0, vertexConidia.length);
+      // vertexHyphae.insert(0, vertexHyphae.length);
+
+      conidia.getVerts().setData(Uint16Array.from(vertexConidia));
+      hyphae.getVerts().setData(Uint16Array.from(vertexHyphae));
+      this.vtk.conidiaMapper.setInputData(conidia, 0);
+      this.vtk.hyphaeMapper.setInputData(hyphae, 0);
 
       this.macrophage.getPointData().setActiveScalars('dead');
       this.vtk.macrophageMapper.setInputData(this.macrophage, 0);
@@ -331,7 +356,7 @@ export default {
       ctfun.addRGBPoint(0.9, 1.0, 0.0, 0.0);
       ofun.addPoint(0.5, 0.0);
       ctfun.addRGBPoint(1, 1.0, 0.0, 0.0);
-      ofun.addPoint(1, 0.05);
+      ofun.addPoint(1, 0.025);
       ctfun.addRGBPoint(1.1, 1.0, 0.0, 0.0);
       ofun.addPoint(1.5, 0.0);
       // REGULAR_TISSUE = 2
@@ -341,7 +366,7 @@ export default {
       ctfun.addRGBPoint(2.5, 1.0, 0.8, 0.8);
       ofun.addPoint(2.5, 0.00);
       ctfun.addRGBPoint(3, 0.9, 0.9, 1.0);
-      ofun.addPoint(3, 0.05);
+      ofun.addPoint(3, 0.025);
       ctfun.addRGBPoint(3.5, 1.0, 0.8, 0.8);
       ofun.addPoint(3.5, 0.00);
 
@@ -372,26 +397,49 @@ export default {
         },
       );
 
-      this.vtk.afumigatusGlyphSource = vtkSphereSource.newInstance({
+      // conidia are spheres
+
+      this.vtk.conidiaGlyphSource = vtkSphereSource.newInstance({
         thetaResolution: SPHERE_RESOLUTION,
         phiResolution: SPHERE_RESOLUTION,
       });
 
-      this.vtk.afumigatusMapper = vtkGlyph3DMapper.newInstance({
+      this.vtk.conidiaMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
         scaleArray: 'scale',
-        scaleFactor: 5,
+        scaleFactor: 5, // Note, should be ~3µm for accuracy but we need to see them
         colorMode: ColorMode.DIRECT_SCALARS,
       });
-      this.vtk.afumigatusMapper
+      this.vtk.conidiaMapper
         .setInputConnection(this.vtk.afumigatusColorFilter.getOutputPort(), 0);
-      this.vtk.afumigatusMapper
-        .setInputConnection(this.vtk.afumigatusGlyphSource.getOutputPort(), 1);
+      this.vtk.conidiaMapper
+        .setInputConnection(this.vtk.conidiaGlyphSource.getOutputPort(), 1);
 
-      this.vtk.afumigatusActor = vtkActor.newInstance();
-      this.vtk.afumigatusActor.setMapper(this.vtk.afumigatusMapper);
+      this.vtk.conidiaActor = vtkActor.newInstance();
+      this.vtk.conidiaActor.setMapper(this.vtk.conidiaMapper);
+      this.vtk.renderer.addActor(this.vtk.conidiaActor);
 
-      this.vtk.renderer.addActor(this.vtk.afumigatusActor);
+      // hyphae are cylinders
+
+      this.vtk.hyphaeGlyphSource = vtkCylinderSource.newInstance({
+        height: 40,
+        radius: 10,
+        resolution: 10,
+      });
+      this.vtk.hyphaeMapper = vtkGlyph3DMapper.newInstance({
+        scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
+        scaleArray: 'scale',
+        scaleFactor: 5, // Note, should be ~3µm for accuracy but we need to see them
+        colorMode: ColorMode.DIRECT_SCALARS,
+      });
+      this.vtk.hyphaeMapper
+        .setInputConnection(this.vtk.afumigatusColorFilter.getOutputPort(), 0);
+      this.vtk.hyphaeMapper
+        .setInputConnection(this.vtk.hyphaeGlyphSource.getOutputPort(), 1);
+
+      this.vtk.hyphaeActor = vtkActor.newInstance();
+      this.vtk.hyphaeActor.setMapper(this.vtk.hyphaeMapper);
+      this.vtk.renderer.addActor(this.vtk.hyphaeActor);
     },
     createMolecules() {
       this.vtk.molecule.actor.setMapper(this.vtk.molecule.mapper);
@@ -408,7 +456,7 @@ export default {
       this.vtk.macrophageMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
         scaleArray: 'scale',
-        scaleFactor: 8,
+        scaleFactor: 21 / 2,
         colorMode: ColorMode.MAP_SCALARS,
         scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
         scalarRange: [0, 1],
@@ -423,7 +471,7 @@ export default {
       this.vtk.macrophageMapper.setLookupTable(this.vtk.macrophageLookupTable);
 
       this.vtk.macrophageActor = vtkActor.newInstance();
-      this.vtk.macrophageActor.getProperty().setColor(253 / 255, 98 / 255, 132 / 255);
+      this.vtk.macrophageActor.getProperty().setColor(189 / 255, 44 / 255, 230 / 255);
       this.vtk.macrophageActor.setMapper(this.vtk.macrophageMapper);
 
       // TODO: Rendering can be disabled here
@@ -438,7 +486,7 @@ export default {
       this.vtk.neutrophilMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
         scaleArray: 'scale',
-        scaleFactor: 5,
+        scaleFactor: 13.5 / 2,
         colorMode: ColorMode.MAP_SCALARS,
         scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
       });
@@ -448,11 +496,12 @@ export default {
 
       this.vtk.neutrophilLookupTable = vtkLookupTable.newInstance({
         numberOfColors: 1,
-        hueRange: [0.7], // TODO: (ACK) what color is this anyway?
+        hueRange: [0.7], // TODO: what is this anyway?
       });
       this.vtk.neutrophilMapper.setLookupTable(this.vtk.neutrophilLookupTable);
 
       this.vtk.neutrophilActor = vtkActor.newInstance();
+      this.vtk.neutrophilActor.getProperty().setColor(235 / 255, 224 / 255, 28 / 255);
       this.vtk.neutrophilActor.setMapper(this.vtk.neutrophilMapper);
 
       // TODO: Rendering can be disabled here
@@ -467,7 +516,7 @@ export default {
       this.vtk.pneumocyteMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
         scaleArray: 'scale',
-        scaleFactor: 5,
+        scaleFactor: 50 / 2,
         colorMode: ColorMode.MAP_SCALARS,
         scalarMode: ScalarMode.USE_POINT_FIELD_DATA,
       });
@@ -476,7 +525,7 @@ export default {
 
       this.vtk.pneumocyteLookupTable = vtkLookupTable.newInstance({
         numberOfColors: 1,
-        hueRange: [0.7], // TODO: (ACK) what color is this anyway?
+        hueRange: [0.7],
       });
       this.vtk.pneumocyteMapper.setLookupTable(this.vtk.pneumocyteLookupTable);
 

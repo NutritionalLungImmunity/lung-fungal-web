@@ -67,7 +67,8 @@ import config from '@/config';
 import cache from '@/cache';
 
 // const geometryFileUrl = 'https://data.kitware.com/api/v1/file/5fbbc06950a41e3d1968d2ad/download';
-const geometryFileUrl = 'https://data.nutritionallungimmunity.org/api/v1/item/61084872542af43cd20bd3df/download';
+// const geometryFileUrl = 'https://data.nutritionallungimmunity.org/api/v1/item/61084872542af43cd20bd3df/download';
+const geometryFileUrl = 'https://data.nutritionallungimmunity.org/api/v1/item/6148d592eba76a9cbe6a4c4d/download';
 
 export default {
   name: 'ConfigPage',
