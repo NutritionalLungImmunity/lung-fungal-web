@@ -92,9 +92,9 @@ export default {
           vertexConidia.push(index);
         }
       });
-      // vertexConidia.insert(0, vertexConidia.length);
+      vertexConidia.unshift(vertexConidia.length);
 
-      conidia.getPoints().setData(Uint16Array.from(vertexConidia));
+      conidia.getVerts().setData(Uint16Array.from(vertexConidia));
       return conidia;
     },
     hyphae() {
@@ -107,9 +107,9 @@ export default {
           vertexHyphae.push(index);
         }
       });
-      // vertexHyphae.insert(0, vertexHyphae.length);
+      vertexHyphae.unshift(vertexHyphae.length);
 
-      hyphae.getPoints().setData(Uint16Array.from(vertexHyphae));
+      hyphae.getVerts().setData(Uint16Array.from(vertexHyphae));
       return hyphae;
     },
     geometry() {
@@ -333,6 +333,7 @@ export default {
 
       this.hyphae.getPointData().setActiveScalars('dead');
       this.vtk.hyphaeMapper.setInputData(this.hyphae, 0);
+      this.vtk.hyphaeMapper.setOrientationArray('vec');
 
       this.macrophage.getPointData().setActiveScalars('dead');
       this.vtk.macrophageMapper.setInputData(this.macrophage, 0);
