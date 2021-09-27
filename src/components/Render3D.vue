@@ -37,7 +37,6 @@ import vtkRenderWindow from 'vtk.js/Sources/Rendering/Core/RenderWindow';
 import vtkRenderWindowInteractor from 'vtk.js/Sources/Rendering/Core/RenderWindowInteractor';
 import vtkRenderer from 'vtk.js/Sources/Rendering/Core/Renderer';
 import vtkSphereSource from 'vtk.js/Sources/Filters/Sources/SphereSource';
-import vtkCylinderSource from 'vtk.js/Sources/Filters/Sources/CylinderSource';
 import vtkVolume from 'vtk.js/Sources/Rendering/Core/Volume';
 import vtkVolumeMapper from 'vtk.js/Sources/Rendering/Core/VolumeMapper';
 import {
@@ -47,6 +46,8 @@ import {
 import { AttributeTypes } from 'vtk.js/Sources/Common/DataModel/DataSetAttributes/Constants';
 import { FieldAssociations, FieldDataTypes } from 'vtk.js/Sources/Common/DataModel/DataSet/Constants';
 import vtkPolydata from 'vtk.js/Sources/Common/DataModel/PolyData';
+import vtkStickMapper from 'vtk.js/Sources/Rendering/Core/StickMapper';
+
 
 import Simulation from '@/data/simulation';
 import hasWebGL from '@/webgl';
@@ -81,6 +82,36 @@ export default {
     afumigatus() {
       return this.state.afumigatus;
     },
+    conidia() {
+      const conidia = vtkPolydata.newInstance();
+      conidia.shallowCopy(this.afumigatus);
+
+      const vertexConidia = [];
+      this.afumigatus.getPointData().getArray('status').getData().forEach((v, index) => {
+        if (v === 1 /* RESTING_CONIDIA */ || v === 2 /* SWELLING_CONIDIA */) {
+          vertexConidia.push(index);
+        }
+      });
+      // vertexConidia.insert(0, vertexConidia.length);
+
+      conidia.getPoints().setData(Uint16Array.from(vertexConidia));
+      return conidia;
+    },
+    hyphae() {
+      const hyphae = vtkPolydata.newInstance();
+      hyphae.shallowCopy(this.afumigatus);
+
+      const vertexHyphae = [];
+      this.afumigatus.getPointData().getArray('status').getData().forEach((v, index) => {
+        if (v === 4 /* HYPHAE */) {
+          vertexHyphae.push(index);
+        }
+      });
+      // vertexHyphae.insert(0, vertexHyphae.length);
+
+      hyphae.getPoints().setData(Uint16Array.from(vertexHyphae));
+      return hyphae;
+    },
     geometry() {
       return this.state.geometry;
     },
@@ -102,6 +133,12 @@ export default {
     activeType() {
       if (this.activeDataSet === this.afumigatus) {
         return 'A. fumigatus';
+      }
+      if (this.activeDataSet === this.conidia) {
+        return 'conidia';
+      }
+      if (this.activeDataSet === this.hyphae) {
+        return 'hyphae';
       }
       if (this.activeDataSet === this.macrophage) {
         return 'macrophage';
@@ -289,31 +326,13 @@ export default {
       this.vtk.geometryMapper.setInputData(this.geometry);
       // this.vtk.sporeColorFilter.setInputData(this.afumigatus, 0); // TODO: rename all 'spore'
 
-      this.afumigatus.getPointData().setActiveScalars('dead', 'root', 'tip', 'vec');
+      // this.afumigatus.getPointData().setActiveScalars('dead');
 
-      const conidia = vtkPolydata.newInstance();
-      conidia.shallowCopy(this.afumigatus);
-      const hyphae = vtkPolydata.newInstance();
-      hyphae.shallowCopy(this.afumigatus);
+      this.conidia.getPointData().setActiveScalars('dead');
+      this.vtk.conidiaMapper.setInputData(this.conidia, 0);
 
-      const vertexConidia = [];
-      const vertexHyphae = [];
-      this.afumigatus.getPointData().getArray('state').getData().forEach((v, index) => {
-        if (v === 1 /* RESTING_CONIDIA */ || v === 2 /* SWELLING_CONIDIA */) {
-          vertexConidia.push(index);
-        }
-        if (v === 4/* HYPHAE */) {
-          vertexHyphae.push(index);
-        }
-      });
-
-      // vertexConidia.insert(0, vertexConidia.length);
-      // vertexHyphae.insert(0, vertexHyphae.length);
-
-      conidia.getVerts().setData(Uint16Array.from(vertexConidia));
-      hyphae.getVerts().setData(Uint16Array.from(vertexHyphae));
-      this.vtk.conidiaMapper.setInputData(conidia, 0);
-      this.vtk.hyphaeMapper.setInputData(hyphae, 0);
+      this.hyphae.getPointData().setActiveScalars('dead');
+      this.vtk.hyphaeMapper.setInputData(this.hyphae, 0);
 
       this.macrophage.getPointData().setActiveScalars('dead');
       this.vtk.macrophageMapper.setInputData(this.macrophage, 0);
@@ -421,22 +440,11 @@ export default {
 
       // hyphae are cylinders
 
-      this.vtk.hyphaeGlyphSource = vtkCylinderSource.newInstance({
-        height: 40,
+      this.vtk.hyphaeMapper = vtkStickMapper.newInstance({
         radius: 10,
-        resolution: 10,
+        length: 40, // hyphae are 40 µm long
+        scaleArray: 5,
       });
-      this.vtk.hyphaeMapper = vtkGlyph3DMapper.newInstance({
-        scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
-        scaleArray: 'scale',
-        scaleFactor: 5, // Note, should be ~3µm for accuracy but we need to see them
-        colorMode: ColorMode.DIRECT_SCALARS,
-      });
-      this.vtk.hyphaeMapper
-        .setInputConnection(this.vtk.afumigatusColorFilter.getOutputPort(), 0);
-      this.vtk.hyphaeMapper
-        .setInputConnection(this.vtk.hyphaeGlyphSource.getOutputPort(), 1);
-
       this.vtk.hyphaeActor = vtkActor.newInstance();
       this.vtk.hyphaeActor.setMapper(this.vtk.hyphaeMapper);
       this.vtk.renderer.addActor(this.vtk.hyphaeActor);
