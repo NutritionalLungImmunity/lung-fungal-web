@@ -22,6 +22,9 @@
 </template>
 
 <script>
+/* eslint-disable no-plusplus */
+// import vtk from 'vtk.js/Sources/vtk';
+import vtkDataArray from 'vtk.js/Sources/Common/Core/DataArray';
 import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
 import vtkCalculator from 'vtk.js/Sources/Filters/General/Calculator';
 import vtkColorTransferFunction from 'vtk.js/Sources/Rendering/Core/ColorTransferFunction';
@@ -80,7 +83,41 @@ export default {
       return this.simulation.timeSteps[this.timeStep];
     },
     afumigatus() {
-      return this.state.afumigatus;
+      const afumigatus = vtkPolydata.newInstance();
+      afumigatus.shallowCopy(this.state.afumigatus);
+      const numFungalCells = afumigatus.getPoints().getNumberOfPoints();
+
+      const vec = afumigatus.getPointData().getArray('vec').getData();
+      const orientation = new Float32Array(numFungalCells * 3);
+      for (let index = 0; index < numFungalCells; index++) {
+        const offset = index * 3;
+        orientation[offset + 0] = vec[offset + 2];
+        orientation[offset + 1] = vec[offset + 1];
+        orientation[offset + 2] = vec[offset + 0];
+      }
+      const da = vtkDataArray.newInstance({
+        name: 'orientation',
+        numberOfComponents: 3,
+        values: orientation,
+      });
+      afumigatus.getPointData().addArray(da);
+
+      // const pts = afumigatus.getPoints().getData();
+      // const centers = new Float32Array(numFungalCells * 3);
+      // for (let index = 0; index < numFungalCells; index++) {
+      //   const offset = index * 3;
+      //   centers[offset + 0] = pts[offset + 0] + 20 * vec[offset + 2];
+      //   centers[offset + 1] = pts[offset + 1] + 20 * vec[offset + 1];
+      //   centers[offset + 2] = pts[offset + 2] + 20 * vec[offset + 0];
+      // }
+      // const da2 = vtkDataArray.newInstance({
+      //   name: 'centers',
+      //   numberOfComponents: 3,
+      //   values: centers,
+      // });
+      // afumigatus.getPointData().addArray(da2);
+
+      return afumigatus;
     },
     conidia() {
       const conidia = vtkPolydata.newInstance();
@@ -111,6 +148,10 @@ export default {
 
       hyphae.getVerts().setData(Uint16Array.from(vertexHyphae));
       return hyphae;
+      // for loop over vec to compute orientation
+      // shallow copy vtkPolydata
+      // add arrays
+      // hyphae.getPointData().addArray(vtkdataarray with name)
     },
     geometry() {
       return this.state.geometry;
@@ -333,7 +374,7 @@ export default {
 
       this.hyphae.getPointData().setActiveScalars('dead');
       this.vtk.hyphaeMapper.setInputData(this.hyphae, 0);
-      this.vtk.hyphaeMapper.setOrientationArray('vec');
+      this.vtk.hyphaeMapper.setOrientationArray('orientation');
 
       this.macrophage.getPointData().setActiveScalars('dead');
       this.vtk.macrophageMapper.setInputData(this.macrophage, 0);
@@ -418,7 +459,6 @@ export default {
       );
 
       // conidia are spheres
-
       this.vtk.conidiaGlyphSource = vtkSphereSource.newInstance({
         thetaResolution: SPHERE_RESOLUTION,
         phiResolution: SPHERE_RESOLUTION,
@@ -427,7 +467,7 @@ export default {
       this.vtk.conidiaMapper = vtkGlyph3DMapper.newInstance({
         scaleMode: vtkGlyph3DMapper.ScaleModes.SCALE_BY_MAGNITUDE,
         scaleArray: 'scale',
-        scaleFactor: 5, // Note, should be ~3µm for accuracy but we need to see them
+        scaleFactor: 3,
         colorMode: ColorMode.DIRECT_SCALARS,
       });
       this.vtk.conidiaMapper
@@ -442,7 +482,7 @@ export default {
       // hyphae are cylinders
 
       this.vtk.hyphaeMapper = vtkStickMapper.newInstance({
-        radius: 10,
+        radius: 3,
         length: 40, // hyphae are 40 µm long
         scaleArray: 5,
       });
