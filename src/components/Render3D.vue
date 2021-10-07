@@ -102,21 +102,6 @@ export default {
       });
       afumigatus.getPointData().addArray(da);
 
-      // const pts = afumigatus.getPoints().getData();
-      // const centers = new Float32Array(numFungalCells * 3);
-      // for (let index = 0; index < numFungalCells; index++) {
-      //   const offset = index * 3;
-      //   centers[offset + 0] = pts[offset + 0] + 20 * vec[offset + 2];
-      //   centers[offset + 1] = pts[offset + 1] + 20 * vec[offset + 1];
-      //   centers[offset + 2] = pts[offset + 2] + 20 * vec[offset + 0];
-      // }
-      // const da2 = vtkDataArray.newInstance({
-      //   name: 'centers',
-      //   numberOfComponents: 3,
-      //   values: centers,
-      // });
-      // afumigatus.getPointData().addArray(da2);
-
       return afumigatus;
     },
     conidia() {
