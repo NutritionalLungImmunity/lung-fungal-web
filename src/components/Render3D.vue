@@ -564,6 +564,7 @@ export default {
       this.vtk.pneumocyteMapper.setLookupTable(this.vtk.pneumocyteLookupTable);
 
       this.vtk.pneumocyteActor = vtkActor.newInstance();
+      this.vtk.pneumocyteActor.getProperty().setColor(174 / 255, 65 / 255, 186 / 255);
       this.vtk.pneumocyteActor.setMapper(this.vtk.pneumocyteMapper);
 
       // TODO: Rendering can be disabled here
