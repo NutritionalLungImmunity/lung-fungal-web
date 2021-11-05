@@ -30,14 +30,12 @@ function toFixedIfNumeric(value) {
 }
 const fungusValueMap = {
   status: {
-    // 99: 'drifting',
-    0: 'resting',
-    1: 'swollen',
-    2: 'germ tube',
-    3: 'hyphae',
-    4: 'dying',
-    5: 'dead',
-    6: 'sterile conidia',
+    0: 'Dead',
+    1: 'Resting conidia',
+    2: 'Swelling conidia',
+    3: 'Germ tube',
+    4: 'Hyphae',
+    5: 'Sterile conidia',
   },
   state: {
     0: 'free',
@@ -105,7 +103,7 @@ const pneumocyteValueMap = {
 };
 
 const valueMappers = {
-  'A. fumigatus': fungusValueMap,
+  afumigatus: fungusValueMap,
   macrophage: macrophageValueMap,
   neutrophil: neutrophilValueMap,
   pneumocyte: pneumocyteValueMap,
